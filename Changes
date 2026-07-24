@@ -1,3 +1,11 @@
+- version: 0.1.2
+  date:    Fri Jul 24 05:45:35 PM EDT 2026
+  changes:
+  - Add OpenBSD and NetBSD releases
+  - Add native BB REPL
+  - Add browser Wasm BB REPL
+  - Document installation and publish site on release
+
 - version: 0.1.1
   date:    Fri Jul 24 04:15:42 PM EDT 2026
   changes:
