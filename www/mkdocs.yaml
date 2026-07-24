@@ -46,8 +46,12 @@ theme:
 extra_css:
   - css/extra.css
 
+extra_javascript:
+  - javascripts/repl.js
+
 nav:
   - Gobb: index.md
+  - REPL: repl.md
   - Implementation: implementation.md
   - Roadmap: roadmap.md
 

@@ -103,7 +103,7 @@ One capability layer covers interpreted and compiled programs.
 | Processes | Planned | Unavailable | Unavailable |
 | HTTP client | Planned | Host-limited | Planned |
 | TCP/UDP | Planned | Host-limited | Browser-limited |
-| Terminal REPL | Planned | Host-limited | Web UI |
+| Terminal REPL | Planned | Host-limited | [BB loop prototype](repl.md) |
 
 Unavailable operations use structured exception data:
 

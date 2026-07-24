@@ -2,4 +2,6 @@ bin/
 dist/
 www/site/
 www/venv/
+www/docs/repl/gobb.wasm
+www/docs/repl/wasm_exec.js
 /*.clj

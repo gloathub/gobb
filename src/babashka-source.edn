@@ -15,4 +15,17 @@
  {babashka.impl.exceptions
   {:disposition :upstream
    :path "babashka/impl/exceptions.clj"
-   :reason "Pure namespace with no SCI, JVM, or Graal dependency"}}}
+   :reason "Pure namespace with no SCI, JVM, or Graal dependency"}
+
+  babashka.impl.clojure.main
+  {:disposition :adapted
+   :path "babashka/impl/clojure/main.clj"
+   :target-namespace gobb.bb-repl
+   :forms [with-bindings repl]
+   :reason "BB's reusable REPL loop, projected without its JVM-only default reader"
+   :adaptations
+   ["Use a portable always-prompt default instead of LineNumberingPushbackReader"
+    "Use generated symbols for the two JVM Object sentinels"
+    "Omit the JVM-only *math-context* thread binding"
+    "Use portable string and identity error handling instead of JVM Throwable accessors"
+    "Name wrapped print errors :gobb/error instead of :sci/error"]}}}

@@ -23,6 +23,8 @@ BABASHKA-SOURCE := $(or $(BABASHKA_DIR),$(BABASHKA-SOURCE-CACHE))
 BABASHKA-SOURCE-STAMP := $(LOCAL-CACHE)/.babashka-src-$(BABASHKA-SOURCE-TAG)
 SOURCE-STAGE := $(TOP)/.cache/source-stage
 SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
+REPL-SOURCE-STAGE := $(TOP)/.cache/repl-source-stage
+REPL-SOURCE-STAGE-STAMP := $(REPL-SOURCE-STAGE)/.stamp
 SOURCE-MANIFEST := $(TOP)/src/babashka-source.edn
 STAGE-SOURCES := $(TOP)/util/stage-sources
 VERSION-FILE := $(TOP)/VERSION
@@ -31,6 +33,8 @@ GOBB-SOURCES := $(shell \
 BABASHKA-SOURCES := $(shell \
   find '$(BABASHKA-SOURCE)/src' -type f -name '*.clj' 2>/dev/null)
 GOBB := $(TOP)/bin/gobb
+GOBB-WASM := $(TOP)/www/docs/repl/gobb.wasm
+WASM-EXEC := $(TOP)/www/docs/repl/wasm_exec.js
 RELEASE := $(TOP)/util/release
 RELEASE-DIST := $(TOP)/util/release-dist
 DIST := $(TOP)/dist
@@ -42,6 +46,9 @@ MAKES-CLEAN := \
   $(DIST) \
   $(RELEASE-BUILD) \
   $(SOURCE-STAGE) \
+  $(REPL-SOURCE-STAGE) \
+  $(GOBB-WASM) \
+  $(WASM-EXEC) \
 
 MAKES-REALCLEAN := \
   $(BABASHKA-SOURCE-CACHE) \
@@ -93,6 +100,25 @@ $(SOURCE-STAGE-STAMP): \
 
 stage: $(SOURCE-STAGE-STAMP)
 
+$(REPL-SOURCE-STAGE-STAMP): \
+  $(BABASHKA-SOURCE-DEP) \
+  $(BABASHKA-SOURCES) \
+  $(BB) \
+  $(GOBB-SOURCES) \
+  $(SOURCE-MANIFEST) \
+  $(STAGE-SOURCES) \
+  $(VERSION-FILE)
+	@$(ECHO) "* Staging the Gobb browser REPL"
+	$Q $(BB) '$(STAGE-SOURCES)' \
+	  '$(SOURCE-MANIFEST)' \
+	  '$(BABASHKA-SOURCE)' \
+	  '$(TOP)/src' \
+	  '$(REPL-SOURCE-STAGE)' \
+	  '$(VERSION-FILE)' \
+	  'gobb.web-repl'
+	$Q touch '$@'
+	@$(ECHO)
+
 $(GOBB): $(SOURCE-STAGE-STAMP) $(GLOAT)
 	@$(ECHO) "* Building Gobb"
 	$Q mkdir -p '$(@D)'
@@ -105,6 +131,27 @@ $(GOBB): $(SOURCE-STAGE-STAMP) $(GLOAT)
 	@$(ECHO)
 
 build: $(GOBB)
+
+$(GOBB-WASM): $(REPL-SOURCE-STAGE-STAMP) $(GLOAT)
+	@$(ECHO) "* Building the Gobb browser REPL"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(REPL-SOURCE-STAGE)' \
+	  --out='$@' \
+	  --to=js \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
+$(WASM-EXEC): $(GLOAT)
+	@$(ECHO) "* Installing the Go Wasm browser runtime"
+	$Q mkdir -p '$(@D)'
+	$Q go="$$( $(GLOAT) --which=go )"; \
+	  cp "$$($$go env GOROOT)/lib/wasm/wasm_exec.js" '$@'
+	@$(ECHO)
+
+repl-wasm: $(GOBB-WASM) $(WASM-EXEC)
 
 install: $(GOBB)
 	$Q install -d '$(DESTDIR)$(PREFIX)/bin'
@@ -139,10 +186,10 @@ release: $(GH) $(WASMTIME)
 source-ledger: $(SOURCE-STAGE-STAMP)
 	@cat '$(SOURCE-STAGE)/ledger.edn'
 
-site:
+site: repl-wasm
 	$(MAKE) -C www site
 
-serve publish:
+serve publish: repl-wasm
 	$(MAKE) -C www $@
 
 serve-www: serve

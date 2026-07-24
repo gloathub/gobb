@@ -76,6 +76,7 @@ Gobb has completed its repository foundation and started native execution:
 - [x] Pinned, Make-managed Babashka source integration
 - [x] First Gloat-compiled Glojure runtime executable
 - [x] Initial source ledger and differential BB tests
+- [x] Browser-Wasm BB REPL proof at [gobb.site/repl](https://gobb.site/repl/)
 - [ ] BB-compatible execution shell
 - [ ] Project dependencies, tasks, pods, and bundled libraries
 - [ ] Production `gobb build` command
@@ -126,6 +127,7 @@ make install PREFIX=/some/path
 | `deps` | Download and verify the pinned Babashka source checkout. |
 | `stage` | Generate the source tree selected from Gobb and Babashka. |
 | `test` | Build Gobb and run native and differential BB tests. |
+| `repl-wasm` | Compile the Babashka-derived browser REPL and install its Go Wasm runtime. |
 | `source-ledger` | Print the generated Babashka namespace compatibility ledger. |
 | `release-prep VERSION=X.Y.Z` | Update `VERSION` and prepend generated release notes to `Changes`. |
 | `release-dist VERSION=X.Y.Z` | Build the cross-platform release archives and checksums. |
@@ -192,6 +194,9 @@ make publish
 ```
 
 The public site is <https://gobb.site/>.
+Its [live REPL](https://gobb.site/repl/) runs Babashka's reusable REPL loop,
+adapted for Gobb and compiled to browser WebAssembly by Gloat. Evaluation is
+performed by Glojure rather than SCI.
 
 ## Repository Layout
 

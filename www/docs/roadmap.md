@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Native execution</p>
+    <p class="summary-value">Browser REPL proof</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">1 / 14</p>
+    <p class="summary-value">2 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,12 +21,14 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 12%"></span>
+  <span style="width: 18%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
 files, and stdin through Glojure and is compiled to a native binary by Gloat.
-This is an architecture proof, not yet a general BB replacement.
+The same architecture now powers a live browser-Wasm REPL using Babashka's
+reusable REPL loop. This remains an architecture proof, not yet a general BB
+replacement.
 
 ## Completed foundation
 
@@ -48,6 +50,7 @@ This is an architecture proof, not yet a general BB replacement.
       <li class="task-done">Clean Make-managed tool provisioning validated</li>
       <li class="task-done">Runtime build and test targets added</li>
       <li class="task-done">Install, cross-platform release, and final website publication automated</li>
+      <li class="task-done">Live browser-Wasm REPL added to the website</li>
     </ul>
   </div>
 </div>
@@ -73,6 +76,8 @@ This is an architecture proof, not yet a general BB replacement.
       <li class="task-done">Focused differential tests against BB</li>
       <li>Runtime <code>require</code> and classpath loading</li>
       <li class="task-done">WASI and browser-Wasm smoke artifacts</li>
+      <li class="task-done">Babashka REPL loop compiled with Gloat for the browser</li>
+      <li class="task-done">Persistent REPL values and <code>*1</code> history verified</li>
     </ul>
   </div>
 </div>
@@ -103,10 +108,13 @@ Git submodules to this repository.
 - A generated source staging tree gives each namespace exactly one provider
   and rejects duplicates or missing selected files.
 - The machine-readable source ledger currently discovers all 67 core
-  Babashka namespaces: 1 is compiled unchanged from upstream and 66 are
-  deferred pending compatibility work.
+  Babashka namespaces: 1 is compiled unchanged, 1 is adapted at staging time,
+  and 65 are deferred pending compatibility work.
 - The upstream proof namespace is `babashka.impl.exceptions`; the executable
   entry point is the Gobb-owned `gobb.cli`.
+- `babashka.impl.clojure.main/repl` and its binding helper are projected from
+  the pinned source into `gobb.bb-repl`. The staging ledger records the small
+  set of JVM/SCI-specific adaptations rather than vendoring a fork.
 
 The build interface is now:
 
@@ -114,6 +122,7 @@ The build interface is now:
 make deps           # Download and verify pinned Babashka source
 make build          # Build bin/gobb with Gloat
 make test           # Run native and differential BB tests
+make repl-wasm      # Build the browser BB REPL with Gloat
 make source-ledger  # Print the generated namespace ledger
 ```
 
@@ -126,17 +135,17 @@ also removes the downloaded Babashka source checkout.
   GraalVM substitutions, or libraries that have not been ported.
 - Runtime `require`, project classpaths, `bb.edn`, and `deps.edn` are not
   supported yet.
-- Tasks, subprocesses, filesystem compatibility, networking, pods, and REPL
-  services remain unimplemented.
-- Native builds are verified; Wasm builds have not yet been attempted.
+- Tasks, subprocesses, filesystem compatibility, networking, pods, and
+  network REPL services remain unimplemented.
+- The browser REPL is a focused proof. Terminal editing, nREPL, socket REPL,
+  classpath loading, and the rest of BB's interactive surface remain.
 - The current source reader wraps input in one `do` form. Shebang handling and
   exact BB reader edge cases remain for a later CLI-compatibility pass.
 
 ## Next concrete slice
 
-Add runtime `require` and ordered classpath loading to the native executable,
-extend the differential harness for namespace loading, then compile the same
-smoke program to WASI.
+Add runtime `require` and ordered classpath loading to the native executable
+and browser REPL, then extend the differential harness for namespace loading.
 
 ## Planned milestones
 
