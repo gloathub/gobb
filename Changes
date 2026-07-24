@@ -1,3 +1,8 @@
+- version: 0.1.1
+  date:    Fri Jul 24 04:15:42 PM EDT 2026
+  changes:
+  - Replace website hero image
+
 - version: 0.1.0
   date:    Fri Jul 24 15:25:48 EDT 2026
   changes:
