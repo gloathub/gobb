@@ -20,7 +20,13 @@ BABASHKA-SOURCE-CACHE := $(LOCAL-CACHE)/babashka-src-$(BABASHKA-SOURCE-TAG)
 BABASHKA-SOURCE := $(or $(BABASHKA_DIR),$(BABASHKA-SOURCE-CACHE))
 BABASHKA-SOURCE-STAMP := $(LOCAL-CACHE)/.babashka-src-$(BABASHKA-SOURCE-TAG)
 SOURCE-STAGE := $(TOP)/.cache/source-stage
+SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
 SOURCE-MANIFEST := $(TOP)/src/babashka-source.edn
+STAGE-SOURCES := $(TOP)/util/stage-sources
+GOBB-SOURCES := $(shell \
+  find '$(TOP)/src/gobb' -type f -name '*.clj' 2>/dev/null)
+BABASHKA-SOURCES := $(shell \
+  find '$(BABASHKA-SOURCE)/src' -type f -name '*.clj' 2>/dev/null)
 GOBB := $(TOP)/bin/gobb
 
 MAKES-CLEAN := \
@@ -57,16 +63,25 @@ ifndef BABASHKA_DIR
 	  "$(BABASHKA-SOURCE-REVISION)"
 endif
 
-stage: deps $(BB)
+$(SOURCE-STAGE-STAMP): \
+  $(BABASHKA-SOURCE-DEP) \
+  $(BABASHKA-SOURCES) \
+  $(BB) \
+  $(GOBB-SOURCES) \
+  $(SOURCE-MANIFEST) \
+  $(STAGE-SOURCES)
 	@$(ECHO) "* Staging Gobb and selected Babashka sources"
-	$Q $(BB) util/stage-sources \
+	$Q $(BB) '$(STAGE-SOURCES)' \
 	  '$(SOURCE-MANIFEST)' \
 	  '$(BABASHKA-SOURCE)' \
 	  '$(TOP)/src' \
 	  '$(SOURCE-STAGE)'
+	$Q touch '$@'
 	@$(ECHO)
 
-$(GOBB): stage $(GLOAT)
+stage: $(SOURCE-STAGE-STAMP)
+
+$(GOBB): $(SOURCE-STAGE-STAMP) $(GLOAT)
 	@$(ECHO) "* Building Gobb"
 	$Q mkdir -p '$(@D)'
 	$Q $(GLOAT) '$(SOURCE-STAGE)' \
@@ -82,7 +97,7 @@ build: $(GOBB)
 test: $(GOBB) $(BB)
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 
-source-ledger: stage
+source-ledger: $(SOURCE-STAGE-STAMP)
 	@cat '$(SOURCE-STAGE)/ledger.edn'
 
 site:
@@ -105,6 +120,3 @@ distclean::
 	$(MAKE) -C www distclean
 
 include $M/shell.mk
-
-.PHONY: build deps stage test source-ledger
-.PHONY: site serve publish serve-www publish-www
