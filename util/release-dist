@@ -34,6 +34,10 @@ platforms=(
   windows_arm64
   freebsd_amd64
   freebsd_arm64
+  openbsd_amd64
+  openbsd_arm64
+  netbsd_amd64
+  netbsd_arm64
   wasip1_wasm
   js_wasm
 )

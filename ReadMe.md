@@ -161,9 +161,20 @@ third-party notices, and upstream license texts. Unix, macOS, FreeBSD, and
 Wasm artifacts use `.tar.gz`; Windows artifacts use `.zip`. SHA-256 checksums
 are published alongside the archives.
 
-The release matrix covers Linux (`amd64`, `arm64`, and ARMv6), macOS
-(`amd64` and `arm64`), Windows (`amd64` and `arm64`), FreeBSD (`amd64` and
-`arm64`), WASI, and browser WebAssembly.
+### Release Platforms
+
+Gobb builds release binaries for:
+
+| Platform | Architectures | Release identifiers |
+| --- | --- | --- |
+| Linux | `amd64`, `arm64`, ARMv6 | `linux_amd64`, `linux_arm64`, `linux_armv6` |
+| macOS | `amd64`, `arm64` | `darwin_amd64`, `darwin_arm64` |
+| Windows | `amd64`, `arm64` | `windows_amd64`, `windows_arm64` |
+| FreeBSD | `amd64`, `arm64` | `freebsd_amd64`, `freebsd_arm64` |
+| OpenBSD | `amd64`, `arm64` | `openbsd_amd64`, `openbsd_arm64` |
+| NetBSD | `amd64`, `arm64` | `netbsd_amd64`, `netbsd_arm64` |
+| WASI | `wasm` | `wasip1_wasm` |
+| Browser WebAssembly | `wasm` | `js_wasm` |
 
 Prepare and review a release, then publish it:
 

@@ -50,6 +50,7 @@ general BB replacement.
       <li class="task-done">Clean Make-managed tool provisioning validated</li>
       <li class="task-done">Runtime build and test targets added</li>
       <li class="task-done">Install, cross-platform release, and final website publication automated</li>
+      <li class="task-done">OpenBSD and NetBSD <code>amd64</code>/<code>arm64</code> release artifacts verified</li>
       <li class="task-done">Live browser-Wasm REPL added to the website</li>
     </ul>
   </div>
