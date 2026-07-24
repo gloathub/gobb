@@ -47,7 +47,7 @@ This is an architecture proof, not yet a general BB replacement.
       <li class="task-done">Branded social cards generated from the hero artwork</li>
       <li class="task-done">Clean Make-managed tool provisioning validated</li>
       <li class="task-done">Runtime build and test targets added</li>
-      <li class="task-done">Install and cross-platform release automation added</li>
+      <li class="task-done">Install, cross-platform release, and final website publication automated</li>
     </ul>
   </div>
 </div>

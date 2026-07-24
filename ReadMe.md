@@ -162,7 +162,8 @@ make release VERSION=0.1.0
 ```
 
 `make release` can perform the preparation and version commit itself when
-starting from a clean checkout. It does not publish the website.
+starting from a clean checkout. After publishing the GitHub release and its
+assets, it publishes the website as the final step.
 
 ## Website
 

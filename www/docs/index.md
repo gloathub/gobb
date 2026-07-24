@@ -33,6 +33,28 @@ hide:
   <span class="status-note">Implementation has just begun.</span>
 </div>
 
+## Install
+
+!!! tip "No language toolchain required"
+
+    The only prerequisites are `git`, `make`, `curl`, and a Bash binary.
+    You do not need Go, Babashka, Glojure, Gloat, Python, or MkDocs
+    pre-installed—Gobb's Makefile provisions its toolchain automatically.
+
+Clone Gobb and install it:
+
+```bash
+git clone https://github.com/clojurestar/gobb
+make -C gobb install
+```
+
+The default prefix is `$HOME/.local`, or `/usr/local` when running as root.
+To choose another installation prefix:
+
+```bash
+make -C gobb install PREFIX=/some/path
+```
+
 ## One runtime, two ways to ship
 
 Gobb is designed to preserve the fast, practical scripting workflows that make

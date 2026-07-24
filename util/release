@@ -175,6 +175,8 @@ publish() {
       "$top"/dist/gobb-"$version"-*
   fi
 
+  make publish-www
+
   echo "Release $tag complete"
 }
 
