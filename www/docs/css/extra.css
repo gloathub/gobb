@@ -85,25 +85,30 @@
   margin-top: 2rem;
 }
 
-.hero-visual {
+.md-typeset .hero-visual {
   position: relative;
   z-index: 1;
-  align-self: stretch;
-  min-height: 25rem;
+  align-self: center;
+  justify-self: end;
+  width: min(100%, 24rem);
   margin: 0;
-  overflow: hidden;
+}
+
+.hero-visual img {
+  display: block;
+  width: 100%;
+  height: auto;
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 1rem;
   background: #100b0c;
   box-shadow: 0 1rem 2.5rem rgba(14, 7, 29, 0.36);
 }
 
-.hero-visual img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 34%;
+.hero-visual figcaption {
+  margin-top: 0.65rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .md-typeset .button {
@@ -372,7 +377,7 @@
   }
 
   .hero-visual {
-    min-height: 24rem;
+    justify-self: center;
   }
 
   .feature-grid,

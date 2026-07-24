@@ -2,9 +2,9 @@
 
 **Go + BB**
 
-Gobb is a Go-native implementation of the
-[Babashka](https://babashka.org/) experience. It uses
-[Gloat](https://gloathub.org/) to build native binaries and
+Gobb is a Go-native implementation of the [Babashka](https://babashka.org/)
+experience.
+It uses [Gloat](https://gloathub.org/) to build native binaries and
 [Glojure](https://github.com/glojurelang/glojure) as its full Clojure runtime,
 without SCI, GraalVM, or a JVM.
 
@@ -16,15 +16,17 @@ gobb build script.clj -o app --platform linux/amd64
 ```
 
 > [!IMPORTANT]
-> Gobb is an early architecture proof, not yet a general BB replacement. The
-> first native executable evaluates expressions, files, and stdin through
+> Gobb is an early architecture proof, not yet a general BB replacement.
+> The first native executable evaluates expressions, files, and stdin through
 > Glojure and is compiled by Gloat.
 
 ## Goals
 
-- Preserve BB's familiar script, expression, stdin, task, dependency, pod, and
-  REPL workflows.
-- Use Glojure directly instead of rebuilding BB's SCI host layer.
+- Create a compatible-as-possible bb built on Go.
+- Use the fully Clojure capable Glojure runtime instead of SCI.
+- Build with Gloat rather than GraalVM.
+  - Builds in seconds vs minutes
+  - Supports myriad platforms beyond GraalVM (including Wasm)
 - Run the same project dynamically or compile it through Gloat.
 - Target Linux, macOS, Windows, WASI, and browser WebAssembly.
 - Grow support for Java-dependent Clojure libraries through
@@ -33,9 +35,9 @@ gobb build script.clj -o app --platform linux/amd64
 - Test compatibility against a pinned BB executable and publish the measured
   progress.
 
-General Java bytecode execution is not a goal. Libraries that refer to Java
-classes become compatible as those classes gain Glojure/gojava or native Go
-implementations.
+General Java bytecode execution is not a goal.
+Libraries that refer to Java classes become compatible as those classes gain
+Glojure/gojava or native Go implementations.
 
 ## Architecture
 
@@ -54,9 +56,9 @@ BB-compatible CLI and project behavior
 ```
 
 Glojure supplies Clojure reading, evaluation, namespaces, Vars, dynamic
-bindings, loading, and runtime compilation. Gobb supplies BB-compatible CLI
-policy, tasks, dependency handling, bundled features, platform capabilities,
-and packaging.
+bindings, loading, and runtime compilation.
+Gobb supplies BB-compatible CLI policy, tasks, dependency handling, bundled
+features, platform capabilities, and packaging.
 
 Reusable runtime, compiler, and Java compatibility improvements belong in
 Glojure, gojava, or Gloat rather than Gobb-specific forks.
@@ -92,20 +94,43 @@ bin/gobb -e '(+ 1 2)'
 ```
 
 The Makefile downloads and verifies the pinned Babashka source checkout in the
-ignored local cache. Gobb does not use Git submodules or commit copied
-Babashka source. For development, select an existing checkout with:
+ignored local cache.
+Gobb does not use Git submodules or commit copied Babashka source.
+For development, select an existing checkout with:
 
 ```bash
 make build BABASHKA_DIR=~/src/babashka
 ```
 
-Run the native and differential BB tests with `make test`. Print the generated
-Babashka namespace compatibility ledger with `make source-ledger`.
+Run the native and differential BB tests with `make test`.
+Print the generated Babashka namespace compatibility ledger with `make
+source-ledger`.
+
+## Makefile Targets
+
+| Target | Description |
+| --- | --- |
+| `build` | Build the native `bin/gobb` executable with Gloat. |
+| `deps` | Download and verify the pinned Babashka source checkout. |
+| `stage` | Generate the source tree selected from Gobb and Babashka. |
+| `test` | Build Gobb and run native and differential BB tests. |
+| `source-ledger` | Print the generated Babashka namespace compatibility ledger. |
+| `site` | Build the MkDocs website in strict mode. |
+| `serve` | Serve the website locally with live reload. |
+| `publish` | Build and publish the website to the `gh-pages` branch. |
+| `clean` | Remove the Gobb binary, staged source, and generated website. |
+| `realclean` | Also remove downloaded Babashka source and the website environment. |
+| `distclean` | Also remove the locally bootstrapped Makes checkout. |
+
+`serve-www` and `publish-www` are aliases for `serve` and `publish`.
+Set `BABASHKA_DIR` to use a local Babashka checkout or `GLOAT_DIR` to use a
+local Gloat checkout.
 
 ## Website
 
-The project website is built with MkDocs Material. All tools are installed
-locally through [Makes](https://github.com/makeplus/makes).
+The project website is built with MkDocs Material.
+All tools are installed locally through
+[Makes](https://github.com/makeplus/makes).
 
 Start the development server:
 
@@ -138,7 +163,6 @@ The public site is <https://clojurestar.github.io/gobb/>.
 ├── src/               # Gobb source and Babashka source-selection manifest
 ├── test/              # Native and differential BB tests
 ├── util/              # Source staging tools
-├── note/              # Local, ignored planning notes
 └── www/               # MkDocs source and website automation
 ```
 
@@ -152,13 +176,14 @@ attribution notices.
 
 ## Related Projects
 
-- [Babashka](https://github.com/babashka/babashka) — behavior and
-  compatibility target
-- [Glojure](https://github.com/glojurelang/glojure) — full Clojure runtime in
-  Go
-- [Gloat](https://github.com/gloathub/gloat) — Clojure-to-Go compilation and
-  cross-compilation
-- [gojava](https://github.com/gloathub/gojava) — JVM-faithful APIs implemented
-  in Go
-- [Makes](https://github.com/makeplus/makes) — reproducible repository
+- [Babashka](https://github.com/babashka/babashka) -
+  Behavior and compatibility target
+- [Glojure](https://github.com/glojurelang/glojure) -
+  Full Clojure runtime in Go
+- [Gloat](https://github.com/gloathub/gloat) -
+  Clojure-to-Go compilation and cross-compilation
+- [gojava](https://github.com/gloathub/gojava) -
+  JVM-faithful APIs implemented in Go
+- [Makes](https://github.com/makeplus/makes) -
+  Jreproducible repository
   automation
