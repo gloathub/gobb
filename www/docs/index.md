@@ -22,7 +22,7 @@ hide:
     </div>
   </div>
   <figure class="hero-visual">
-    <img src="img/gobb.png" alt="Gobb project artwork">
+    <img src="img/gobb.jpg" alt="Gobb project artwork">
     <figcaption><em>It's not a trick, it's an illusion.</em></figcaption>
   </figure>
 </section>
