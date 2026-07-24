@@ -43,6 +43,8 @@ This is an architecture proof, not yet a general BB replacement.
       <li class="task-done">Architecture and complete roadmap written</li>
       <li class="task-done">Initial MkDocs website created</li>
       <li class="task-done"><code>make serve</code> and <code>make publish</code> wired</li>
+      <li class="task-done"><code>gobb.site</code> custom domain configured</li>
+      <li class="task-done">Branded social cards generated from the hero artwork</li>
       <li class="task-done">Clean Make-managed tool provisioning validated</li>
       <li class="task-done">Runtime build and test targets added</li>
     </ul>

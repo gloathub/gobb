@@ -63,9 +63,8 @@ features, platform capabilities, and packaging.
 Reusable runtime, compiler, and Java compatibility improvements belong in
 Glojure, gojava, or Gloat rather than Gobb-specific forks.
 
-See the
-[implementation details](https://clojurestar.github.io/gobb/implementation/)
-for the full design.
+See the [implementation details](https://gobb.site/implementation/) for the
+full design.
 
 ## Project Status
 
@@ -81,8 +80,7 @@ Gobb has completed its repository foundation and started native execution:
 - [ ] Project dependencies, tasks, pods, and bundled libraries
 - [ ] Production `gobb build` command
 
-Follow the [live roadmap](https://clojurestar.github.io/gobb/roadmap/) for
-current progress.
+Follow the [live roadmap](https://gobb.site/roadmap/) for current progress.
 
 ## Build and Test
 
@@ -152,7 +150,7 @@ Publish the generated site to the `gh-pages` branch:
 make publish
 ```
 
-The public site is <https://clojurestar.github.io/gobb/>.
+The public site is <https://gobb.site/>.
 
 ## Repository Layout
 

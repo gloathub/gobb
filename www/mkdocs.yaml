@@ -1,5 +1,5 @@
 site_name: Gobb
-site_url: https://clojurestar.github.io/gobb/
+site_url: https://gobb.site/
 site_description:
   A Go-native Babashka powered by Gloat and the full Glojure runtime
 site_author: Ingy dot Net
@@ -76,6 +76,10 @@ markdown_extensions:
 plugins:
   - search:
       separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - social:
+      cards_layout_dir: layouts
+      cards_layout: gobb
+      cache_dir: ../.cache/plugin/social
 
 extra:
   social:

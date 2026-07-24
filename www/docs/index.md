@@ -1,6 +1,9 @@
 ---
 title: Gobb
 description: A Go-native Babashka powered by Gloat and Glojure
+social:
+  cards_layout_options:
+    title: Gobb · Go + bb!
 hide:
   - navigation
   - toc

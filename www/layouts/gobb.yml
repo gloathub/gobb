@@ -1,0 +1,99 @@
+definitions:
+  - &page_title >-
+    {%- if layout.title -%}
+      {{ layout.title }}
+    {%- else -%}
+      {{ page.meta.get("title", page.title) }}
+    {%- endif -%}
+
+  - &page_title_with_site_name >-
+    {%- if layout.title -%}
+      {{ layout.title }}
+    {%- elif not page.is_homepage -%}
+      {{ page.meta.get("title", page.title) }} - {{ config.site_name }}
+    {%- else -%}
+      {{ page.meta.get("title", page.title) }}
+    {%- endif -%}
+
+  - &page_description >-
+    {%- if layout.description -%}
+      {{ layout.description }}
+    {%- else -%}
+      {{ page.meta.get("description", config.site_description) | x }}
+    {%- endif -%}
+
+  - &font_family >-
+    {%- if layout.font_family -%}
+      {{ layout.font_family }}
+    {%- elif config.theme.font is mapping -%}
+      {{ config.theme.font.get("text", "Roboto") }}
+    {%- else -%}
+      Roboto
+    {%- endif -%}
+
+tags:
+  og:type: website
+  og:title: *page_title_with_site_name
+  og:description: *page_description
+  og:image: "{{ image.url }}"
+  og:image:type: "{{ image.type }}"
+  og:image:width: "{{ image.width }}"
+  og:image:height: "{{ image.height }}"
+  og:url: "{{ page.canonical_url }}"
+  twitter:card: summary_large_image
+  twitter:title: *page_title_with_site_name
+  twitter:description: *page_description
+  twitter:image: "{{ image.url }}"
+
+size: { width: 1200, height: 630 }
+layers:
+  - background:
+      color: "#2c145a"
+
+  - size: { width: 436, height: 538 }
+    offset: { x: 718, y: 46 }
+    background:
+      image: docs/img/gobb.png
+
+  - size: { width: 436, height: 26 }
+    offset: { x: 718, y: 594 }
+    typography:
+      content: "It's not a trick, it's an illusion."
+      align: center
+      color: "#e9ddff"
+      font:
+        family: *font_family
+        style: Italic
+
+  - size: { width: 620, height: 240 }
+    offset: { x: 62, y: 154 }
+    typography:
+      content: *page_title
+      color: "#ffffff"
+      line:
+        amount: 3
+        height: 1.15
+      font:
+        family: *font_family
+        style: Bold
+
+  - size: { width: 620, height: 112 }
+    offset: { x: 64, y: 444 }
+    typography:
+      content: *page_description
+      color: "#e9ddff"
+      line:
+        amount: 3
+        height: 1.4
+      font:
+        family: *font_family
+        style: Regular
+
+  - size: { width: 620, height: 30 }
+    offset: { x: 64, y: 570 }
+    typography:
+      content: https://gobb.site
+      color: "#ff9800"
+      font:
+        family: *font_family
+        style: Bold
