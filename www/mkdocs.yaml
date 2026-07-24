@@ -1,0 +1,86 @@
+site_name: Gobb
+site_url: https://clojurestar.github.io/gobb/
+site_description:
+  A Go-native Babashka powered by Gloat and the full Glojure runtime
+site_author: Ingy dot Net
+
+repo_name: clojurestar/gobb
+repo_url: https://github.com/clojurestar/gobb
+edit_uri: edit/main/www/docs/
+
+theme:
+  name: material
+  favicon: img/favicon.svg
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/cards-playing-spade-multiple
+    repo: fontawesome/brands/github
+
+extra_css:
+  - css/extra.css
+
+nav:
+  - Gobb: index.md
+  - Implementation: implementation.md
+  - Roadmap: roadmap.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/clojurestar/gobb
+      name: Gobb on GitHub
+
+copyright: Copyright &copy; 2026 Ingy dot Net
