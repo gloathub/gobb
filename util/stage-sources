@@ -51,9 +51,13 @@
                           (flat-name namespace)))]
     (fs/copy source target {:replace-existing true})))
 
-(let [[manifest-file babashka-dir gobb-src-dir stage-dir & extra] *command-line-args*]
-  (when (or extra (some nil? [manifest-file babashka-dir gobb-src-dir stage-dir]))
-    (die "usage: stage-sources MANIFEST BABASHKA-DIR GOBB-SRC-DIR STAGE-DIR"))
+(let [[manifest-file babashka-dir gobb-src-dir stage-dir version-file & extra]
+      *command-line-args*]
+  (when (or extra
+            (some nil? [manifest-file babashka-dir gobb-src-dir
+                        stage-dir version-file]))
+    (die (str "usage: stage-sources MANIFEST BABASHKA-DIR GOBB-SRC-DIR "
+              "STAGE-DIR VERSION-FILE")))
   (let [manifest (edn/read-string (slurp manifest-file))
         source-root (fs/path babashka-dir
                              (get-in manifest [:babashka :source-root]))
@@ -91,6 +95,19 @@
         (when-not namespace
           (die "cannot find namespace in " source))
         (stage-file! providers stage-dir namespace source)))
+    (let [version (str/trim (slurp version-file))
+          namespace 'gobb.version
+          target (fs/path stage-dir "gobb_version.clj")]
+      (when (str/blank? version)
+        (die "VERSION file is empty"))
+      (when-let [previous (get @providers namespace)]
+        (die "duplicate namespace " namespace
+             "  first: " previous
+             "  again: " version-file))
+      (swap! providers assoc namespace (str version-file))
+      (spit (str target)
+            (str "(ns gobb.version)\n\n"
+                 "(def version " (pr-str version) ")\n")))
     (spit (str (fs/path stage-dir "ledger.edn"))
           (with-out-str
             (prn {:babashka (:babashka manifest)

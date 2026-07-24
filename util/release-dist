@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+version=${1:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
+gloat=${2:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
+source_stage=${3:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
+babashka_source=${4:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
+top=${5:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
+dist_dir=${6:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
+build_dir=${7:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
+
+version=${version#v}
+[[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+  echo "release-dist: VERSION must have the form X.Y.Z" >&2
+  exit 1
+}
+[[ $(< "$top/VERSION") == "$version" ]] || {
+  echo "release-dist: VERSION=$version does not match $top/VERSION" >&2
+  exit 1
+}
+[[ $dist_dir == "$top/dist" && $build_dir == "$top/.cache/release" ]] || {
+  echo "release-dist: refusing unexpected output directories" >&2
+  exit 1
+}
+
+platforms=(
+  linux_amd64
+  linux_arm64
+  linux_armv6
+  darwin_amd64
+  darwin_arm64
+  windows_amd64
+  windows_arm64
+  freebsd_amd64
+  freebsd_arm64
+  wasip1_wasm
+  js_wasm
+)
+
+rm -rf "$dist_dir" "$build_dir"
+mkdir -p "$dist_dir" "$build_dir/bin" "$build_dir/packages"
+
+build_platform() {
+  local platform=$1 target output name
+  target=${platform/_//}
+  name=gobb
+
+  case $platform in
+    linux_armv6)
+      target=linux/arm
+      ;;
+    windows_*)
+      name=gobb.exe
+      ;;
+    wasip1_wasm)
+      name=gobb.wasm
+      ;;
+    js_wasm)
+      name=gobb.js
+      ;;
+  esac
+
+  output="$build_dir/bin/$platform/$name"
+  mkdir -p "${output%/*}"
+  echo "* Building $platform"
+
+  if [[ $platform == linux_armv6 ]]; then
+    GOARM=6 "$gloat" "$source_stage" \
+      --out="$output" \
+      --platform="$target" \
+      --force \
+      --quiet \
+      --ext=goimports \
+      --module=github.com/clojurestar/gobb
+  else
+    "$gloat" "$source_stage" \
+      --out="$output" \
+      --platform="$target" \
+      --force \
+      --quiet \
+      --ext=goimports \
+      --module=github.com/clojurestar/gobb
+  fi
+}
+
+for platform in "${platforms[@]}"; do
+  build_platform "$platform"
+done
+
+gloat_dir=${gloat%/bin/gloat}
+go_bin=$(find "$gloat_dir/.cache/local" -type f -path '*/bin/go' -print -quit)
+[[ -n $go_bin ]] || {
+  echo "release-dist: cannot locate Gloat's Go executable" >&2
+  exit 1
+}
+go_root=${go_bin%/bin/go}
+go_mod_cache=${go_root%/*}/go/pkg/mod
+license_base="$build_dir/licenses"
+mkdir -p "$license_base/modules"
+
+cp "$babashka_source/LICENSE" "$license_base/Babashka-EPL-1.0.txt"
+cp "$gloat_dir/License" "$license_base/Gloat-MIT.txt"
+cp "$go_root/LICENSE" "$license_base/Go-BSD-3-Clause.txt"
+
+glojure_license=$(
+  find "$gloat_dir/.cache/local/cache" \
+    -path '*/glojure-*/LICENSE.md' -print -quit
+)
+[[ -n $glojure_license ]] || {
+  echo "release-dist: cannot locate the Glojure license" >&2
+  exit 1
+}
+cp "$glojure_license" "$license_base/Glojure-EPL-1.0.txt"
+
+module_list="$license_base/modules.txt"
+"$go_bin" version -m "$build_dir/bin/linux_amd64/gobb" |
+  awk '$1 == "dep" { print $2 "\t" $3 }' |
+  sort -u > "$module_list"
+
+while IFS=$'\t' read -r module module_version; do
+  [[ -n $module && -n $module_version ]] || continue
+  module_dir="$go_mod_cache/$module@$module_version"
+  safe_name=${module//\//_}
+  safe_name=${safe_name//./_}
+  found=0
+
+  if [[ -d $module_dir ]]; then
+    while IFS= read -r license; do
+      cp "$license" \
+        "$license_base/modules/${safe_name}-${license##*/}"
+      found=1
+    done < <(
+      find "$module_dir" -maxdepth 1 -type f \
+        \( -iname 'LICENSE*' -o -iname 'NOTICE*' -o -iname 'COPYING*' \) |
+        sort
+    )
+  fi
+
+  if (( ! found )); then
+    printf '%s %s: no license file in module archive\n' \
+      "$module" "$module_version" \
+      >> "$license_base/modules-without-license-file.txt"
+  fi
+done < "$module_list"
+
+package_platform() {
+  local platform=$1 package_name package_dir archive
+  package_name="gobb-$version-$platform"
+  package_dir="$build_dir/packages/$package_name"
+  mkdir -p "$package_dir/licenses"
+
+  cp "$top/ReadMe.md" "$package_dir/"
+  cp "$top/Changes" "$package_dir/"
+  cp "$top/License" "$package_dir/"
+  cp "$top/ThirdPartyNotices.md" "$package_dir/"
+  cp -R "$license_base/." "$package_dir/licenses/"
+
+  case $platform in
+    windows_*)
+      cp "$build_dir/bin/$platform/gobb.exe" "$package_dir/"
+      archive="$dist_dir/$package_name.zip"
+      (
+        cd "$build_dir/packages"
+        zip -qr "$archive" "$package_name"
+      )
+      ;;
+    wasip1_wasm)
+      cp "$build_dir/bin/$platform/gobb.wasm" "$package_dir/"
+      archive="$dist_dir/$package_name.tar.gz"
+      tar -czf "$archive" -C "$build_dir/packages" "$package_name"
+      ;;
+    js_wasm)
+      cp "$build_dir/bin/$platform/gobb.js" "$package_dir/"
+      cp "$go_root/lib/wasm/wasm_exec.js" "$package_dir/"
+      cp "$go_root/misc/wasm/wasm_exec.html" "$package_dir/gobb.html"
+      sed -i \
+        -e 's|../../lib/wasm/wasm_exec.js|wasm_exec.js|' \
+        -e 's|test\.wasm|gobb.js|' \
+        -e 's|<title>Go wasm</title>|<title>Gobb WebAssembly</title>|' \
+        "$package_dir/gobb.html"
+      archive="$dist_dir/$package_name.tar.gz"
+      tar -czf "$archive" -C "$build_dir/packages" "$package_name"
+      ;;
+    *)
+      cp "$build_dir/bin/$platform/gobb" "$package_dir/"
+      chmod 0755 "$package_dir/gobb"
+      archive="$dist_dir/$package_name.tar.gz"
+      tar -czf "$archive" -C "$build_dir/packages" "$package_name"
+      ;;
+  esac
+}
+
+for platform in "${platforms[@]}"; do
+  package_platform "$platform"
+done
+
+(
+  cd "$dist_dir"
+  find . -maxdepth 1 -type f \
+    \( -name "gobb-$version-*.tar.gz" -o -name "gobb-$version-*.zip" \) \
+    -printf '%f\n' |
+    sort |
+    xargs sha256sum
+) > "$dist_dir/gobb-$version-checksums.txt"
+
+echo "* Created release artifacts"
+find "$dist_dir" -maxdepth 1 -type f -printf '  %f\n' | sort

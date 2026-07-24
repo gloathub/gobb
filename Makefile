@@ -12,6 +12,8 @@ GLOAT-DIR ?= $(or $(GLOAT_DIR),$(LOCAL-CACHE)/gloat-$(GLOAT-VERSION))
 
 include $M/babashka.mk
 include $M/gloat.mk
+include $M/gh.mk
+include $M/wasmtime.mk
 include $M/clean.mk
 
 BABASHKA-SOURCE-TAG := v1.12.218
@@ -23,14 +25,22 @@ SOURCE-STAGE := $(TOP)/.cache/source-stage
 SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
 SOURCE-MANIFEST := $(TOP)/src/babashka-source.edn
 STAGE-SOURCES := $(TOP)/util/stage-sources
+VERSION-FILE := $(TOP)/VERSION
 GOBB-SOURCES := $(shell \
   find '$(TOP)/src/gobb' -type f -name '*.clj' 2>/dev/null)
 BABASHKA-SOURCES := $(shell \
   find '$(BABASHKA-SOURCE)/src' -type f -name '*.clj' 2>/dev/null)
 GOBB := $(TOP)/bin/gobb
+RELEASE := $(TOP)/util/release
+RELEASE-DIST := $(TOP)/util/release-dist
+DIST := $(TOP)/dist
+RELEASE-BUILD := $(TOP)/.cache/release
+PREFIX ?= $(if $(filter 0,$(shell id -u)),/usr/local,$(HOME)/.local)
 
 MAKES-CLEAN := \
   $(GOBB) \
+  $(DIST) \
+  $(RELEASE-BUILD) \
   $(SOURCE-STAGE) \
 
 MAKES-REALCLEAN := \
@@ -69,13 +79,15 @@ $(SOURCE-STAGE-STAMP): \
   $(BB) \
   $(GOBB-SOURCES) \
   $(SOURCE-MANIFEST) \
-  $(STAGE-SOURCES)
+  $(STAGE-SOURCES) \
+  $(VERSION-FILE)
 	@$(ECHO) "* Staging Gobb and selected Babashka sources"
 	$Q $(BB) '$(STAGE-SOURCES)' \
 	  '$(SOURCE-MANIFEST)' \
 	  '$(BABASHKA-SOURCE)' \
 	  '$(TOP)/src' \
-	  '$(SOURCE-STAGE)'
+	  '$(SOURCE-STAGE)' \
+	  '$(VERSION-FILE)'
 	$Q touch '$@'
 	@$(ECHO)
 
@@ -94,8 +106,35 @@ $(GOBB): $(SOURCE-STAGE-STAMP) $(GLOAT)
 
 build: $(GOBB)
 
+install: $(GOBB)
+	$Q install -d '$(DESTDIR)$(PREFIX)/bin'
+	$Q install -m 0755 '$(GOBB)' '$(DESTDIR)$(PREFIX)/bin/gobb'
+
 test: $(GOBB) $(BB)
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
+
+release-prep:
+	@$(if $(filter command line,$(origin VERSION)),,\
+	  $(error VERSION is required on the command line))
+	$Q '$(RELEASE)' prepare '$(VERSION)'
+
+release-dist: $(SOURCE-STAGE-STAMP) $(GLOAT)
+	@$(if $(filter command line,$(origin VERSION)),,\
+	  $(error VERSION is required on the command line))
+	$Q '$(RELEASE-DIST)' \
+	  '$(VERSION)' \
+	  '$(GLOAT)' \
+	  '$(SOURCE-STAGE)' \
+	  '$(BABASHKA-SOURCE)' \
+	  '$(TOP)' \
+	  '$(DIST)' \
+	  '$(RELEASE-BUILD)'
+
+release: $(GH) $(WASMTIME)
+	@$(if $(filter command line,$(origin VERSION)),,\
+	  $(error VERSION is required on the command line))
+	$Q GH='$(GH)' WASMTIME='$(WASMTIME)' \
+	  '$(RELEASE)' publish '$(VERSION)'
 
 source-ledger: $(SOURCE-STAGE-STAMP)
 	@cat '$(SOURCE-STAGE)/ledger.edn'

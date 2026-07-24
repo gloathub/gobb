@@ -104,15 +104,32 @@ Run the native and differential BB tests with `make test`.
 Print the generated Babashka namespace compatibility ledger with `make
 source-ledger`.
 
+Install Gobb for the current user:
+
+```bash
+make install
+```
+
+The default prefix is `$HOME/.local`, or `/usr/local` when running as root.
+Override it explicitly when needed:
+
+```bash
+make install PREFIX=/some/path
+```
+
 ## Makefile Targets
 
 | Target | Description |
 | --- | --- |
 | `build` | Build the native `bin/gobb` executable with Gloat. |
+| `install` | Install `gobb` under `PREFIX/bin`. |
 | `deps` | Download and verify the pinned Babashka source checkout. |
 | `stage` | Generate the source tree selected from Gobb and Babashka. |
 | `test` | Build Gobb and run native and differential BB tests. |
 | `source-ledger` | Print the generated Babashka namespace compatibility ledger. |
+| `release-prep VERSION=X.Y.Z` | Update `VERSION` and prepend generated release notes to `Changes`. |
+| `release-dist VERSION=X.Y.Z` | Build the cross-platform release archives and checksums. |
+| `release VERSION=X.Y.Z` | Test, package, tag, push, and create the GitHub release. |
 | `site` | Build the MkDocs website in strict mode. |
 | `serve` | Serve the website locally with live reload. |
 | `publish` | Build and publish the website to the `gh-pages` branch. |
@@ -123,6 +140,29 @@ source-ledger`.
 `serve-www` and `publish-www` are aliases for `serve` and `publish`.
 Set `BABASHKA_DIR` to use a local Babashka checkout or `GLOAT_DIR` to use a
 local Gloat checkout.
+
+## Releases
+
+Release archives contain the executable, README, changelog, Gobb license,
+third-party notices, and upstream license texts. Unix, macOS, FreeBSD, and
+Wasm artifacts use `.tar.gz`; Windows artifacts use `.zip`. SHA-256 checksums
+are published alongside the archives.
+
+The release matrix covers Linux (`amd64`, `arm64`, and ARMv6), macOS
+(`amd64` and `arm64`), Windows (`amd64` and `arm64`), FreeBSD (`amd64` and
+`arm64`), WASI, and browser WebAssembly.
+
+Prepare and review a release, then publish it:
+
+```bash
+make release-prep VERSION=0.1.0
+git add VERSION Changes
+git commit -m 'Version 0.1.0'
+make release VERSION=0.1.0
+```
+
+`make release` can perform the preparation and version commit itself when
+starting from a clean checkout. It does not publish the website.
 
 ## Website
 
@@ -136,7 +176,7 @@ Start the development server:
 make serve
 ```
 
-The site is available at <http://127.0.0.1:8000/gobb/>.
+The site is available at <http://127.0.0.1:8000/>.
 
 Build the strict production site:
 

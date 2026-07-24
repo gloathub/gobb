@@ -22,6 +22,10 @@ check() {
 check "expression evaluation" "3" \
   "$GOBB" -e '(+ 1 2)'
 
+expected_version="gobb v$(< VERSION)"
+check "version output" "$expected_version" \
+  "$GOBB" --version
+
 check "definitions persist between forms" "42" \
   "$GOBB" -e '(def x 41) (inc x)'
 

@@ -1,4 +1,5 @@
 bin/
+dist/
 www/site/
 www/venv/
 /*.clj

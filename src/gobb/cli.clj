@@ -1,5 +1,6 @@
 (ns gobb.cli
-  (:require [babashka.impl.exceptions]))
+  (:require [babashka.impl.exceptions]
+            [gobb.version]))
 
 (def usage
   "Usage: gobb -e EXPR [ARGS...]\n       gobb FILE [ARGS...]\n       SOURCE | gobb")
@@ -42,6 +43,9 @@
     (or (= "-h" (first argv))
         (= "--help" (first argv)))
     (println usage)
+
+    (= "--version" (first argv))
+    (println (str "gobb v" gobb.version/version))
 
     (.startsWith (str (first argv)) "-")
     (fail! (str "unknown option: " (first argv)))

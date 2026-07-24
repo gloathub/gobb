@@ -47,6 +47,7 @@ This is an architecture proof, not yet a general BB replacement.
       <li class="task-done">Branded social cards generated from the hero artwork</li>
       <li class="task-done">Clean Make-managed tool provisioning validated</li>
       <li class="task-done">Runtime build and test targets added</li>
+      <li class="task-done">Install and cross-platform release automation added</li>
     </ul>
   </div>
 </div>
@@ -71,7 +72,7 @@ This is an architecture proof, not yet a general BB replacement.
       <li class="task-done">Useful CLI errors and nonzero exit status</li>
       <li class="task-done">Focused differential tests against BB</li>
       <li>Runtime <code>require</code> and classpath loading</li>
-      <li>WASI and browser-Wasm smoke artifacts</li>
+      <li class="task-done">WASI and browser-Wasm smoke artifacts</li>
     </ul>
   </div>
 </div>
