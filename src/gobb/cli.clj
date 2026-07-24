@@ -30,10 +30,19 @@
   (set-command-line-args! args)
   (evaluate-source (slurp file) false))
 
+(defn stdin-terminal? []
+  (let [[info error] (.Stat os.Stdin)]
+    (when error
+      (fail! (str "cannot inspect standard input: " error)))
+    (not (zero? (bit-and (int (.Mode info))
+                         (int os.ModeCharDevice))))))
+
 (defn -main [& argv]
   (cond
     (empty? argv)
-    (evaluate-source (slurp *in*) true)
+    (if (stdin-terminal?)
+      (fail! "REPL is not supported yet")
+      (evaluate-source (slurp *in*) true))
 
     (= "-e" (first argv))
     (if-let [expression (second argv)]

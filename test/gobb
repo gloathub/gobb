@@ -49,6 +49,14 @@ if "$GOBB" --not-an-option >/dev/null 2>&1; then
 fi
 
 set +e
+repl_error=$("$GOBB" </dev/null 2>&1)
+repl_status=$?
+set -e
+
+[[ $repl_status -ne 0 && $repl_error == *"REPL is not supported yet"* ]] ||
+  fail "terminal input did not report unsupported REPL"
+
+set +e
 reader_error=$("$GOBB" -e '(' 2>&1)
 reader_status=$?
 runtime_error=$("$GOBB" -e '(throw (ex-info "boom" {}))' 2>&1)

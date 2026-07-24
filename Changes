@@ -1,1 +1,11 @@
-# Gobb release history
+- version: 0.1.0
+  date:    Fri Jul 24 15:25:48 EDT 2026
+  changes:
+  - Report unsupported REPL instead of waiting on terminal input
+  - Add install and release automation
+  - Configure custom domain and social cards
+  - Fix incremental builds and ignore root scripts
+  - Update project docs and hero artwork
+  - Build first native Gobb executable
+  - Add project website
+  - Initial commit
