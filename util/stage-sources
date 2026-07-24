@@ -178,6 +178,9 @@
           (die "cannot find namespace in " source))
         (stage-file! providers stage-dir entry-namespace namespace source)))
     (let [version (str/trim (slurp version-file))
+          babashka-version (str/replace
+                            (get-in manifest [:babashka :tag])
+                            #"^v" "")
           namespace 'gobb.version
           target (fs/path stage-dir "gobb_version.clj")]
       (when (str/blank? version)
@@ -189,7 +192,9 @@
       (swap! providers assoc namespace (str version-file))
       (spit (str target)
             (str "(ns gobb.version)\n\n"
-                 "(def version " (pr-str version) ")\n")))
+                 "(def version " (pr-str version) ")\n"
+                 "(def babashka-version "
+                 (pr-str babashka-version) ")\n")))
     (spit (str (fs/path stage-dir "ledger.edn"))
           (with-out-str
             (prn {:babashka (:babashka manifest)

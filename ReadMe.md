@@ -77,6 +77,7 @@ Gobb has completed its repository foundation and started native execution:
 - [x] First Gloat-compiled Glojure runtime executable
 - [x] Initial source ledger and differential BB tests
 - [x] Browser-Wasm BB REPL proof at [gobb.site/repl](https://gobb.site/repl/)
+- [x] Babashka-derived native CLI REPL
 - [ ] BB-compatible execution shell
 - [ ] Project dependencies, tasks, pods, and bundled libraries
 - [ ] Production `gobb build` command
@@ -90,6 +91,16 @@ Build the native executable:
 ```bash
 make build
 bin/gobb -e '(+ 1 2)'
+```
+
+Start the native REPL:
+
+```text
+$ bin/gobb
+Gobb v0.1.1
+Babashka v1.12.218
+Type :repl/help for help
+user=>
 ```
 
 The Makefile downloads and verifies the pinned Babashka source checkout in the

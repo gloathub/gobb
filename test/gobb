@@ -48,13 +48,33 @@ if "$GOBB" --not-an-option >/dev/null 2>&1; then
   fail "unknown option succeeded"
 fi
 
-set +e
-repl_error=$("$GOBB" </dev/null 2>&1)
-repl_status=$?
-set -e
+repl_output=$("$GOBB" </dev/null)
+expected_repl_banner="Gobb v$(< VERSION)
+Babashka v1.12.218
+Type :repl/help for help
+user=> "
+[[ $repl_output == "$expected_repl_banner" ]] ||
+  fail "REPL banner: expected '$expected_repl_banner', got '$repl_output'"
 
-[[ $repl_status -ne 0 && $repl_error == *"REPL is not supported yet"* ]] ||
-  fail "terminal input did not report unsupported REPL"
+repl_session=$(
+  printf '%s\n' \
+    '(+ 1 2)' \
+    '(def x' \
+    '  7)' \
+    '(* x 6)' \
+    '*1' \
+    ':repl/exit' |
+    "$GOBB" --repl
+)
+
+[[ $repl_session == *"user=> 3"* ]] ||
+  fail "REPL did not evaluate an expression"
+[[ $repl_session == *"#'user/x"* ]] ||
+  fail "REPL did not preserve a multiline definition"
+[[ $repl_session == *"user=> 42"* ]] ||
+  fail "REPL did not use the preserved definition"
+[[ $(grep -o 'user=> 42' <<< "$repl_session" | wc -l) -eq 2 ]] ||
+  fail "REPL did not preserve *1"
 
 set +e
 reader_error=$("$GOBB" -e '(' 2>&1)

@@ -8,7 +8,7 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Browser REPL proof</p>
+    <p class="summary-value">Native and browser REPL proof</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
@@ -26,9 +26,9 @@ description: Current Gobb implementation progress and upcoming milestones
 
 The first native Gobb executable is now working. It evaluates expressions,
 files, and stdin through Glojure and is compiled to a native binary by Gloat.
-The same architecture now powers a live browser-Wasm REPL using Babashka's
-reusable REPL loop. This remains an architecture proof, not yet a general BB
-replacement.
+The same architecture now powers native and live browser-Wasm REPLs using
+Babashka's reusable REPL loop. This remains an architecture proof, not yet a
+general BB replacement.
 
 ## Completed foundation
 
@@ -77,6 +77,8 @@ replacement.
       <li>Runtime <code>require</code> and classpath loading</li>
       <li class="task-done">WASI and browser-Wasm smoke artifacts</li>
       <li class="task-done">Babashka REPL loop compiled with Gloat for the browser</li>
+      <li class="task-done"><code>gobb</code> starts a native <code>user=&gt;</code> REPL</li>
+      <li class="task-done">Native multiline input, help, exit, and error recovery</li>
       <li class="task-done">Persistent REPL values and <code>*1</code> history verified</li>
     </ul>
   </div>
@@ -137,8 +139,9 @@ also removes the downloaded Babashka source checkout.
   supported yet.
 - Tasks, subprocesses, filesystem compatibility, networking, pods, and
   network REPL services remain unimplemented.
-- The browser REPL is a focused proof. Terminal editing, nREPL, socket REPL,
-  classpath loading, and the rest of BB's interactive surface remain.
+- The native and browser REPLs are focused proofs. Terminal line editing and
+  command history, nREPL, socket REPL, classpath loading, and the rest of BB's
+  interactive surface remain.
 - The current source reader wraps input in one `do` form. Shebang handling and
   exact BB reader edge cases remain for a later CLI-compatibility pass.
 
@@ -188,7 +191,7 @@ and browser REPL, then extend the differential harness for namespace loading.
   <article class="roadmap-card">
     <span>10</span>
     <h3>Interactive services</h3>
-    <p>Add terminal REPL, nREPL, socket REPL, pods, and servers.</p>
+    <p>Extend the basic terminal/browser REPLs with editing, nREPL, socket REPL, pods, and servers.</p>
   </article>
   <article class="roadmap-card">
     <span>11</span>
