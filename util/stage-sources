@@ -1,0 +1,101 @@
+#!/usr/bin/env bb
+
+(require '[babashka.fs :as fs]
+         '[clojure.edn :as edn]
+         '[clojure.java.io :as io]
+         '[clojure.string :as str])
+
+(defn die [& messages]
+  (binding [*out* *err*]
+    (doseq [message messages]
+      (println (str "stage-sources: " message))))
+  (System/exit 1))
+
+(defn namespace-in [file]
+  (with-open [reader (java.io.PushbackReader.
+                      (io/reader (str file)))]
+    (loop []
+      (let [form (read {:eof ::eof} reader)]
+        (cond
+          (= ::eof form) nil
+          (and (seq? form) (= 'ns (first form))) (second form)
+          :else (recur))))))
+
+(defn flat-name [namespace]
+  (str (str/replace (str namespace) #"[.-]" "_") ".clj"))
+
+(defn discover-upstream [source-root]
+  (reduce
+   (fn [namespaces file]
+     (let [namespace (namespace-in file)]
+       (when-not namespace
+         (die "cannot find namespace in " file))
+       (when-let [previous (get-in namespaces [namespace :path])]
+         (die "duplicate upstream namespace " namespace
+              "  first: " previous
+              "  again: " file))
+       (assoc namespaces namespace
+              {:path (str (fs/relativize source-root file))})))
+   (sorted-map)
+   (sort (fs/glob source-root "**/*.clj"))))
+
+(defn stage-file! [providers stage-dir namespace source]
+  (when-let [previous (get @providers namespace)]
+    (die "duplicate namespace " namespace
+         "  first: " previous
+         "  again: " source))
+  (swap! providers assoc namespace (str source))
+  (let [target (fs/path stage-dir
+                        (if (= namespace 'gobb.cli)
+                          "main.clj"
+                          (flat-name namespace)))]
+    (fs/copy source target {:replace-existing true})))
+
+(let [[manifest-file babashka-dir gobb-src-dir stage-dir & extra] *command-line-args*]
+  (when (or extra (some nil? [manifest-file babashka-dir gobb-src-dir stage-dir]))
+    (die "usage: stage-sources MANIFEST BABASHKA-DIR GOBB-SRC-DIR STAGE-DIR"))
+  (let [manifest (edn/read-string (slurp manifest-file))
+        source-root (fs/path babashka-dir
+                             (get-in manifest [:babashka :source-root]))
+        discovered (discover-upstream source-root)
+        overrides (:namespaces manifest)
+        unknown (remove #(contains? discovered %) (keys overrides))
+        ledger (into (sorted-map)
+                     (map (fn [[namespace data]]
+                            [namespace
+                             (merge (:default manifest)
+                                    data
+                                    (get overrides namespace))]))
+                     discovered)
+        selected (filter (fn [[_ data]]
+                           (= :upstream (:disposition data)))
+                         ledger)
+        gobb-files (sort (fs/glob gobb-src-dir "**/*.clj"))
+        providers (atom {})]
+    (when-not (fs/directory? source-root)
+      (die "Babashka source root not found: " source-root))
+    (when (seq unknown)
+      (die "manifest contains unknown namespaces: "
+           (str/join ", " unknown)))
+    (fs/delete-tree stage-dir)
+    (fs/create-dirs stage-dir)
+    (doseq [[namespace {:keys [path]}] selected]
+      (let [source (fs/path source-root path)]
+        (when-not (fs/regular-file? source)
+          (die "selected upstream source not found: " source))
+        (when-not (= namespace (namespace-in source))
+          (die "namespace mismatch for " source))
+        (stage-file! providers stage-dir namespace source)))
+    (doseq [source gobb-files]
+      (let [namespace (namespace-in source)]
+        (when-not namespace
+          (die "cannot find namespace in " source))
+        (stage-file! providers stage-dir namespace source)))
+    (spit (str (fs/path stage-dir "ledger.edn"))
+          (with-out-str
+            (prn {:babashka (:babashka manifest)
+                  :counts (frequencies (map (comp :disposition val) ledger))
+                  :namespaces ledger})))
+    (println "Staged" (count @providers) "namespaces;"
+             (count selected) "from Babashka and"
+             (count gobb-files) "from Gobb")))

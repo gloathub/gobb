@@ -1,0 +1,18 @@
+{:babashka
+ {:tag "v1.12.218"
+  :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"
+  :source-root "src"}
+
+ ;; Every namespace discovered under Babashka's source root receives this
+ ;; disposition unless it has an explicit entry below. This keeps the ledger
+ ;; complete as upstream adds namespaces while requiring an intentional opt-in
+ ;; before any new source enters a Gobb binary.
+ :default
+ {:disposition :deferred
+  :reason "Requires compatibility work for SCI, JVM/Graal APIs, or dependencies"}
+
+ :namespaces
+ {babashka.impl.exceptions
+  {:disposition :upstream
+   :path "babashka/impl/exceptions.clj"
+   :reason "Pure namespace with no SCI, JVM, or Graal dependency"}}}

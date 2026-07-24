@@ -16,8 +16,9 @@ gobb build script.clj -o app --platform linux/amd64
 ```
 
 > [!IMPORTANT]
-> Gobb is at the foundation stage. The architecture, automation, website, and
-> implementation roadmap exist; the Gobb runtime has not been implemented yet.
+> Gobb is an early architecture proof, not yet a general BB replacement. The
+> first native executable evaluates expressions, files, and stdin through
+> Glojure and is compiled by Gloat.
 
 ## Goals
 
@@ -66,19 +67,40 @@ for the full design.
 
 ## Project Status
 
-Gobb is currently establishing its repository foundation:
+Gobb has completed its repository foundation and started native execution:
 
 - [x] Architecture and implementation roadmap
 - [x] Makes-managed project and website automation
 - [x] MkDocs project website
-- [ ] BB compatibility ledger and differential test harness
-- [ ] First Gloat-compiled Glojure runtime executable
+- [x] Pinned, Make-managed Babashka source integration
+- [x] First Gloat-compiled Glojure runtime executable
+- [x] Initial source ledger and differential BB tests
 - [ ] BB-compatible execution shell
 - [ ] Project dependencies, tasks, pods, and bundled libraries
 - [ ] Production `gobb build` command
 
 Follow the [live roadmap](https://clojurestar.github.io/gobb/roadmap/) for
 current progress.
+
+## Build and Test
+
+Build the native executable:
+
+```bash
+make build
+bin/gobb -e '(+ 1 2)'
+```
+
+The Makefile downloads and verifies the pinned Babashka source checkout in the
+ignored local cache. Gobb does not use Git submodules or commit copied
+Babashka source. For development, select an existing checkout with:
+
+```bash
+make build BABASHKA_DIR=~/src/babashka
+```
+
+Run the native and differential BB tests with `make test`. Print the generated
+Babashka namespace compatibility ledger with `make source-ledger`.
 
 ## Website
 
@@ -111,14 +133,14 @@ The public site is <https://clojurestar.github.io/gobb/>.
 
 ```text
 .
-├── Makefile          # Makes-managed repository automation
-├── ReadMe.md         # Project overview
-├── note/             # Local, ignored planning notes
-└── www/              # MkDocs source and website automation
+├── Makefile           # Makes-managed build, tests, and website automation
+├── ReadMe.md          # Project overview
+├── src/               # Gobb source and Babashka source-selection manifest
+├── test/              # Native and differential BB tests
+├── util/              # Source staging tools
+├── note/              # Local, ignored planning notes
+└── www/               # MkDocs source and website automation
 ```
-
-Runtime and compatibility source trees will be added as their corresponding
-roadmap milestones begin.
 
 ## License
 

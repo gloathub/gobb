@@ -8,11 +8,82 @@ ifdef MAKES_REPO_DIR
 MAKES_LOCAL_DIR ?= $(TOP)/.cache/local
 endif
 
+GLOAT-DIR ?= $(or $(GLOAT_DIR),$(LOCAL-CACHE)/gloat-$(GLOAT-VERSION))
+
+include $M/babashka.mk
+include $M/gloat.mk
 include $M/clean.mk
 
-MAKES-CLEAN :=
+BABASHKA-SOURCE-TAG := v1.12.218
+BABASHKA-SOURCE-REVISION := 0fb349c414e717800be775ba9cb77c95a9eb700d
+BABASHKA-SOURCE-CACHE := $(LOCAL-CACHE)/babashka-src-$(BABASHKA-SOURCE-TAG)
+BABASHKA-SOURCE := $(or $(BABASHKA_DIR),$(BABASHKA-SOURCE-CACHE))
+BABASHKA-SOURCE-STAMP := $(LOCAL-CACHE)/.babashka-src-$(BABASHKA-SOURCE-TAG)
+SOURCE-STAGE := $(TOP)/.cache/source-stage
+SOURCE-MANIFEST := $(TOP)/src/babashka-source.edn
+GOBB := $(TOP)/bin/gobb
 
-default:: site
+MAKES-CLEAN := \
+  $(GOBB) \
+  $(SOURCE-STAGE) \
+
+MAKES-REALCLEAN := \
+  $(BABASHKA-SOURCE-CACHE) \
+  $(BABASHKA-SOURCE-STAMP) \
+
+default:: build
+
+ifndef BABASHKA_DIR
+$(BABASHKA-SOURCE-STAMP):
+	@$(ECHO) "* Downloading Babashka $(BABASHKA-SOURCE-TAG) source"
+	$Q $(RM) -r '$(BABASHKA-SOURCE-CACHE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch $(BABASHKA-SOURCE-TAG) \
+	  --config advice.detachedHead=false \
+	  https://github.com/babashka/babashka '$(BABASHKA-SOURCE-CACHE)'
+	$Q test "$$(git -C '$(BABASHKA-SOURCE-CACHE)' rev-parse HEAD)" = \
+	  "$(BABASHKA-SOURCE-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+BABASHKA-SOURCE-DEP := $(BABASHKA-SOURCE-STAMP)
+else
+BABASHKA-SOURCE-DEP := $(BABASHKA-SOURCE)
+endif
+
+deps: $(BABASHKA-SOURCE-DEP)
+	$Q test -f '$(BABASHKA-SOURCE)/src/babashka/main.clj'
+ifndef BABASHKA_DIR
+	$Q test "$$(git -C '$(BABASHKA-SOURCE)' rev-parse HEAD)" = \
+	  "$(BABASHKA-SOURCE-REVISION)"
+endif
+
+stage: deps $(BB)
+	@$(ECHO) "* Staging Gobb and selected Babashka sources"
+	$Q $(BB) util/stage-sources \
+	  '$(SOURCE-MANIFEST)' \
+	  '$(BABASHKA-SOURCE)' \
+	  '$(TOP)/src' \
+	  '$(SOURCE-STAGE)'
+	@$(ECHO)
+
+$(GOBB): stage $(GLOAT)
+	@$(ECHO) "* Building Gobb"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(SOURCE-STAGE)' \
+	  --out='$@' \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
+build: $(GOBB)
+
+test: $(GOBB) $(BB)
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
+
+source-ledger: stage
+	@cat '$(SOURCE-STAGE)/ledger.edn'
 
 site:
 	$(MAKE) -C www site
@@ -35,4 +106,5 @@ distclean::
 
 include $M/shell.mk
 
+.PHONY: build deps stage test source-ledger
 .PHONY: site serve publish serve-www publish-www

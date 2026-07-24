@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the BB executable}"
+
+fail() {
+  echo "test/gobb: $*" >&2
+  exit 1
+}
+
+check() {
+  local description=$1 expected=$2
+  shift 2
+  local actual
+  actual=$("$@")
+  [[ $actual == "$expected" ]] ||
+    fail "$description: expected '$expected', got '$actual'"
+}
+
+check "expression evaluation" "3" \
+  "$GOBB" -e '(+ 1 2)'
+
+check "definitions persist between forms" "42" \
+  "$GOBB" -e '(def x 41) (inc x)'
+
+check "stdin evaluation" "5" \
+  bash -c "printf '(+ 2 3)\\n' | \"\$1\"" _ "$GOBB"
+
+check "file arguments" '("alpha" "beta")' \
+  "$GOBB" test/fixtures/args.clj alpha beta
+
+gobb_output=$("$GOBB" -e '(str "go" "bb")')
+bb_output=$("$BB" -e '(str "go" "bb")')
+[[ $gobb_output == "$bb_output" ]] ||
+  fail "BB comparison: Gobb '$gobb_output', BB '$bb_output'"
+
+if "$GOBB" -e >/dev/null 2>&1; then
+  fail "missing -e expression succeeded"
+fi
+
+if "$GOBB" --not-an-option >/dev/null 2>&1; then
+  fail "unknown option succeeded"
+fi
+
+set +e
+reader_error=$("$GOBB" -e '(' 2>&1)
+reader_status=$?
+runtime_error=$("$GOBB" -e '(throw (ex-info "boom" {}))' 2>&1)
+runtime_status=$?
+set -e
+
+[[ $reader_status -ne 0 && $reader_error ]] ||
+  fail "invalid syntax did not produce a useful failure"
+
+[[ $runtime_status -ne 0 && $runtime_error == *boom* ]] ||
+  fail "runtime exception did not produce a useful failure"
+
+echo "All Gobb tests passed"

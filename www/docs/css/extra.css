@@ -273,6 +273,10 @@
   box-shadow: 0 0.7rem 2rem rgba(45, 19, 104, 0.07);
 }
 
+.milestone-done {
+  border-color: rgba(26, 155, 104, 0.45);
+}
+
 .milestone-next {
   background: var(--gobb-paper);
 }
@@ -317,8 +321,17 @@
   color: var(--gobb-purple);
 }
 
+.status-done {
+  background: rgba(26, 155, 104, 0.15);
+  color: #14794f;
+}
+
 [data-md-color-scheme="slate"] .status-next {
   color: #b99cff;
+}
+
+[data-md-color-scheme="slate"] .status-done {
+  color: #66d6a6;
 }
 
 .task-list {
