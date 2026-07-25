@@ -2,11 +2,11 @@
 
 **Go + BB**
 
-Gobb is a Go-native implementation of the [Babashka](https://babashka.org/)
-experience.
-It uses [Gloat](https://gloathub.org/) to build native binaries and
-[Glojure](https://github.com/glojurelang/glojure) as its full Clojure runtime,
-without SCI, GraalVM, or a JVM.
+Gobb (pronounced "Joby"; rhymes with "Moby") is the
+[Babashka](https://github.com/babashka/babashka) source code compiled by
+[Gloat](https://gloathub.org/) using the Go hosted
+[Glojure](https://github.com/glojurelang/glojure) runtime; without SCI,
+GraalVM, or a JVM.
 
 The project aims to make as much existing BB code and behavior work as
 possible while adding first-class native and WebAssembly compilation:
@@ -20,24 +20,78 @@ gobb build script.clj -o app --platform linux/amd64
 > The first native executable evaluates expressions, files, and stdin through
 > Glojure and is compiled by Gloat.
 
-## Goals
+## Install
 
-- Create a compatible-as-possible bb built on Go.
-- Use the fully Clojure capable Glojure runtime instead of SCI.
+You can install Gobb by downloading a [pre-built release binary](
+https://github.com/clojurestar/gobb/releases/) and adding it to a directory in
+your `PATH`, or by simply running the `make install` command.
+
+Building and installing Gobb requires only `git`, `make`, `curl`, and a `bash`
+binary.
+You do not need Go, BB, Glojure, Gloat, GraalVM, Java, or a JVM pre-installed.
+
+```bash
+git clone https://github.com/clojurestar/gobb
+make -C gobb install
+```
+
+The default installation PREFIX is `$HOME/.local`, or `/usr/local` when
+running as root.
+Ensure `$PREFIX/bin` is in your `PATH` for a user installation.
+
+Set an explicit prefix when needed:
+
+```bash
+make -C gobb install PREFIX=/some/path
+```
+
+Prebuilt archives for supported platforms are available from
+[GitHub Releases](https://github.com/clojurestar/gobb/releases).
+
+
+## Gobb's Goals
+
+The main point of this project is to show that Oracle GraalVM's `native-image`
+compiler is no longer needed to compile Clojure code to native binaries and
+shared libraries.
+The point is made by taking one of Clojure's most popular projects and using
+Gloat to do far more than GraalVM can, with software that is truly open.
+
+Oracle GraalVM (GFTC licensed) `native-image` compiler:
+* Is infamously slow (minutes vs seconds)
+* Doesn't cross-compile
+* Only supports `Windows/amd64`, `macOS/arm64`, and `Linux/amd64+arm64`.
+  * No mac/Intel, no Wasm, no BSD, no 32-bit
+* Produces images that cannot load Clojure code dynamically
+  * Requires the SCI runtime reimplementation of the Clojure runtime
+* Is not OSI open source licensed
+
+> [!NOTE]
+> The first four limits apply to every GraalVM edition, including Community and
+> Mandrel.
+> The licensing limit applies to Oracle GraalVM specifically, which is what
+> Babashka's own release workflow builds with.
+
+Gloat/Glojure solves all of these problems.
+It compiles very fast and cross-compiles to ~25 platforms including mac/Intel,
+BSDs, Wasm and 32-bit (Gobb releases ship [prebuilt binaries for 15 of those](
+https://github.com/clojurestar/gobb/releases/)).
+It replaces the need for SCI with the Glojure runtime which is a faithful port
+of Clojure hosted on the Go language.
+All under an open, OSI-approved license.
+
+Gobb aims to:
+
+- Create a `bb` that is as compatible as possible with Babashka, built on Go.
+- Build from pinned Babashka source code and move forward in sync with bb.
+- Use the fully Clojure-capable Glojure runtime instead of SCI.
 - Build with Gloat rather than GraalVM.
-  - Builds in seconds vs minutes
-  - Supports myriad platforms beyond GraalVM (including Wasm)
-- Run the same project dynamically or compile it through Gloat.
-- Target Linux, macOS, Windows, WASI, and browser WebAssembly.
-- Grow support for Java-dependent Clojure libraries through
-  [gojava](https://github.com/gloathub/gojava) and reusable Go-backed
-  compatibility shims.
+- Run the same project dynamically or compile it to binary through Gloat.
+- Offer full Go host interop, plus a growing subset of commonly used Java
+  classes via the [gojava](https://github.com/gloathub/gojava) project.
 - Test compatibility against a pinned BB executable and publish the measured
   progress.
 
-General Java bytecode execution is not a goal.
-Libraries that refer to Java classes become compatible as those classes gain
-Glojure/gojava or native Go implementations.
 
 ## Architecture
 
@@ -115,19 +169,6 @@ make build BABASHKA_DIR=~/src/babashka
 Run the native and differential BB tests with `make test`.
 Print the generated Babashka namespace compatibility ledger with `make
 source-ledger`.
-
-Install Gobb for the current user:
-
-```bash
-make install
-```
-
-The default prefix is `$HOME/.local`, or `/usr/local` when running as root.
-Override it explicitly when needed:
-
-```bash
-make install PREFIX=/some/path
-```
 
 ## Makefile Targets
 
@@ -251,5 +292,4 @@ attribution notices.
 - [gojava](https://github.com/gloathub/gojava) -
   JVM-faithful APIs implemented in Go
 - [Makes](https://github.com/makeplus/makes) -
-  Jreproducible repository
-  automation
+  Reproducible dependency automation

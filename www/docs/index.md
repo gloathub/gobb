@@ -13,8 +13,11 @@ hide:
   <div class="hero-content">
     <h1>Go + bb!</h1>
     <p class="hero-copy">
-      Gobb is a Go-native implementation of the Babashka experience, powered by
-      Gloat and the full Glojure runtime—without SCI, GraalVM, or a JVM.
+      Gobb is the
+      <a href="https://github.com/babashka/babashka">Babashka</a> source code
+      compiled by <a href="https://gloathub.org/">Gloat</a> using the Go hosted
+      <a href="https://github.com/glojurelang/glojure">Glojure</a> runtime;
+      without SCI, GraalVM, or a JVM.
     </p>
     <div class="hero-actions">
       <a class="button button-primary" href="implementation/">See how it works</a>

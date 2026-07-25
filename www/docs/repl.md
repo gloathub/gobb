@@ -1,14 +1,14 @@
 ---
-title: Gobb REPL
+title: Gobb Browser REPL
 description: Run Gobb's Babashka-derived REPL in your browser
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
 ---
 
 This is Babashka's reusable REPL loop, compiled to browser Wasm by Gloat.
-Forms are read and evaluated by the full Glojure runtime—there is no SCI,
-JVM, or GraalVM involved.
+Forms are read and evaluated by the full Glojure runtime.
+There is no SCI, JVM, or GraalVM involved.
 
 <div id="repl-loading">
   <span class="repl-spinner"></span>
