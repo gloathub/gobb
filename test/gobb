@@ -22,6 +22,12 @@ check() {
 check "expression evaluation" "3" \
   "$GOBB" -e '(+ 1 2)'
 
+check "Babashka version property" "1.12.218" \
+  "$GOBB" -e '(println (System/getProperty "babashka.version"))'
+
+check "initial Java classpath property" '""' \
+  "$GOBB" -e '(prn (System/getProperty "java.class.path"))'
+
 expected_version="gobb v$(< VERSION)"
 check "version output" "$expected_version" \
   "$GOBB" --version
@@ -34,6 +40,11 @@ check "stdin evaluation" "5" \
 
 check "file arguments" '("alpha" "beta")' \
   "$GOBB" test/fixtures/args.clj alpha beta
+
+expected_file_properties="1.12.218
+$(realpath test/fixtures/system-properties.clj)"
+check "file system properties" "$expected_file_properties" \
+  "$GOBB" test/fixtures/system-properties.clj
 
 gobb_output=$("$GOBB" -e '(str "go" "bb")')
 bb_output=$("$BB" -e '(str "go" "bb")')

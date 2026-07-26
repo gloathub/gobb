@@ -28,8 +28,12 @@
   (evaluate-source expression true))
 
 (defn evaluate-file [file args]
-  (set-command-line-args! args)
-  (evaluate-source (slurp file) false))
+  (let [[absolute-file error] (path:filepath.Abs file)]
+    (when error
+      (fail! (str "cannot resolve file path: " error)))
+    (System/setProperty "babashka.file" absolute-file)
+    (set-command-line-args! args)
+    (evaluate-source (slurp absolute-file) false)))
 
 (defn stdin-terminal? []
   (let [[info error] (.Stat os.Stdin)]
@@ -118,6 +122,9 @@
   (repl/start read-native-form))
 
 (defn -main [& argv]
+  (System/setProperty
+   "babashka.version" gobb.version/babashka-version)
+  (System/setProperty "java.class.path" "")
   (cond
     (empty? argv)
     (if (stdin-terminal?)
