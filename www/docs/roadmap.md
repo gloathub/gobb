@@ -47,6 +47,7 @@ general BB replacement.
       <li class="task-done"><code>make serve</code> and <code>make publish</code> wired</li>
       <li class="task-done"><code>gobb.site</code> custom domain configured</li>
       <li class="task-done">Branded social cards generated from the hero artwork</li>
+      <li class="task-done">Social-card image URLs cache-busted on each website build</li>
       <li class="task-done">Clean Make-managed tool provisioning validated</li>
       <li class="task-done">Runtime build and test targets added</li>
       <li class="task-done">Install, cross-platform release, and final website publication automated</li>

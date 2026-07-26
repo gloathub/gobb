@@ -78,6 +78,9 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
 
+hooks:
+  - hooks/og_cache_bust.py
+
 plugins:
   - search:
       separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
