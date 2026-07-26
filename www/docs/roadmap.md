@@ -52,6 +52,7 @@ general BB replacement.
       <li class="task-done">Install, cross-platform release, and final website publication automated</li>
       <li class="task-done">OpenBSD and NetBSD <code>amd64</code>/<code>arm64</code> release artifacts verified</li>
       <li class="task-done">Live browser-Wasm REPL added to the website</li>
+      <li class="task-done">Shareable browser REPL history URLs</li>
     </ul>
   </div>
 </div>

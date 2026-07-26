@@ -450,6 +450,12 @@
   padding: 0.45rem 0.7rem;
 }
 
+.repl-toolbar-actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+#repl-share,
 #repl-clear {
   background: transparent;
   border: 1px solid #8464c6;
@@ -457,6 +463,29 @@
   color: #ded3f5;
   cursor: pointer;
   padding: 0.15rem 0.5rem;
+}
+
+#repl-shell {
+  position: relative;
+}
+
+#repl-notice {
+  background: #b9ff2c;
+  border-radius: 0.3rem;
+  box-shadow: 0 0.3rem 1rem rgb(18 10 35 / 35%);
+  color: #120a23;
+  font-family: var(--md-code-font-family);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.45rem 0.7rem;
+  position: absolute;
+  right: 0.7rem;
+  top: 3.3rem;
+  z-index: 2;
+}
+
+#repl-notice[hidden] {
+  display: none;
 }
 
 #repl-terminal {

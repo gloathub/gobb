@@ -18,8 +18,12 @@ There is no SCI, JVM, or GraalVM involved.
 <div id="repl-shell" hidden>
   <div id="repl-toolbar">
     <span>Gobb · Go + bb!</span>
-    <button id="repl-clear" type="button">Clear</button>
+    <div class="repl-toolbar-actions">
+      <button id="repl-share" type="button">Share</button>
+      <button id="repl-clear" type="button">Clear</button>
+    </div>
   </div>
+  <div id="repl-notice" role="status" aria-live="polite" hidden></div>
   <div id="repl-terminal"
        onclick="if (!window.getSelection().toString()) document.getElementById('repl-input').focus()">
     <div id="repl-output">

@@ -89,10 +89,105 @@
     var output = document.getElementById("repl-output");
     var input = document.getElementById("repl-input");
     var terminal = document.getElementById("repl-terminal");
+    var share = document.getElementById("repl-share");
     var clear = document.getElementById("repl-clear");
+    var notice = document.getElementById("repl-notice");
     var history = [];
     var historyIndex = 0;
     var stdin = new InputQueue(taskScheduler());
+    var noticeTimer = null;
+    var replayQueue = sharedHistory();
+    var replayLast = replayQueue.pop() || "";
+    var clearSharedURL = window.location.hash.indexOf("#s:") === 0;
+
+    function decodeBase64(encoded) {
+      var binary = atob(encoded);
+      var bytes = new Uint8Array(binary.length);
+      for (var index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+      }
+      return new TextDecoder("utf-8").decode(bytes);
+    }
+
+    function encodeBase64(text) {
+      var bytes = new TextEncoder().encode(text);
+      var binary = "";
+      for (var index = 0; index < bytes.length; index += 1) {
+        binary += String.fromCharCode(bytes[index]);
+      }
+      return btoa(binary);
+    }
+
+    function sharedHistory() {
+      if (window.location.hash.indexOf("#s:") !== 0) return [];
+
+      try {
+        var decoded = JSON.parse(
+          decodeBase64(window.location.hash.slice(3))
+        );
+        if (
+          Array.isArray(decoded) &&
+          decoded.every(function (source) {
+            return typeof source === "string";
+          })
+        ) {
+          return decoded;
+        }
+      } catch (error) {
+        console.warn("Could not decode shared Gobb REPL state", error);
+      }
+      return [];
+    }
+
+    function shareURL() {
+      var url = new URL(window.location.href);
+      url.hash = "s:" + encodeBase64(JSON.stringify(history));
+      return url.href;
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+
+      return new Promise(function (resolve, reject) {
+        var copy = document.createElement("textarea");
+        copy.value = text;
+        copy.style.position = "fixed";
+        copy.style.opacity = "0";
+        document.body.appendChild(copy);
+        copy.select();
+        try {
+          if (!document.execCommand("copy")) {
+            throw new Error("copy command failed");
+          }
+          resolve();
+        } catch (error) {
+          reject(error);
+        } finally {
+          copy.remove();
+        }
+      });
+    }
+
+    function showNotice(message) {
+      window.clearTimeout(noticeTimer);
+      notice.textContent = message;
+      notice.hidden = false;
+      noticeTimer = window.setTimeout(function () {
+        notice.hidden = true;
+      }, 1800);
+    }
+
+    function focusAtEnd(element) {
+      var selection = window.getSelection();
+      var range = document.createRange();
+      element.focus();
+      range.selectNodeContents(element);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
 
     function fail(error) {
       shell.hidden = true;
@@ -104,9 +199,8 @@
       console.error(error);
     }
 
-    function submit() {
+    function evaluate(source) {
       if (!stdin.waiting()) return;
-      var source = input.innerText.replace(/\u00a0/g, " ").trim();
       if (!source) return;
 
       append(output, input, source + "\n", "repl-entered");
@@ -119,6 +213,11 @@
       stdin.write(new TextEncoder().encode(
         encodeURIComponent(source) + "\n"
       ));
+    }
+
+    function submit() {
+      var source = input.innerText.replace(/\u00a0/g, " ").trim();
+      evaluate(source);
     }
 
     input.addEventListener("keydown", function (event) {
@@ -147,12 +246,24 @@
       input.focus();
     });
 
+    share.addEventListener("click", function () {
+      copyText(shareURL()).then(function () {
+        showNotice("Copied sharable REPL state URL");
+      }).catch(function (error) {
+        showNotice("Could not copy REPL state URL");
+        console.error(error);
+      });
+      input.focus();
+    });
+
     var script = document.createElement("script");
     script.src = new URL("wasm_exec.js", window.location.href).href;
     script.onload = function () {
       var go = new Go();
       var decoder = new TextDecoder("utf-8");
       var originalRead = globalThis.fs.read;
+      var outputTail = "";
+      var promptReady = false;
 
       globalThis.fs.fstat = function (fd, callback) {
         callback(null, {
@@ -170,7 +281,12 @@
       };
 
       globalThis.fs.writeSync = function (_fd, buffer) {
-        append(output, input, decoder.decode(buffer));
+        var text = decoder.decode(buffer);
+        append(output, input, text);
+        outputTail = (outputTail + text).slice(-200);
+        if (/(?:^|\n)[^\n]*=> $/.test(outputTail)) {
+          promptReady = true;
+        }
         return buffer.length;
       };
 
@@ -181,7 +297,31 @@
           return originalRead(fd, buffer, offset, length, position, callback);
         }
         stdin.read(buffer, offset, length, callback);
-        input.focus();
+        if (!promptReady) return;
+        promptReady = false;
+
+        if (replayQueue.length) {
+          var source = replayQueue.shift();
+          window.setTimeout(function () {
+            evaluate(source);
+          }, 0);
+        } else {
+          if (replayLast) {
+            input.textContent = replayLast;
+            replayLast = "";
+            focusAtEnd(input);
+          } else {
+            input.focus();
+          }
+          if (clearSharedURL) {
+            window.history.replaceState(
+              null,
+              "",
+              window.location.pathname + window.location.search
+            );
+            clearSharedURL = false;
+          }
+        }
       };
 
       WebAssembly.instantiateStreaming(
