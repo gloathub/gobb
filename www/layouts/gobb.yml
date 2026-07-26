@@ -53,7 +53,7 @@ layers:
   - size: { width: 436, height: 538 }
     offset: { x: 718, y: 46 }
     background:
-      image: docs/img/gobb.jpg
+      image: docs/img/gobb.png
 
   - size: { width: 436, height: 26 }
     offset: { x: 718, y: 594 }

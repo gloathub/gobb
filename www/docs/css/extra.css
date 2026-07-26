@@ -24,8 +24,17 @@
   background: linear-gradient(90deg, #3d1b87, #6d3ee8);
 }
 
+.md-header__home {
+  color: inherit;
+  text-decoration: none;
+}
+
 .md-tabs {
   background: #3d1b87;
+}
+
+.md-tabs__item:first-child {
+  display: none;
 }
 
 .md-typeset h1,

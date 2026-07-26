@@ -1,6 +1,75 @@
 (function () {
   "use strict";
 
+  function InputQueue(schedule) {
+    this.schedule = schedule;
+    this.pendingRead = null;
+    this.bytes = new Uint8Array(0);
+    this.offset = 0;
+  }
+
+  InputQueue.prototype.waiting = function () {
+    return this.pendingRead !== null;
+  };
+
+  InputQueue.prototype.write = function (bytes) {
+    this.bytes = bytes;
+    this.offset = 0;
+    this.pump();
+  };
+
+  InputQueue.prototype.read = function (
+    buffer, offset, length, callback
+  ) {
+    this.pendingRead = {
+      buffer: buffer,
+      offset: offset,
+      length: length,
+      callback: callback
+    };
+    this.schedule(this.pump.bind(this));
+  };
+
+  InputQueue.prototype.pump = function () {
+    if (!this.pendingRead || this.offset >= this.bytes.length) return;
+
+    var read = this.pendingRead;
+    var count = Math.min(
+      read.length,
+      this.bytes.length - this.offset
+    );
+    var chunk = this.bytes.subarray(this.offset, this.offset + count);
+    this.pendingRead = null;
+    this.offset += count;
+    read.buffer.set(chunk, read.offset);
+    read.callback(null, count);
+
+    if (this.offset >= this.bytes.length) {
+      this.bytes = new Uint8Array(0);
+      this.offset = 0;
+    }
+  };
+
+  function taskScheduler() {
+    var callbacks = [];
+    var channel = new MessageChannel();
+
+    channel.port1.onmessage = function () {
+      var callback = callbacks.shift();
+      if (callback) callback();
+    };
+
+    return function (callback) {
+      callbacks.push(callback);
+      channel.port2.postMessage(null);
+    };
+  }
+
+  if (typeof module !== "undefined") {
+    module.exports = InputQueue;
+  }
+  if (typeof document === "undefined") return;
+
   var running = false;
 
   function append(output, input, text, className) {
@@ -23,17 +92,20 @@
     var clear = document.getElementById("repl-clear");
     var history = [];
     var historyIndex = 0;
-    var pendingRead = null;
+    var stdin = new InputQueue(taskScheduler());
 
     function fail(error) {
+      shell.hidden = true;
+      loading.hidden = false;
       loading.innerHTML = "";
-      append(loading, null, "Could not load Gobb: " + error.message,
+      append(loading, null, "Could not load Gobb: " +
+             (error.message || error),
              "repl-error");
       console.error(error);
     }
 
     function submit() {
-      if (!pendingRead) return;
+      if (!stdin.waiting()) return;
       var source = input.innerText.replace(/\u00a0/g, " ").trim();
       if (!source) return;
 
@@ -44,17 +116,9 @@
 
       // fmt.Scanln in Gobb reads one whitespace-free token. URI encoding
       // preserves arbitrary strings and multiline forms in that token.
-      var bytes = new TextEncoder().encode(
+      stdin.write(new TextEncoder().encode(
         encodeURIComponent(source) + "\n"
-      );
-      var read = pendingRead;
-      pendingRead = null;
-      if (bytes.length > read.length) {
-        fail(new Error("expression exceeds the REPL input buffer"));
-        return;
-      }
-      read.buffer.set(bytes, read.offset);
-      read.callback(null, bytes.length);
+      ));
     }
 
     input.addEventListener("keydown", function (event) {
@@ -77,6 +141,9 @@
       Array.from(output.children).forEach(function (child) {
         if (child !== input) child.remove();
       });
+      if (stdin.waiting()) {
+        append(output, input, "user=> ");
+      }
       input.focus();
     });
 
@@ -113,9 +180,7 @@
         if (fd !== 0) {
           return originalRead(fd, buffer, offset, length, position, callback);
         }
-        pendingRead = {
-          buffer: buffer, offset: offset, length: length, callback: callback
-        };
+        stdin.read(buffer, offset, length, callback);
         input.focus();
       };
 
@@ -125,10 +190,17 @@
       ).then(function (result) {
         loading.hidden = true;
         shell.hidden = false;
-        go.run(result.instance).then(function () {
-          pendingRead = null;
-          input.contentEditable = "false";
-          append(output, input, "\nREPL exited.\n", "repl-muted");
+
+        // Let the browser paint the terminal before starting the Wasm
+        // runtime. Go's first stdin read then yields through taskScheduler,
+        // keeping the page responsive while the REPL is running.
+        requestAnimationFrame(function () {
+          setTimeout(function () {
+            go.run(result.instance).then(function () {
+              input.contentEditable = "false";
+              append(output, input, "\nREPL exited.\n", "repl-muted");
+            }).catch(fail);
+          }, 0);
         });
       }).catch(fail);
     };

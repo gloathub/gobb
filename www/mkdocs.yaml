@@ -10,6 +10,7 @@ edit_uri: edit/main/www/docs/
 
 theme:
   name: material
+  custom_dir: overrides
   favicon: img/favicon.svg
   features:
     - navigation.instant
