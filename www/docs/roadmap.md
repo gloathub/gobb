@@ -81,6 +81,9 @@ general BB replacement.
       <li class="task-done"><code>gobb</code> starts a native <code>user=&gt;</code> REPL</li>
       <li class="task-done">Native multiline input, help, exit, and error recovery</li>
       <li class="task-done">Persistent REPL values and <code>*1</code> history verified</li>
+      <li class="task-done">BB-compatible <code>babashka.version</code>, <code>babashka.file</code>, and initial <code>java.class.path</code> properties</li>
+      <li class="task-done">REPL errors expose the underlying evaluator message</li>
+      <li>Runtime <code>(ns ...)</code>: Glojure fix and Gloat regression complete; awaiting released versions and the Gobb dependency pin</li>
     </ul>
   </div>
 </div>

@@ -23,7 +23,7 @@ from Babashka's babashka.impl.clojure.main/repl.")
   (print (str (ns-name *ns*) "=> ")))
 
 (defn caught [error]
-  (println (str "Error: " error)))
+  (println (str "Error: " (fmt.Sprint error))))
 
 (defn start [read-form]
   (System/setProperty

@@ -72,6 +72,7 @@ repl_session=$(
     '(+ 1 2)' \
     '(def x' \
     '  7)' \
+    '(throw (ex-info "repl boom" {}))' \
     '(* x 6)' \
     '*1' \
     ':repl/exit' |
@@ -82,6 +83,8 @@ repl_session=$(
   fail "REPL did not evaluate an expression"
 [[ $repl_session == *"#'user/x"* ]] ||
   fail "REPL did not preserve a multiline definition"
+[[ $repl_session == *"Error: repl boom"* ]] ||
+  fail "REPL did not render the underlying exception"
 [[ $repl_session == *"user=> 42"* ]] ||
   fail "REPL did not use the preserved definition"
 [[ $(grep -o 'user=> 42' <<< "$repl_session" | wc -l) -eq 2 ]] ||
