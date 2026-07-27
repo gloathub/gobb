@@ -30,6 +30,11 @@
    :description "Bind expression command-line arguments"
    :args ["-e" "(prn *command-line-args*)" "alpha" "beta"]}
 
+  {:id :cli/expression-file
+   :area :execution-state
+   :description "Bind BB's expression source marker"
+   :args ["-e" "(prn *file*)"]}
+
   {:id :reader/collections
    :area :reader
    :description "Read and print nested collection literals"
@@ -55,6 +60,11 @@
    :description "Load a script with arguments"
    :args ["{fixtures}/args.clj" "alpha" "beta"]}
 
+  {:id :loading/script-state
+   :area :execution-state
+   :description "Bind absolute *file*, arguments, and working directory"
+   :args ["{fixtures}/runtime-state.clj" "alpha" "beta"]}
+
   {:id :loading/require
    :area :script-loading
    :description "Require source from an explicit classpath"
@@ -66,6 +76,12 @@
    :area :runtime
    :description "Normalize each isolated working directory"
    :args ["-e" "(println (System/getProperty \"user.dir\"))"]}
+
+  {:id :runtime/environment
+   :area :execution-state
+   :description "Expose the inherited process environment"
+   :env {"GOBB_COMPAT_ENV" "visible"}
+   :args ["-e" "(prn (System/getenv \"GOBB_COMPAT_ENV\"))"]}
 
   {:id :runtime/timestamp
    :area :runtime
@@ -80,8 +96,14 @@
 
   {:id :io/stderr
    :area :errors
-   :description "Keep standard error separate from standard output"
-   :args ["-e" "(.println System/err \"compat warning\")"]}
+   :description "Bind *err* as the standard error writer"
+   :args ["-e" "(binding [*out* *err*] (println \"compat warning\"))"]}
+
+  {:id :io/stdin
+   :area :execution-state
+   :description "Bind *in* as the standard input reader"
+   :stdin "compat input\n"
+   :args ["-e" "(prn (slurp *in*))"]}
 
   {:id :exit/nonzero
    :area :exit

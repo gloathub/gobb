@@ -139,10 +139,10 @@ architecture proof, not yet a general BB replacement.
       Gobb layer built directly on Glojure.
     </p>
     <ul class="task-list">
-      <li>Current execution namespace and <code>*file*</code></li>
-      <li>Standard input, output, and error bindings</li>
-      <li><code>*command-line-args*</code></li>
-      <li>Environment and working-directory state</li>
+      <li class="task-done">Current execution namespace and <code>*file*</code></li>
+      <li class="task-done">Standard input, output, and error bindings</li>
+      <li class="task-done"><code>*command-line-args*</code></li>
+      <li class="task-done">Environment and working-directory state</li>
       <li>Load paths and embedded resources</li>
       <li>Data readers and default data-reader behavior</li>
       <li>Preloads and repeated <code>require</code></li>

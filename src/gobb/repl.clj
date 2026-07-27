@@ -1,5 +1,6 @@
 (ns gobb.repl
   (:require [gobb.bb-repl :as bb-repl]
+            [gobb.host :as host]
             [gobb.version]))
 
 (def help-text
@@ -26,6 +27,8 @@ from Babashka's babashka.impl.clojure.main/repl.")
   (println (str "Error: " (fmt.Sprint error))))
 
 (defn start [read-form]
+  (host/initialize!)
+  (host/set-file! host/repl-source-path)
   (System/setProperty
    "babashka.version" gobb.version/babashka-version)
   (when (nil? (System/getProperty "java.class.path"))

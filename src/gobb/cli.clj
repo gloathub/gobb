@@ -1,5 +1,6 @@
 (ns gobb.cli
   (:require [babashka.impl.exceptions]
+            [gobb.host :as host]
             [gobb.repl :as repl]
             [gobb.version]))
 
@@ -13,9 +14,6 @@
   (fmt.Fprintln os.Stderr (str "gobb: " message))
   (fmt.Fprintln os.Stderr usage)
   (os.Exit 1))
-
-(defn set-command-line-args! [args]
-  (alter-var-root #'*command-line-args* (constantly (seq args))))
 
 (defn parse-global-options [argv]
   (loop [args argv
@@ -105,26 +103,22 @@
                       (str ":\n" details))))))
           output)))))
 
-(defn evaluate-source [source print-result?]
-  ;; A single enclosing do lets the runtime reader accept any number of forms
-  ;; while keeping them in the same Glojure environment.
-  (let [form (read-string (str "(do\n" source "\n)"))
-        result (eval form)]
-    (when (and print-result? (some? result))
-      (prn result))
-    result))
-
 (defn evaluate-expression [expression args]
-  (set-command-line-args! args)
-  (evaluate-source expression true))
+  (host/evaluate-source
+   expression
+   {:args args
+    :file host/no-source-path
+    :print-result? true}))
 
 (defn evaluate-file [file args]
   (let [[absolute-file error] (path:filepath.Abs file)]
     (when error
       (fail! (str "cannot resolve file path: " error)))
     (System/setProperty "babashka.file" absolute-file)
-    (set-command-line-args! args)
-    (evaluate-source (slurp absolute-file) false)))
+    (host/evaluate-source
+     (slurp absolute-file)
+     {:args args
+      :file absolute-file})))
 
 (defn stdin-terminal? []
   (let [[info error] (.Stat os.Stdin)]
@@ -210,9 +204,12 @@
 
 (defn start-repl []
   (reset! native-input "")
+  (host/set-command-line-args! ())
+  (host/set-file! host/repl-source-path)
   (repl/start read-native-form))
 
 (defn -main [& argv]
+  (host/initialize!)
   (System/setProperty
    "babashka.version" gobb.version/babashka-version)
   (let [{:keys [argv classpath]} (parse-global-options argv)]
@@ -221,7 +218,10 @@
       (empty? argv)
       (if (stdin-terminal?)
         (start-repl)
-        (evaluate-source (slurp *in*) true))
+        (host/evaluate-source
+         (slurp *in*)
+         {:file host/no-source-path
+          :print-result? true}))
 
       (= "--repl" (first argv))
       (start-repl)

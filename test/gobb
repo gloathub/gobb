@@ -22,6 +22,9 @@ check() {
 check "expression evaluation" "3" \
   "$GOBB" -e '(+ 1 2)'
 
+check "expression source marker" '"NO_SOURCE_PATH"' \
+  "$GOBB" -e '(prn *file*)'
+
 check "Babashka version property" "1.12.218" \
   "$GOBB" -e '(println (System/getProperty "babashka.version"))'
 
@@ -60,6 +63,19 @@ check "stdin evaluation" "5" \
 
 check "file arguments" '("alpha" "beta")' \
   "$GOBB" test/fixtures/args.clj alpha beta
+
+check "file source binding" "$(realpath test/fixtures/file-var.clj)" \
+  "$GOBB" test/fixtures/file-var.clj
+
+stderr_file=$(mktemp)
+trap 'rm -f "$stderr_file"' EXIT
+stdout=$(
+  "$GOBB" -e \
+    '(binding [*out* *err*] (println "compat warning"))' \
+    2>"$stderr_file"
+)
+[[ -z $stdout && $(<"$stderr_file") == "compat warning" ]] ||
+  fail "*err* is not bound to standard error"
 
 expected_file_properties="1.12.218
 $(realpath test/fixtures/system-properties.clj)"
@@ -109,6 +125,7 @@ repl_session=$(
     '(+ 1 2)' \
     '(def x' \
     '  7)' \
+    '(prn *file*)' \
     '(throw (ex-info "repl boom" {}))' \
     '(* x 6)' \
     '*1' \
@@ -120,6 +137,8 @@ repl_session=$(
   fail "REPL did not evaluate an expression"
 [[ $repl_session == *"#'user/x"* ]] ||
   fail "REPL did not preserve a multiline definition"
+[[ $repl_session == *'"<repl>"'* ]] ||
+  fail "REPL did not bind *file*"
 [[ $repl_session == *"Error: repl boom"* ]] ||
   fail "REPL did not render the underlying exception"
 [[ $repl_session == *"user=> 42"* ]] ||

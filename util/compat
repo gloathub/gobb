@@ -51,17 +51,22 @@
           [(str/replace (str (fs/relativize workdir file)) "\\" "/")
            (file-value file)])))
 
-(defn execute! [executable args workdir]
-  (let [command (into [executable] args)
-        result @(process/process command
-                                 {:dir (str workdir)
-                                  :out :string
-                                  :err :string})]
-    {:command command
-     :exit (:exit result)
-     :out (:out result)
-     :err (:err result)
-     :files (filesystem-snapshot workdir)}))
+(defn execute!
+  ([executable args workdir]
+   (execute! executable args workdir {}))
+  ([executable args workdir {:keys [env stdin]}]
+   (let [command (into [executable] args)
+         options (cond-> {:dir (str workdir)
+                          :out :string
+                          :err :string}
+                   env (assoc :extra-env env)
+                   stdin (assoc :in stdin))
+         result @(process/process command options)]
+     {:command command
+      :exit (:exit result)
+      :out (:out result)
+      :err (:err result)
+      :files (filesystem-snapshot workdir)})))
 
 (defn normalized-result [workdir normalizations result]
   (-> result
@@ -99,8 +104,10 @@
         gobb-dir (fs/path fixture-root "gobb")]
     (fs/create-dirs bb-dir)
     (fs/create-dirs gobb-dir)
-    (let [bb-result (execute! bb args bb-dir)
-          gobb-result (execute! gobb args gobb-dir)
+    (let [options {:env (:env fixture)
+                   :stdin (:stdin fixture)}
+          bb-result (execute! bb args bb-dir options)
+          gobb-result (execute! gobb args gobb-dir options)
           bb-normalized
           (normalized-result bb-dir normalizations bb-result)
           gobb-normalized
