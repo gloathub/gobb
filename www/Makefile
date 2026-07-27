@@ -25,7 +25,10 @@ export NO_MKDOCS_2_WARNING := 1
 
 REPO ?= git@github.com:clojurestar/gobb
 
-MAKES-CLEAN := site
+MAKES-CLEAN := \
+  site \
+  hooks/__pycache__ \
+
 MAKES-REALCLEAN := $(PYTHON-VENV)
 
 DEPS := $(PYTHON-VENV)
