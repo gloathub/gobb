@@ -95,6 +95,15 @@ configuration and dependency resolution.
     inside the resulting program unless a future explicit optimization mode
     disables it.
 
+    The initial build spike accepts a dependency-free Clojure namespace with
+    `-main` and delegates compilation to Gloat. Gobb finds `gloat` on `PATH`,
+    or uses the executable named by `GOBB_GLOAT`. Native targets use
+    `--platform OS/ARCH`; `js/wasm` selects Gloat's browser-Wasm output.
+
+    `make smoke` proves the path by evaluating one namespace with Gobb, then
+    building and executing it as a native program, WASI under Wasmtime, and
+    browser Go/Wasm under the JavaScript runtime. All four outputs must match.
+
 ## Java compatibility without a JVM
 
 Many useful Clojure libraries refer to Java classes even when their core logic

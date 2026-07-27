@@ -32,6 +32,10 @@ expected_version="gobb v$(< VERSION)"
 check "version output" "$expected_version" \
   "$GOBB" --version
 
+check "build help" \
+  "Usage: gobb build INPUT -o OUTPUT [--platform OS/ARCH]" \
+  "$GOBB" build --help
+
 check "definitions persist between forms" "42" \
   "$GOBB" -e '(def x 41) (inc x)'
 
@@ -82,6 +86,10 @@ fi
 
 if "$GOBB" --classpath >/dev/null 2>&1; then
   fail "missing --classpath path succeeded"
+fi
+
+if "$GOBB" build test/fixtures/gobb/build_smoke.clj >/dev/null 2>&1; then
+  fail "gobb build without -o succeeded"
 fi
 
 if "$GOBB" --not-an-option >/dev/null 2>&1; then

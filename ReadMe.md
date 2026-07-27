@@ -181,6 +181,21 @@ gobb --classpath src:lib script.clj
 Classpath lists use the platform path separator and are reflected in the
 `java.class.path` system property.
 
+## Build Programs
+
+The initial `gobb build` spike compiles a dependency-free namespace containing
+`-main` through Gloat:
+
+```bash
+gobb build src/example/core.clj -o example
+gobb build src/example/core.clj -o example.wasm --platform wasip1/wasm
+gobb build src/example/core.clj -o example.wasm --platform js/wasm
+```
+
+Gobb uses the `gloat` executable on `PATH`. Set `GOBB_GLOAT=/path/to/gloat`
+to select it explicitly. Project dependencies, resources, and `bb.edn` build
+configuration remain later milestones.
+
 ## Makefile Targets
 
 | Target | Description |
@@ -190,6 +205,7 @@ Classpath lists use the platform path separator and are reflected in the
 | `deps` | Download and verify the pinned Babashka source checkout. |
 | `stage` | Generate the source tree selected from Gobb and Babashka. |
 | `test` | Build Gobb and run native and differential BB tests. |
+| `smoke` | Build and execute equivalent interpreted, native, WASI, and browser-Wasm smoke programs. |
 | `repl-wasm` | Compile the Babashka-derived browser REPL and install its Go Wasm runtime. |
 | `source-ledger` | Print the generated Babashka namespace compatibility ledger. |
 | `release-prep VERSION=X.Y.Z` | Update `VERSION` and prepend generated release notes to `Changes`. |

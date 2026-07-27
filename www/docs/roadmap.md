@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Native and browser REPL proof</p>
+    <p class="summary-value">Differential BB compatibility harness</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">2 / 14</p>
+    <p class="summary-value">3 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 18%"></span>
+  <span style="width: 21%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -58,12 +58,12 @@ general BB replacement.
   </div>
 </div>
 
-## Current work
+## Completed execution architecture
 
-<div class="milestone milestone-active">
-  <div class="milestone-marker">2</div>
+<div class="milestone milestone-done">
+  <div class="milestone-marker">1</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Prove the execution architecture</h3>
     <p>
       Expand the working native executable into the complete execution proof,
@@ -86,20 +86,41 @@ general BB replacement.
       <li class="task-done">BB-compatible <code>babashka.version</code>, <code>babashka.file</code>, and initial <code>java.class.path</code> properties</li>
       <li class="task-done">REPL errors expose the underlying evaluator message</li>
       <li class="task-done">Runtime <code>(ns ...)</code> support with Gloat <code>0.1.64</code> and Glojure <code>0.7.2</code></li>
+      <li class="task-done">Dependency-free <code>gobb build</code> compilation spike</li>
+      <li class="task-done">One portable smoke program produces equivalent evaluated and compiled output</li>
+      <li class="task-done">Native, WASI, and browser-Wasm smoke artifacts are executed by tests</li>
     </ul>
   </div>
 </div>
 
-<div class="milestone milestone-next">
-  <div class="milestone-marker">1</div>
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">2</div>
   <div>
-    <span class="status-badge status-next">Started</span>
-    <h3>Compatibility ledger and test inventory</h3>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Differential BB compatibility harness</h3>
     <p>
-      Inventory BB's CLI, configuration, bundled namespaces, Java classes,
-      platforms, and tests. The source namespace portion now exists; the
-      broader user-visible compatibility inventory remains.
+      Run the same fixtures under the pinned BB executable and the current
+      Gobb, preserving complete diagnostics for every unexpected difference.
     </p>
+    <ul class="task-list">
+      <li>Build a reusable fixture runner for pinned BB and current Gobb</li>
+      <li>Compare standard output</li>
+      <li>Compare standard error</li>
+      <li>Compare exit status</li>
+      <li>Compare structured exception data</li>
+      <li>Compare expected filesystem effects</li>
+      <li>Normalize only known nondeterminism: temporary paths, timestamps, ports, process IDs, and platform separators</li>
+      <li>Persist complete reproduction diagnostics while keeping successful output concise</li>
+      <li>Cover CLI parsing and invocation</li>
+      <li>Cover reader behavior and printing</li>
+      <li>Cover namespace creation and switching</li>
+      <li>Cover dynamic Vars and script loading</li>
+      <li>Cover error formatting and exit behavior</li>
+      <li>Support interpreted and <code>gobb build</code> compiled programs</li>
+      <li>Generate and publish a compatibility report in CI</li>
+    </ul>
   </div>
 </div>
 
@@ -130,6 +151,7 @@ The build interface is now:
 make deps           # Download and verify pinned Babashka source
 make build          # Build bin/gobb with Gloat
 make test           # Run native and differential BB tests
+make smoke          # Execute interpreted, native, WASI, and browser-Wasm proof
 make repl-wasm      # Build the browser BB REPL with Gloat
 make source-ledger  # Print the generated namespace ledger
 ```
@@ -141,33 +163,33 @@ also removes the downloaded Babashka source checkout.
 
 - Most Babashka implementation namespaces still depend on SCI, JVM classes,
   GraalVM substitutions, or libraries that have not been ported.
-- Runtime `require`, project classpaths, `bb.edn`, and `deps.edn` are not
-  supported yet.
+- Working-directory and explicit runtime classpaths work; project-derived
+  classpaths, `bb.edn`, and `deps.edn` are not supported yet.
 - Tasks, subprocesses, filesystem compatibility, networking, pods, and
   network REPL services remain unimplemented.
 - The native and browser REPLs are focused proofs. Terminal line editing and
-  command history, nREPL, socket REPL, classpath loading, and the rest of BB's
-  interactive surface remain.
+  command history, nREPL, socket REPL, browser filesystem loading, and the rest
+  of BB's interactive surface remain.
 - The current source reader wraps input in one `do` form. Shebang handling and
   exact BB reader edge cases remain for a later CLI-compatibility pass.
 
 ## Next concrete slice
 
-Add runtime `require` and ordered classpath loading to the native executable
-and browser REPL, then extend the differential harness for namespace loading.
+Build the reusable differential runner, start with CLI/reader/namespace
+fixtures, and publish its first compatibility report.
 
 ## Planned milestones
 
 <div class="roadmap-grid">
   <article class="roadmap-card">
     <span>03</span>
-    <h3>Differential BB harness</h3>
-    <p>Compare BB and Gobb output, errors, exit status, and side effects.</p>
+    <h3>Glojure-native BB shell</h3>
+    <p>Replace SCI's host responsibilities with Glojure-native execution.</p>
   </article>
   <article class="roadmap-card">
     <span>04</span>
-    <h3>Glojure-native BB shell</h3>
-    <p>Replace SCI's host responsibilities with Glojure-native execution.</p>
+    <h3>Compatibility ledger</h3>
+    <p>Complete the BB feature, class, platform, and upstream-test inventory.</p>
   </article>
   <article class="roadmap-card">
     <span>05</span>

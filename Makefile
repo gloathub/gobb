@@ -13,6 +13,7 @@ GLOAT-DIR ?= $(or $(GLOAT_DIR),$(LOCAL-CACHE)/gloat-$(GLOAT-VERSION))
 include $M/babashka.mk
 include $M/gloat.mk
 include $M/gh.mk
+include $M/node.mk
 include $M/wasmtime.mk
 include $M/clean.mk
 
@@ -39,6 +40,11 @@ RELEASE := $(TOP)/util/release
 RELEASE-DIST := $(TOP)/util/release-dist
 DIST := $(TOP)/dist
 RELEASE-BUILD := $(TOP)/.cache/release
+SMOKE-DIR := $(TOP)/.cache/smoke
+SMOKE-SOURCE := $(TOP)/test/fixtures/gobb/build_smoke.clj
+SMOKE-NATIVE := $(SMOKE-DIR)/native
+SMOKE-WASI := $(SMOKE-DIR)/wasi.wasm
+SMOKE-BROWSER := $(SMOKE-DIR)/browser.wasm
 PREFIX ?= $(if $(filter 0,$(shell id -u)),/usr/local,$(HOME)/.local)
 
 MAKES-CLEAN := \
@@ -47,6 +53,7 @@ MAKES-CLEAN := \
   $(RELEASE-BUILD) \
   $(SOURCE-STAGE) \
   $(REPL-SOURCE-STAGE) \
+  $(SMOKE-DIR) \
   $(GOBB-WASM) \
   $(WASM-EXEC) \
 
@@ -157,7 +164,45 @@ install: $(GOBB)
 	$Q install -d '$(DESTDIR)$(PREFIX)/bin'
 	$Q install -m 0755 '$(GOBB)' '$(DESTDIR)$(PREFIX)/bin/gobb'
 
-test: $(GOBB) $(BB)
+$(SMOKE-NATIVE): $(GOBB) $(GLOAT) $(SMOKE-SOURCE)
+	@$(ECHO) "* Building the native Gobb smoke program"
+	$Q mkdir -p '$(@D)'
+	$Q GOBB_GLOAT='$(GLOAT)' '$(GOBB)' build \
+	  '$(SMOKE-SOURCE)' -o '$@'
+	@$(ECHO)
+
+$(SMOKE-WASI): $(GOBB) $(GLOAT) $(SMOKE-SOURCE)
+	@$(ECHO) "* Building the WASI Gobb smoke program"
+	$Q mkdir -p '$(@D)'
+	$Q GOBB_GLOAT='$(GLOAT)' '$(GOBB)' build \
+	  '$(SMOKE-SOURCE)' -o '$@' --platform wasip1/wasm
+	@$(ECHO)
+
+$(SMOKE-BROWSER): $(GOBB) $(GLOAT) $(SMOKE-SOURCE)
+	@$(ECHO) "* Building the browser-Wasm Gobb smoke program"
+	$Q mkdir -p '$(@D)'
+	$Q GOBB_GLOAT='$(GLOAT)' '$(GOBB)' build \
+	  '$(SMOKE-SOURCE)' -o '$@' --platform js/wasm
+	@$(ECHO)
+
+smoke: $(SMOKE-NATIVE) $(SMOKE-WASI) $(SMOKE-BROWSER) $(WASMTIME) $(NODE)
+	@$(ECHO) "* Executing Gobb smoke programs"
+	$Q expected=$$('$(GOBB)' -cp '$(TOP)/test/fixtures' -e \
+	    "(require '[gobb.build-smoke :as smoke]) (smoke/-main)"); \
+	  native=$$('$(SMOKE-NATIVE)'); \
+	  wasi=$$('$(WASMTIME)' '$(SMOKE-WASI)'); \
+	  go=$$('$(GLOAT)' --which=go); \
+	  goroot=$$($$go env GOROOT); \
+	  browser=$$(env -i HOME=/tmp \
+	    PATH='$(dir $(NODE)):/usr/bin:/bin' \
+	    "$$goroot/lib/wasm/go_js_wasm_exec" '$(SMOKE-BROWSER)'); \
+	  test "$$native" = "$$expected"; \
+	  test "$$wasi" = "$$expected"; \
+	  test "$$browser" = "$$expected"; \
+	  echo "$$expected"
+	@$(ECHO)
+
+test: $(GOBB) $(BB) smoke
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 
 release-prep:

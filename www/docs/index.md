@@ -32,8 +32,8 @@ hide:
 
 <div class="status-strip">
   <span class="status-pulse"></span>
-  <strong>Current phase:</strong> Execution architecture
-  <span class="status-note">Expressions, files, REPLs, namespaces, and classpath source loading work.</span>
+  <strong>Current phase:</strong> Compatibility inventory
+  <span class="status-note">The native, WASI, and browser-Wasm execution architecture is proven.</span>
 </div>
 
 ## Install

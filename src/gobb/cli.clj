@@ -4,7 +4,10 @@
             [gobb.version]))
 
 (def usage
-  "Usage: gobb [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [-cp PATH|--classpath PATH] --repl\n       gobb [-cp PATH|--classpath PATH] FILE [ARGS...]\n       SOURCE | gobb")
+  "Usage: gobb [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [-cp PATH|--classpath PATH] --repl\n       gobb [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb")
+
+(def build-usage
+  "Usage: gobb build INPUT -o OUTPUT [--platform OS/ARCH]")
 
 (defn fail! [message]
   (fmt.Fprintln os.Stderr (str "gobb: " message))
@@ -32,6 +35,75 @@
     (when-not (empty? path)
       (add-load-path path)))
   (System/setProperty "java.class.path" classpath))
+
+(defn build-fail! [message]
+  (fmt.Fprintln os.Stderr (str "gobb build: " message))
+  (fmt.Fprintln os.Stderr build-usage)
+  (os.Exit 1))
+
+(defn parse-build-options [argv]
+  (loop [args argv
+         options {}]
+    (if-let [arg (first args)]
+      (cond
+        (contains? #{"-h" "--help"} arg)
+        (assoc options :help true)
+
+        (contains? #{"-o" "--out"} arg)
+        (if-let [output (second args)]
+          (recur (drop 2 args) (assoc options :output output))
+          (build-fail! (str arg " requires a path")))
+
+        (= "--platform" arg)
+        (if-let [platform (second args)]
+          (recur (drop 2 args) (assoc options :platform platform))
+          (build-fail! "--platform requires OS/ARCH"))
+
+        (.startsWith (str arg) "--platform=")
+        (recur (next args)
+               (assoc options :platform
+                      (subs arg (count "--platform="))))
+
+        (.startsWith (str arg) "-")
+        (build-fail! (str "unknown option: " arg))
+
+        (:input options)
+        (build-fail! (str "unexpected argument: " arg))
+
+        :else
+        (recur (next args) (assoc options :input arg)))
+      options)))
+
+(defn build-program [argv]
+  (let [{:keys [help input output platform]} (parse-build-options argv)]
+    (if help
+      (println build-usage)
+      (do
+        (when-not input
+          (build-fail! "INPUT is required"))
+        (when-not output
+          (build-fail! "-o OUTPUT is required"))
+        (let [gloat (or (os.Getenv "GOBB_GLOAT") "gloat")
+              target-option (when platform
+                              (if (= "js/wasm" platform)
+                                "--to=js"
+                                (str "--platform=" platform)))
+              args (cond-> [gloat input
+                            (str "--out=" output)
+                            "--force"
+                            "--quiet"
+                            "--ext=goimports"]
+                     target-option (conj target-option))
+              command (apply os:exec.Command args)
+              [command-output command-error] (.CombinedOutput command)]
+          (when command-error
+            (let [details (strings.TrimSpace (go/string command-output))]
+              (build-fail!
+               (str "Gloat failed"
+                    (if (empty? details)
+                      (str ": " (fmt.Sprint command-error))
+                      (str ":\n" details))))))
+          output)))))
 
 (defn evaluate-source [source print-result?]
   ;; A single enclosing do lets the runtime reader accept any number of forms
@@ -153,6 +225,9 @@
 
       (= "--repl" (first argv))
       (start-repl)
+
+      (= "build" (first argv))
+      (build-program (rest argv))
 
       (= "-e" (first argv))
       (if-let [expression (second argv)]
