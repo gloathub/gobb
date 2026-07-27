@@ -14,6 +14,7 @@ include $M/babashka.mk
 include $M/gloat.mk
 include $M/gh.mk
 include $M/node.mk
+include $M/rg.mk
 include $M/wasmtime.mk
 include $M/clean.mk
 
@@ -207,7 +208,7 @@ smoke: $(SMOKE-NATIVE) $(SMOKE-WASI) $(SMOKE-BROWSER) $(WASMTIME) $(NODE)
 	  echo "$$expected"
 	@$(ECHO)
 
-test: $(GOBB) $(BB) smoke
+test: $(GOBB) $(BB) $(RG) smoke
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 
 compat: $(GOBB) $(BB) $(GLOAT) $(COMPAT-FIXTURES) $(COMPAT-RUNNER)
