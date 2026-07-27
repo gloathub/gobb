@@ -48,6 +48,7 @@ extra_css:
   - css/extra.css
 
 extra_javascript:
+  - javascripts/external-links.js
   - javascripts/repl.js
 
 nav:
