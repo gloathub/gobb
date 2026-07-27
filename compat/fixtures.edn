@@ -1,7 +1,23 @@
 {:schema 1
  :normalizations
  [{:id :working-directory
-   :description "Replace each isolated fixture directory with <WORKDIR>"}]
+   :automatic true
+   :description "Replace each isolated fixture directory with <WORKDIR>"}
+  {:id :platform-separators
+   :automatic true
+   :description "Use forward slashes in captured paths on every platform"}
+  {:id :timestamp
+   :pattern "\\b\\d{13}\\b"
+   :replacement "<TIMESTAMP>"
+   :description "Replace explicitly declared millisecond timestamps"}
+  {:id :process-id
+   :pattern "pid=\\d+"
+   :replacement "pid=<PID>"
+   :description "Replace explicitly declared process identifiers"}
+  {:id :port
+   :pattern "port=\\d+"
+   :replacement "port=<PORT>"
+   :description "Replace explicitly declared ephemeral port numbers"}]
 
  :fixtures
  [{:id :cli/expression
@@ -45,6 +61,17 @@
    :args ["-cp" "{fixtures}/classpath"
           "-e"
           "(require '[gobb.fixture.math-ops :as math]) (math/answer 40)"]}
+
+  {:id :runtime/working-directory
+   :area :runtime
+   :description "Normalize each isolated working directory"
+   :args ["-e" "(println (System/getProperty \"user.dir\"))"]}
+
+  {:id :runtime/timestamp
+   :area :runtime
+   :description "Normalize a declared millisecond timestamp"
+   :normalizations [:timestamp]
+   :args ["-e" "(println (System/currentTimeMillis))"]}
 
   {:id :errors/exception-data
    :area :errors

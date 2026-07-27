@@ -15,17 +15,41 @@
 (defn expand-arg [fixtures-root arg]
   (str/replace arg "{fixtures}" (str fixtures-root)))
 
-(defn normalize-text [workdir text]
+(defn apply-normalizations [text normalizations]
+  (reduce (fn [value {:keys [pattern replacement]}]
+            (str/replace value (re-pattern pattern) replacement))
+          text
+          normalizations))
+
+(defn normalize-text [workdir normalizations text]
   (-> (or text "")
       (str/replace (str workdir) "<WORKDIR>")
-      (str/replace "\\" "/")))
+      (str/replace "\\" "/")
+      (apply-normalizations normalizations)))
+
+(defn sha256 [bytes]
+  (let [digest (.digest (java.security.MessageDigest/getInstance "SHA-256")
+                        bytes)]
+    (apply str (map #(format "%02x" (bit-and 0xff %)) digest))))
+
+(defn file-value [file]
+  (let [bytes (java.nio.file.Files/readAllBytes (.toPath file))
+        text (String. bytes java.nio.charset.StandardCharsets/UTF_8)]
+    (if (java.util.Arrays/equals
+         bytes
+         (.getBytes text java.nio.charset.StandardCharsets/UTF_8))
+      {:type :text
+       :content text}
+      {:type :binary
+       :size (count bytes)
+       :sha256 (sha256 bytes)})))
 
 (defn filesystem-snapshot [workdir]
   (into (sorted-map)
         (for [file (file-seq (io/file (str workdir)))
               :when (.isFile file)]
           [(str/replace (str (fs/relativize workdir file)) "\\" "/")
-           (slurp file)])))
+           (file-value file)])))
 
 (defn execute! [executable args workdir]
   (let [command (into [executable] args)
@@ -39,17 +63,37 @@
      :err (:err result)
      :files (filesystem-snapshot workdir)}))
 
-(defn normalized-result [workdir result]
+(defn normalized-result [workdir normalizations result]
   (-> result
       (dissoc :command)
-      (update :out #(normalize-text workdir %))
-      (update :err #(normalize-text workdir %))))
+      (update :out #(normalize-text workdir normalizations %))
+      (update :err #(normalize-text workdir normalizations %))
+      (update :files
+              (fn [files]
+                (into (sorted-map)
+                      (map (fn [[path value]]
+                             [path
+                              (if (= :text (:type value))
+                                (update value :content
+                                        #(normalize-text
+                                          workdir normalizations %))
+                                value)]))
+                      files)))))
 
 (defn fixture-name [{:keys [id]}]
   (str (namespace id) "__" (name id)))
 
-(defn run-fixture! [fixture bb gobb fixtures-root run-root]
+(defn selected-normalizations [definitions fixture]
+  (mapv (fn [id]
+          (or (get definitions id)
+              (die "fixture " (:id fixture)
+                   " names unknown normalization " id)))
+        (:normalizations fixture)))
+
+(defn run-fixture!
+  [fixture bb gobb fixtures-root run-root definitions]
   (let [args (mapv #(expand-arg fixtures-root %) (:args fixture))
+        normalizations (selected-normalizations definitions fixture)
         fixture-root (fs/path run-root (fixture-name fixture))
         bb-dir (fs/path fixture-root "bb")
         gobb-dir (fs/path fixture-root "gobb")]
@@ -57,8 +101,10 @@
     (fs/create-dirs gobb-dir)
     (let [bb-result (execute! bb args bb-dir)
           gobb-result (execute! gobb args gobb-dir)
-          bb-normalized (normalized-result bb-dir bb-result)
-          gobb-normalized (normalized-result gobb-dir gobb-result)
+          bb-normalized
+          (normalized-result bb-dir normalizations bb-result)
+          gobb-normalized
+          (normalized-result gobb-dir normalizations gobb-result)
           equal? (= bb-normalized gobb-normalized)
           expected-difference? (= :difference (:expect fixture))
           status (cond
@@ -75,9 +121,10 @@
                           :gobb gobb-normalized}))))
 
 (defn run-compiled-fixture!
-  [fixture bb gobb gloat fixtures-root run-root]
+  [fixture bb gobb gloat fixtures-root run-root definitions]
   (let [bb-args (mapv #(expand-arg fixtures-root %) (:bb-args fixture))
         source (expand-arg fixtures-root (:source fixture))
+        normalizations (selected-normalizations definitions fixture)
         fixture-root (fs/path run-root (fixture-name fixture))
         bb-dir (fs/path fixture-root "bb")
         gobb-dir (fs/path fixture-root "gobb")
@@ -98,8 +145,10 @@
              :out ""
              :err (str "gobb build failed\n" (:err build-result))
              :files (filesystem-snapshot gobb-dir)})
-          bb-normalized (normalized-result bb-dir bb-result)
-          gobb-normalized (normalized-result gobb-dir gobb-result)
+          bb-normalized
+          (normalized-result bb-dir normalizations bb-result)
+          gobb-normalized
+          (normalized-result gobb-dir normalizations gobb-result)
           equal? (= bb-normalized
                     (update gobb-normalized :files dissoc "program"))
           status (if equal? :match :unexpected-difference)]
@@ -201,6 +250,8 @@
     (die (str "usage: compat FIXTURES BB GOBB GLOAT FIXTURES-ROOT "
               "OUTPUT-DIR WEBSITE-REPORT")))
   (let [manifest (edn/read-string (slurp fixture-file))
+        definitions
+        (into {} (map (juxt :id identity)) (:normalizations manifest))
         output-dir (fs/absolutize output-dir)
         diagnostics-dir (fs/path output-dir "fixtures")
         run-root (fs/path output-dir "work")
@@ -210,9 +261,10 @@
     (fs/create-dirs run-root)
     (let [results (mapv #(if (= :compiled (:kind %))
                            (run-compiled-fixture!
-                            % bb gobb gloat fixtures-root run-root)
+                            % bb gobb gloat fixtures-root run-root
+                            definitions)
                            (run-fixture!
-                            % bb gobb fixtures-root run-root))
+                            % bb gobb fixtures-root run-root definitions))
                         (:fixtures manifest))
           counts (frequencies (map :status results))
           report {:schema (:schema manifest)

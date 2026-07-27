@@ -175,6 +175,10 @@ make compat
 make compat STRICT=1
 ```
 
+CI runs the strict comparison, publishes the Markdown summary in the workflow
+run, and retains the machine-readable report and per-fixture diagnostics as an
+artifact.
+
 Print the generated Babashka namespace compatibility ledger with `make
 source-ledger`.
 

@@ -1,0 +1,45 @@
+name: Compatibility
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache Makes dependencies
+      uses: actions/cache@v4
+      with:
+        path: .cache/
+        key: compat-${{ runner.os }}-${{ hashFiles('Makefile', 'VERSION', 'compat/fixtures.edn', 'util/compat') }}
+        restore-keys: compat-${{ runner.os }}-
+
+    - name: Compare Gobb with Babashka
+      run: make compat STRICT=1
+
+    - name: Verify the tracked website report
+      run: git diff --exit-code -- www/docs/compatibility.md
+
+    - name: Publish compatibility summary
+      if: always() && hashFiles('www/docs/compatibility.md') != ''
+      run: cat www/docs/compatibility.md >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Publish compatibility diagnostics
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: gobb-compatibility-${{ github.run_id }}
+        path: |
+          .cache/compat/
+          www/docs/compatibility.md
+        if-no-files-found: warn
+        retention-days: 14

@@ -8,7 +8,7 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Differential BB compatibility harness</p>
+    <p class="summary-value">Glojure-native BB execution shell</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
@@ -27,8 +27,9 @@ description: Current Gobb implementation progress and upcoming milestones
 The first native Gobb executable is now working. It evaluates expressions,
 files, and stdin through Glojure and is compiled to a native binary by Gloat.
 The same architecture now powers native and live browser-Wasm REPLs using
-Babashka's reusable REPL loop. This remains an architecture proof, not yet a
-general BB replacement.
+Babashka's reusable REPL loop. A strict differential harness records current
+BB compatibility for interpreted and compiled programs. Gobb remains an
+architecture proof, not yet a general BB replacement.
 
 ## Completed foundation
 
@@ -93,12 +94,12 @@ general BB replacement.
   </div>
 </div>
 
-## Current work
+## Completed compatibility harness
 
-<div class="milestone milestone-active">
+<div class="milestone milestone-done">
   <div class="milestone-marker">2</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Differential BB compatibility harness</h3>
     <p>
       Run the same fixtures under the pinned BB executable and the current
@@ -111,7 +112,8 @@ general BB replacement.
       <li class="task-done">Compare exit status</li>
       <li class="task-done">Compare structured exception data</li>
       <li class="task-done">Compare expected filesystem effects</li>
-      <li>Extend normalization beyond isolated working directories and platform separators when fixtures expose another known source of nondeterminism</li>
+      <li class="task-done">Normalize isolated working directories and platform separators automatically</li>
+      <li class="task-done">Provide explicit timestamp, process ID, and ephemeral-port normalizers</li>
       <li class="task-done">Persist complete reproduction diagnostics while keeping successful output concise</li>
       <li class="task-done">Cover initial CLI parsing and invocation</li>
       <li class="task-done">Cover initial reader behavior and printing</li>
@@ -120,7 +122,37 @@ general BB replacement.
       <li class="task-done">Cover initial error and exit behavior</li>
       <li class="task-done">Support interpreted and <code>gobb build</code> compiled programs</li>
       <li class="task-done">Generate a website compatibility report with <code>make compat</code></li>
-      <li>Publish the compatibility report in CI</li>
+      <li class="task-done">Publish the compatibility summary and full diagnostics in CI</li>
+    </ul>
+  </div>
+</div>
+
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">3</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Glojure-native BB execution shell</h3>
+    <p>
+      Replace the host responsibilities that SCI performs inside BB with a
+      Gobb layer built directly on Glojure.
+    </p>
+    <ul class="task-list">
+      <li>Current execution namespace and <code>*file*</code></li>
+      <li>Standard input, output, and error bindings</li>
+      <li><code>*command-line-args*</code></li>
+      <li>Environment and working-directory state</li>
+      <li>Load paths and embedded resources</li>
+      <li>Data readers and default data-reader behavior</li>
+      <li>Preloads and repeated <code>require</code></li>
+      <li><code>:bb</code> and <code>:gobb</code> reader features</li>
+      <li>Expression, file, stdin, namespace-main, and exec-function invocation</li>
+      <li>Shutdown hooks and controlled exits</li>
+      <li>Source-aware stacktraces and error formatting</li>
+      <li>Signal and interrupt handling where supported</li>
+      <li>Runtime and compiled execution agree on namespace, binding, and loader behavior</li>
+      <li>No Gobb source depends on SCI</li>
     </ul>
   </div>
 </div>
@@ -153,6 +185,7 @@ make deps           # Download and verify pinned Babashka source
 make build          # Build bin/gobb with Gloat
 make test           # Run native and differential BB tests
 make smoke          # Execute interpreted, native, WASI, and browser-Wasm proof
+make compat         # Generate the BB-vs-Gobb compatibility report
 make repl-wasm      # Build the browser BB REPL with Gloat
 make source-ledger  # Print the generated namespace ledger
 ```
@@ -176,17 +209,13 @@ also removes the downloaded Babashka source checkout.
 
 ## Next concrete slice
 
-Build the reusable differential runner, start with CLI/reader/namespace
-fixtures, and publish its first compatibility report.
+Consolidate namespace, binding, loader, and invocation state into the
+Glojure-native host layer, with each behavior guarded by the differential
+harness.
 
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>03</span>
-    <h3>Glojure-native BB shell</h3>
-    <p>Replace SCI's host responsibilities with Glojure-native execution.</p>
-  </article>
   <article class="roadmap-card">
     <span>04</span>
     <h3>Compatibility ledger</h3>
