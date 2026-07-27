@@ -40,6 +40,25 @@
    :description "Read and print nested collection literals"
    :args ["-e" "(prn {:vector [1 2 3] :list '(a b) :keyword :ok})"]}
 
+  {:id :reader/bb-feature
+   :area :reader
+   :description "Select the :bb reader-conditional branch"
+   :args ["-e" "#?(:bb :bb :default :other)"]}
+
+  {:id :reader/gobb-feature
+   :area :reader
+   :description "Select Gobb's additional reader-conditional branch"
+   :args ["-e" "#?(:gobb :gobb :default :other)"]
+   :expect :difference
+   :rationale "The :gobb feature is intentionally active only under Gobb"}
+
+  {:id :reader/data-readers
+   :area :reader
+   :description "Load a tagged-literal reader from data_readers.clj"
+   :args ["-cp" "{fixtures}/classpath"
+          "-e"
+          "(require 'gobb.fixture.readers) #fixture/tag {:answer 42}"]}
+
   {:id :printing/basic
    :area :printing
    :description "Preserve print and prn output"
@@ -71,6 +90,62 @@
    :args ["-cp" "{fixtures}/classpath"
           "-e"
           "(require '[gobb.fixture.math-ops :as math]) (math/answer 40)"]}
+
+  {:id :loading/repeated-require
+   :area :script-loading
+   :description "Repeated require preserves the loaded namespace"
+   :args ["-cp" "{fixtures}/classpath"
+          "-e"
+          "(require 'gobb.fixture.math-ops) (require 'gobb.fixture.math-ops) (gobb.fixture.math-ops/answer 40)"]}
+
+  {:id :loading/resource
+   :area :script-loading
+   :description "Resolve and read a resource from the runtime classpath"
+   :args ["-cp" "{fixtures}/classpath"
+          "-e"
+          "(require '[clojure.java.io :as io]) (slurp (io/resource \"fixture-resource.txt\"))"]}
+
+  {:id :loading/preloads
+   :area :script-loading
+   :description "Evaluate BABASHKA_PRELOADS before the expression"
+   :env {"BABASHKA_PRELOADS" "(def preload-value 42)"}
+   :args ["-e" "preload-value"]}
+
+  {:id :loading/init
+   :area :script-loading
+   :description "Evaluate --init before the expression"
+   :args ["--init" "{fixtures}/init.clj"
+          "-e"
+          "(prn init-value)"]}
+
+  {:id :invocation/main
+   :area :invocation
+   :description "Invoke a namespace -main with command-line arguments"
+   :args ["-cp" "{fixtures}/classpath"
+          "-m"
+          "gobb.fixture.entry"
+          "alpha"
+          "beta"]}
+
+  {:id :invocation/main-var
+   :area :invocation
+   :description "Invoke a qualified var through -m"
+   :args ["-cp" "{fixtures}/classpath"
+          "-m"
+          "gobb.fixture.entry/alternate"
+          "alpha"]}
+
+  {:id :invocation/exec
+   :area :invocation
+   :description "Invoke a qualified var through -x with parsed options"
+   :args ["-cp" "{fixtures}/classpath"
+          "-x"
+          "gobb.fixture.entry/exec"
+          "--name"
+          "Gobb"
+          "--count"
+          "2"
+          "--enabled"]}
 
   {:id :runtime/working-directory
    :area :runtime
@@ -124,4 +199,17 @@
    :source "{fixtures}/gobb/build_smoke.clj"
    :bb-args ["-cp" "{fixtures}"
              "-e"
-             "(require '[gobb.build-smoke :as smoke]) (smoke/-main)"]}]}
+             "(require '[gobb.build-smoke :as smoke]) (smoke/-main)"]}
+
+  {:id :compiled/host-state
+   :area :compiled-programs
+   :kind :compiled
+   :description "Keep runtime and compiled namespace and binding state aligned"
+   :source "{fixtures}/gobb/host_parity.clj"
+   :env {"GOBB_PARITY_ENV" "visible"}
+   :run-args ["alpha" "beta"]
+   :bb-args ["-cp" "{fixtures}"
+             "-m"
+             "gobb.host-parity"
+             "alpha"
+             "beta"]}]}

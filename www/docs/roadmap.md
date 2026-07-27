@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Glojure-native BB execution shell</p>
+    <p class="summary-value">Compatibility ledger and test inventory</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">3 / 14</p>
+    <p class="summary-value">4 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 21%"></span>
+  <span style="width: 29%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -127,12 +127,12 @@ architecture proof, not yet a general BB replacement.
   </div>
 </div>
 
-## Current work
+## Completed Glojure-native shell
 
-<div class="milestone milestone-active">
+<div class="milestone milestone-done">
   <div class="milestone-marker">3</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Glojure-native BB execution shell</h3>
     <p>
       Replace the host responsibilities that SCI performs inside BB with a
@@ -143,16 +143,41 @@ architecture proof, not yet a general BB replacement.
       <li class="task-done">Standard input, output, and error bindings</li>
       <li class="task-done"><code>*command-line-args*</code></li>
       <li class="task-done">Environment and working-directory state</li>
-      <li>Load paths and embedded resources</li>
-      <li>Data readers and default data-reader behavior</li>
-      <li>Preloads and repeated <code>require</code></li>
-      <li><code>:bb</code> and <code>:gobb</code> reader features</li>
-      <li>Expression, file, stdin, namespace-main, and exec-function invocation</li>
-      <li>Shutdown hooks and controlled exits</li>
-      <li>Source-aware stacktraces and error formatting</li>
-      <li>Signal and interrupt handling where supported</li>
-      <li>Runtime and compiled execution agree on namespace, binding, and loader behavior</li>
-      <li>No Gobb source depends on SCI</li>
+      <li class="task-done">Runtime load paths and classpath resources</li>
+      <li class="task-done">Data readers and default data-reader behavior</li>
+      <li class="task-done">Preloads and repeated <code>require</code></li>
+      <li class="task-done"><code>:bb</code> and <code>:gobb</code> reader features</li>
+      <li class="task-done">Expression, file, stdin, namespace-main, and exec-function invocation</li>
+      <li class="task-done">Shutdown hooks and controlled exits</li>
+      <li class="task-done">Source-aware error formatting without Go panic leakage</li>
+      <li class="task-done">Native interrupt behavior where supported</li>
+      <li class="task-done">Runtime and compiled execution agree on namespace, binding, and loader behavior</li>
+      <li class="task-done">No Gobb-owned runtime source depends on SCI</li>
+    </ul>
+  </div>
+</div>
+
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">4</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Compatibility ledger and test inventory</h3>
+    <p>
+      Turn BB's complete user-visible surface into a machine-readable backlog
+      before starting the larger feature ports.
+    </p>
+    <ul class="task-list">
+      <li>Inventory BB CLI commands and options</li>
+      <li>Inventory <code>bb.edn</code>, <code>deps.edn</code>, tasks, and exec behavior</li>
+      <li>Inventory bundled namespaces and libraries</li>
+      <li>Inventory BB-exposed Java classes</li>
+      <li>Inventory REPL, pod, server, process, platform, and architecture features</li>
+      <li>Map upstream BB tests and representative programs</li>
+      <li>Assign every item a compatibility state and tested evidence</li>
+      <li>Record rationales for intentional differences and platform limits</li>
+      <li>Generate concise Markdown and website reports from the ledger</li>
     </ul>
   </div>
 </div>
@@ -209,18 +234,12 @@ also removes the downloaded Babashka source checkout.
 
 ## Next concrete slice
 
-Consolidate namespace, binding, loader, and invocation state into the
-Glojure-native host layer, with each behavior guarded by the differential
-harness.
+Generate the initial machine-readable ledger from BB's CLI, exposed classes,
+bundled namespaces, platform features, and upstream tests.
 
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>04</span>
-    <h3>Compatibility ledger</h3>
-    <p>Complete the BB feature, class, platform, and upstream-test inventory.</p>
-  </article>
   <article class="roadmap-card">
     <span>05</span>
     <h3>Platform capabilities</h3>

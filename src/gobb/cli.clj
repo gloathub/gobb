@@ -5,7 +5,7 @@
             [gobb.version]))
 
 (def usage
-  "Usage: gobb [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [-cp PATH|--classpath PATH] --repl\n       gobb [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb")
+  "Usage: gobb [--init FILE] [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [--init FILE] [-cp PATH|--classpath PATH] -m NS|VAR [ARGS...]\n       gobb [--init FILE] [-cp PATH|--classpath PATH] -x VAR [ARGS...]\n       gobb [-cp PATH|--classpath PATH] --repl\n       gobb [--init FILE] [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb")
 
 (def build-usage
   "Usage: gobb build INPUT -o OUTPUT [--platform OS/ARCH]")
@@ -13,31 +13,42 @@
 (defn fail! [message]
   (fmt.Fprintln os.Stderr (str "gobb: " message))
   (fmt.Fprintln os.Stderr usage)
-  (os.Exit 1))
+  (host/exit! 1))
 
 (defn parse-global-options [argv]
   (loop [args argv
-         classpath ""]
-    (if (contains? #{"-cp" "--classpath"} (first args))
+         classpath ""
+         init nil]
+    (cond
+      (contains? #{"-cp" "--classpath"} (first args))
       (if-let [path (second args)]
-        (recur (drop 2 args) path)
+        (recur (drop 2 args) path init)
         (fail! (str (first args) " requires a path")))
+
+      (= "--init" (first args))
+      (if-let [file (second args)]
+        (recur (drop 2 args) classpath file)
+        (fail! "--init requires a file"))
+
+      :else
       {:argv args
-       :classpath classpath})))
+       :classpath classpath
+       :init init})))
 
 (defn configure-classpath! [classpath]
   ;; BB always loads source from the working directory. Explicit classpath
   ;; entries are searched after it in platform path-list order.
-  (add-load-path ".")
+  (host/add-load-path! ".")
   (doseq [path (path:filepath.SplitList classpath)]
     (when-not (empty? path)
-      (add-load-path path)))
+      (host/add-load-path! path)))
+  (host/install-data-readers!)
   (System/setProperty "java.class.path" classpath))
 
 (defn build-fail! [message]
   (fmt.Fprintln os.Stderr (str "gobb build: " message))
   (fmt.Fprintln os.Stderr build-usage)
-  (os.Exit 1))
+  (host/exit! 1))
 
 (defn parse-build-options [argv]
   (loop [args argv
@@ -81,12 +92,34 @@
           (build-fail! "INPUT is required"))
         (when-not output
           (build-fail! "-o OUTPUT is required"))
-        (let [gloat (or (os.Getenv "GOBB_GLOAT") "gloat")
+        (let [[input-bytes input-error] (os.ReadFile input)]
+          (when input-error
+            (build-fail! (str "cannot read INPUT: " input-error)))
+          (let [[temporary-dir temporary-error]
+                (os.MkdirTemp "" "gobb-build-")]
+            (when temporary-error
+              (build-fail!
+               (str "cannot create temporary directory: "
+                    temporary-error)))
+            (let [staged-input (path:filepath.Join
+                                temporary-dir "main.clj")
+                  staged-source
+                  (host/prepare-build-source
+                   (fmt.Sprintf "%s" input-bytes))
+                  write-error
+                  (os.WriteFile staged-input
+                                (.getBytes staged-source)
+                                0644)]
+              (when write-error
+                (os.RemoveAll temporary-dir)
+                (build-fail!
+                 (str "cannot stage INPUT: " write-error)))
+              (let [gloat (or (os.Getenv "GOBB_GLOAT") "gloat")
               target-option (when platform
                               (if (= "js/wasm" platform)
                                 "--to=js"
                                 (str "--platform=" platform)))
-              args (cond-> [gloat input
+              args (cond-> [gloat staged-input
                             (str "--out=" output)
                             "--force"
                             "--quiet"
@@ -94,6 +127,7 @@
                      target-option (conj target-option))
               command (apply os:exec.Command args)
               [command-output command-error] (.CombinedOutput command)]
+          (os.RemoveAll temporary-dir)
           (when command-error
             (let [details (strings.TrimSpace (go/string command-output))]
               (build-fail!
@@ -101,7 +135,7 @@
                     (if (empty? details)
                       (str ": " (fmt.Sprint command-error))
                       (str ":\n" details))))))
-          output)))))
+                output))))))))
 
 (defn evaluate-expression [expression args]
   (host/evaluate-source
@@ -212,37 +246,51 @@
   (host/initialize!)
   (System/setProperty
    "babashka.version" gobb.version/babashka-version)
-  (let [{:keys [argv classpath]} (parse-global-options argv)]
-    (configure-classpath! classpath)
-    (cond
-      (empty? argv)
-      (if (stdin-terminal?)
-        (start-repl)
-        (host/evaluate-source
-         (slurp *in*)
-         {:file host/no-source-path
-          :print-result? true}))
+  (host/run-main!
+   (fn []
+     (let [{:keys [argv classpath init]} (parse-global-options argv)]
+       (configure-classpath! classpath)
+       (host/run-preloads!)
+       (host/run-init! init)
+       (cond
+         (empty? argv)
+         (if (stdin-terminal?)
+           (start-repl)
+           (host/evaluate-source
+            (slurp *in*)
+            {:file host/no-source-path
+             :print-result? true}))
 
-      (= "--repl" (first argv))
-      (start-repl)
+         (= "--repl" (first argv))
+         (start-repl)
 
-      (= "build" (first argv))
-      (build-program (rest argv))
+         (= "build" (first argv))
+         (build-program (rest argv))
 
-      (= "-e" (first argv))
-      (if-let [expression (second argv)]
-        (evaluate-expression expression (drop 2 argv))
-        (fail! "-e requires an expression"))
+         (contains? #{"-e" "--eval"} (first argv))
+         (if-let [expression (second argv)]
+           (evaluate-expression expression (drop 2 argv))
+           (fail! (str (first argv) " requires an expression")))
 
-      (or (= "-h" (first argv))
-          (= "--help" (first argv)))
-      (println usage)
+         (contains? #{"-m" "--main"} (first argv))
+         (if-let [target (second argv)]
+           (host/invoke-main! target (drop 2 argv))
+           (fail! (str (first argv) " requires a namespace or var")))
 
-      (= "--version" (first argv))
-      (println (str "gobb v" gobb.version/version))
+         (contains? #{"-x" "--exec"} (first argv))
+         (if-let [target (second argv)]
+           (host/invoke-exec! target (drop 2 argv))
+           (fail! (str (first argv) " requires a var")))
 
-      (.startsWith (str (first argv)) "-")
-      (fail! (str "unknown option: " (first argv)))
+         (or (= "-h" (first argv))
+             (= "--help" (first argv)))
+         (println usage)
 
-      :else
-      (evaluate-file (first argv) (rest argv)))))
+         (= "--version" (first argv))
+         (println (str "gobb v" gobb.version/version))
+
+         (.startsWith (str (first argv)) "-")
+         (fail! (str "unknown option: " (first argv)))
+
+         :else
+         (evaluate-file (first argv) (rest argv)))))))

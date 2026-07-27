@@ -193,6 +193,20 @@ gobb --classpath src:lib script.clj
 Classpath lists use the platform path separator and are reflected in the
 `java.class.path` system property.
 
+Gobb supports BB-style namespace-main, qualified-main, and exec-function
+invocation:
+
+```bash
+gobb -cp src -m example.core alpha beta
+gobb -cp src -m example.core/alternate alpha
+gobb -cp src -x example.core/run --name Gobb --count 2
+```
+
+Use `BABASHKA_PRELOADS` or `--init FILE` to establish runtime state before
+evaluation. Reader conditionals recognize `:clj`, `:bb`, and the additional
+`:gobb` feature. Runtime classpaths also provide namespaces,
+`data_readers.clj`, and resources through `clojure.java.io/resource`.
+
 ## Build Programs
 
 The initial `gobb build` spike compiles a dependency-free namespace containing

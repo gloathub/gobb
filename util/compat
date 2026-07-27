@@ -138,7 +138,9 @@
         program (fs/path gobb-dir "program")]
     (fs/create-dirs bb-dir)
     (fs/create-dirs gobb-dir)
-    (let [bb-result (execute! bb bb-args bb-dir)
+    (let [options {:env (:env fixture)
+                   :stdin (:stdin fixture)}
+          bb-result (execute! bb bb-args bb-dir options)
           build-result
           (execute! "env"
                     [(str "GOBB_GLOAT=" gloat)
@@ -146,7 +148,8 @@
                     gobb-dir)
           gobb-result
           (if (zero? (:exit build-result))
-            (execute! (str program) [] gobb-dir)
+            (execute! (str program) (:run-args fixture) gobb-dir
+                      options)
             {:command [(str program)]
              :exit (:exit build-result)
              :out ""

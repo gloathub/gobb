@@ -25,6 +25,18 @@ check "expression evaluation" "3" \
 check "expression source marker" '"NO_SOURCE_PATH"' \
   "$GOBB" -e '(prn *file*)'
 
+check "initial execution namespace" "user" \
+  "$GOBB" -e '(ns-name *ns*)'
+
+check "BB reader feature" ":bb" \
+  "$GOBB" -e '#?(:bb :bb :default :other)'
+
+check "Gobb reader feature" ":gobb" \
+  "$GOBB" -e '#?(:gobb :gobb :default :other)'
+
+check "splicing reader feature" "[1 2]" \
+  "$GOBB" -e '[#?@(:bb [1 2] :default [3])]'
+
 check "Babashka version property" "1.12.218" \
   "$GOBB" -e '(println (System/getProperty "babashka.version"))'
 
@@ -49,6 +61,21 @@ check "explicit classpath require" "42" \
 check "short classpath option" "42" \
   "$GOBB" -cp test/fixtures/classpath -e "$require_expression"
 
+check "data readers" '[:fixture/tag {:answer 42}]' \
+  "$GOBB" -cp test/fixtures/classpath \
+  -e "(require 'gobb.fixture.readers) #fixture/tag {:answer 42}"
+
+check "repeated require" "42" \
+  "$GOBB" -cp test/fixtures/classpath \
+  -e "(require 'gobb.fixture.math-ops)
+      (require 'gobb.fixture.math-ops)
+      (gobb.fixture.math-ops/answer 40)"
+
+check "classpath resource" '"resource-loaded\n"' \
+  "$GOBB" -cp test/fixtures/classpath \
+  -e "(require '[clojure.java.io :as io])
+      (slurp (io/resource \"fixture-resource.txt\"))"
+
 check "working directory require" "7" \
   bash -c \
   'cd test/fixtures/classpath && "$1" -e "(require '"'"'[gobb.fixture.math-ops :as math]) (math/answer 5)"' \
@@ -66,6 +93,41 @@ check "file arguments" '("alpha" "beta")' \
 
 check "file source binding" "$(realpath test/fixtures/file-var.clj)" \
   "$GOBB" test/fixtures/file-var.clj
+
+check "preloads" "42" \
+  env BABASHKA_PRELOADS='(def preload-value 42)' \
+  "$GOBB" -e preload-value
+
+check "init file" \
+  "{:loaded true, :file \"$(realpath test/fixtures/init.clj)\"}" \
+  "$GOBB" --init test/fixtures/init.clj -e '(prn init-value)'
+
+check "namespace main" \
+  '{:mode :main, :args ("alpha" "beta"), :file "NO_SOURCE_PATH"}' \
+  "$GOBB" -cp test/fixtures/classpath \
+  -m gobb.fixture.entry alpha beta
+
+check "qualified main var" \
+  '{:mode :alternate, :args ("alpha"), :file "NO_SOURCE_PATH"}' \
+  "$GOBB" -cp test/fixtures/classpath \
+  -m gobb.fixture.entry/alternate alpha
+
+check "exec function" \
+  '{:mode :exec, :options {:name "Gobb", :count 2, :enabled true}, :file "NO_SOURCE_PATH"}' \
+  "$GOBB" -cp test/fixtures/classpath \
+  -x gobb.fixture.entry/exec --name Gobb --count 2 --enabled
+
+check "shutdown hook" $'body\nshutdown' \
+  "$GOBB" -e \
+  '(gobb.host/register-shutdown-hook! #(println "shutdown"))
+   (println "body")'
+
+check "default data reader" ":default-read" \
+  env BABASHKA_PRELOADS='
+    (alter-var-root
+      (var *default-data-reader-fn*)
+      (constantly (fn [_ _] :default-read)))' \
+  "$GOBB" -e '#unknown/tag 42'
 
 stderr_file=$(mktemp)
 trap 'rm -f "$stderr_file"' EXIT
@@ -151,6 +213,8 @@ reader_error=$("$GOBB" -e '(' 2>&1)
 reader_status=$?
 runtime_error=$("$GOBB" -e '(throw (ex-info "boom" {}))' 2>&1)
 runtime_status=$?
+file_error=$("$GOBB" test/fixtures/error.clj 2>&1)
+file_error_status=$?
 set -e
 
 [[ $reader_status -ne 0 && $reader_error ]] ||
@@ -158,5 +222,25 @@ set -e
 
 [[ $runtime_status -ne 0 && $runtime_error == *boom* ]] ||
   fail "runtime exception did not produce a useful failure"
+[[ $runtime_error != *"goroutine "* && $runtime_error != panic:* ]] ||
+  fail "runtime exception leaked a Go panic stack"
+[[ $file_error_status -ne 0 &&
+   $file_error == *"$(realpath test/fixtures/error.clj)"* &&
+   $file_error == *"file boom"* ]] ||
+  fail "file exception did not include its source path"
+
+if rg -n '\bsci(\.|/|\b)' src/gobb >/dev/null; then
+  fail "Gobb-owned runtime source depends on SCI"
+fi
+
+if command -v timeout >/dev/null 2>&1; then
+  set +e
+  timeout --preserve-status -s INT 0.2 \
+    "$GOBB" -e '(Thread/sleep 5000)' >/dev/null 2>&1
+  interrupt_status=$?
+  set -e
+  [[ $interrupt_status -eq 130 ]] ||
+    fail "SIGINT did not terminate Gobb with status 130"
+fi
 
 echo "All Gobb tests passed"
