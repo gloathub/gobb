@@ -45,6 +45,10 @@ SMOKE-SOURCE := $(TOP)/test/fixtures/gobb/build_smoke.clj
 SMOKE-NATIVE := $(SMOKE-DIR)/native
 SMOKE-WASI := $(SMOKE-DIR)/wasi.wasm
 SMOKE-BROWSER := $(SMOKE-DIR)/browser.wasm
+COMPAT-FIXTURES := $(TOP)/compat/fixtures.edn
+COMPAT-RUNNER := $(TOP)/util/compat
+COMPAT-DIR := $(TOP)/.cache/compat
+COMPAT-REPORT := $(TOP)/www/docs/compatibility.md
 PREFIX ?= $(if $(filter 0,$(shell id -u)),/usr/local,$(HOME)/.local)
 
 MAKES-CLEAN := \
@@ -54,6 +58,7 @@ MAKES-CLEAN := \
   $(SOURCE-STAGE) \
   $(REPL-SOURCE-STAGE) \
   $(SMOKE-DIR) \
+  $(COMPAT-DIR) \
   $(GOBB-WASM) \
   $(WASM-EXEC) \
 
@@ -204,6 +209,18 @@ smoke: $(SMOKE-NATIVE) $(SMOKE-WASI) $(SMOKE-BROWSER) $(WASMTIME) $(NODE)
 
 test: $(GOBB) $(BB) smoke
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
+
+compat: $(GOBB) $(BB) $(GLOAT) $(COMPAT-FIXTURES) $(COMPAT-RUNNER)
+	@$(ECHO) "* Comparing Gobb with Babashka"
+	$Q STRICT='$(STRICT)' $(BB) '$(COMPAT-RUNNER)' \
+	  '$(COMPAT-FIXTURES)' \
+	  '$(BB)' \
+	  '$(GOBB)' \
+	  '$(GLOAT)' \
+	  '$(TOP)/test/fixtures' \
+	  '$(COMPAT-DIR)' \
+	  '$(COMPAT-REPORT)'
+	@$(ECHO)
 
 release-prep:
 	@$(if $(filter command line,$(origin VERSION)),,\

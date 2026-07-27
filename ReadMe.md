@@ -167,6 +167,14 @@ make build BABASHKA_DIR=~/src/babashka
 ```
 
 Run the native and differential BB tests with `make test`.
+Generate the BB-vs-Gobb compatibility report with `make compat`. Add
+`STRICT=1` to fail when the harness finds an unexpected result:
+
+```bash
+make compat
+make compat STRICT=1
+```
+
 Print the generated Babashka namespace compatibility ledger with `make
 source-ledger`.
 

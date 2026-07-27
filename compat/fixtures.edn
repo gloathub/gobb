@@ -1,0 +1,78 @@
+{:schema 1
+ :normalizations
+ [{:id :working-directory
+   :description "Replace each isolated fixture directory with <WORKDIR>"}]
+
+ :fixtures
+ [{:id :cli/expression
+   :area :cli
+   :description "Evaluate an expression"
+   :args ["-e" "(+ 20 22)"]}
+
+  {:id :cli/arguments
+   :area :cli
+   :description "Bind expression command-line arguments"
+   :args ["-e" "(prn *command-line-args*)" "alpha" "beta"]}
+
+  {:id :reader/collections
+   :area :reader
+   :description "Read and print nested collection literals"
+   :args ["-e" "(prn {:vector [1 2 3] :list '(a b) :keyword :ok})"]}
+
+  {:id :printing/basic
+   :area :printing
+   :description "Preserve print and prn output"
+   :args ["-e" "(do (print \"left:\") (prn {:right 42}))"]}
+
+  {:id :namespace/switch
+   :area :namespace
+   :description "Create and switch the current namespace"
+   :args ["-e" "(ns compat.alpha) (println (ns-name *ns*))"]}
+
+  {:id :vars/dynamic
+   :area :dynamic-vars
+   :description "Bind dynamic command-line state"
+   :args ["-e" "(binding [*print-length* 2] (prn [1 2 3 4]))"]}
+
+  {:id :loading/script
+   :area :script-loading
+   :description "Load a script with arguments"
+   :args ["{fixtures}/args.clj" "alpha" "beta"]}
+
+  {:id :loading/require
+   :area :script-loading
+   :description "Require source from an explicit classpath"
+   :args ["-cp" "{fixtures}/classpath"
+          "-e"
+          "(require '[gobb.fixture.math-ops :as math]) (math/answer 40)"]}
+
+  {:id :errors/exception-data
+   :area :errors
+   :description "Preserve structured exception data"
+   :args ["-e" "(prn (ex-data (ex-info \"boom\" {:kind :compat :code 42})))"]}
+
+  {:id :io/stderr
+   :area :errors
+   :description "Keep standard error separate from standard output"
+   :args ["-e" "(.println System/err \"compat warning\")"]}
+
+  {:id :exit/nonzero
+   :area :exit
+   :description "Preserve an explicit nonzero exit status"
+   :args ["-e" "(System/exit 7)"]}
+
+  {:id :filesystem/write
+   :area :filesystem
+   :description "Write a deterministic filesystem effect"
+   :args ["-e" "(spit \"effect.txt\" \"42\")"]
+   :expect :difference
+   :rationale "Glojure's core spit host adapter is not linked into Gobb yet"}
+
+  {:id :compiled/main
+   :area :compiled-programs
+   :kind :compiled
+   :description "Compile and execute a namespace containing -main"
+   :source "{fixtures}/gobb/build_smoke.clj"
+   :bb-args ["-cp" "{fixtures}"
+             "-e"
+             "(require '[gobb.build-smoke :as smoke]) (smoke/-main)"]}]}

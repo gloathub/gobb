@@ -105,21 +105,22 @@ general BB replacement.
       Gobb, preserving complete diagnostics for every unexpected difference.
     </p>
     <ul class="task-list">
-      <li>Build a reusable fixture runner for pinned BB and current Gobb</li>
-      <li>Compare standard output</li>
-      <li>Compare standard error</li>
-      <li>Compare exit status</li>
-      <li>Compare structured exception data</li>
-      <li>Compare expected filesystem effects</li>
-      <li>Normalize only known nondeterminism: temporary paths, timestamps, ports, process IDs, and platform separators</li>
-      <li>Persist complete reproduction diagnostics while keeping successful output concise</li>
-      <li>Cover CLI parsing and invocation</li>
-      <li>Cover reader behavior and printing</li>
-      <li>Cover namespace creation and switching</li>
-      <li>Cover dynamic Vars and script loading</li>
-      <li>Cover error formatting and exit behavior</li>
-      <li>Support interpreted and <code>gobb build</code> compiled programs</li>
-      <li>Generate and publish a compatibility report in CI</li>
+      <li class="task-done">Build a reusable fixture runner for pinned BB and current Gobb</li>
+      <li class="task-done">Compare standard output</li>
+      <li class="task-done">Compare standard error</li>
+      <li class="task-done">Compare exit status</li>
+      <li class="task-done">Compare structured exception data</li>
+      <li class="task-done">Compare expected filesystem effects</li>
+      <li>Extend normalization beyond isolated working directories and platform separators when fixtures expose another known source of nondeterminism</li>
+      <li class="task-done">Persist complete reproduction diagnostics while keeping successful output concise</li>
+      <li class="task-done">Cover initial CLI parsing and invocation</li>
+      <li class="task-done">Cover initial reader behavior and printing</li>
+      <li class="task-done">Cover namespace creation and switching</li>
+      <li class="task-done">Cover dynamic Vars and script loading</li>
+      <li class="task-done">Cover initial error and exit behavior</li>
+      <li class="task-done">Support interpreted and <code>gobb build</code> compiled programs</li>
+      <li class="task-done">Generate a website compatibility report with <code>make compat</code></li>
+      <li>Publish the compatibility report in CI</li>
     </ul>
   </div>
 </div>

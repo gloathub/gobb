@@ -55,6 +55,7 @@ nav:
   - Gobb: index.md
   - REPL: repl.md
   - Implementation: implementation.md
+  - Compatibility: compatibility.md
   - Roadmap: roadmap.md
 
 markdown_extensions:

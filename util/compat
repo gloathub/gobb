@@ -1,0 +1,239 @@
+#!/usr/bin/env bb
+
+(require '[babashka.fs :as fs]
+         '[babashka.process :as process]
+         '[clojure.edn :as edn]
+         '[clojure.java.io :as io]
+         '[clojure.string :as str])
+
+(defn die [& messages]
+  (binding [*out* *err*]
+    (doseq [message messages]
+      (println (str "compat: " message))))
+  (System/exit 1))
+
+(defn expand-arg [fixtures-root arg]
+  (str/replace arg "{fixtures}" (str fixtures-root)))
+
+(defn normalize-text [workdir text]
+  (-> (or text "")
+      (str/replace (str workdir) "<WORKDIR>")
+      (str/replace "\\" "/")))
+
+(defn filesystem-snapshot [workdir]
+  (into (sorted-map)
+        (for [file (file-seq (io/file (str workdir)))
+              :when (.isFile file)]
+          [(str/replace (str (fs/relativize workdir file)) "\\" "/")
+           (slurp file)])))
+
+(defn execute! [executable args workdir]
+  (let [command (into [executable] args)
+        result @(process/process command
+                                 {:dir (str workdir)
+                                  :out :string
+                                  :err :string})]
+    {:command command
+     :exit (:exit result)
+     :out (:out result)
+     :err (:err result)
+     :files (filesystem-snapshot workdir)}))
+
+(defn normalized-result [workdir result]
+  (-> result
+      (dissoc :command)
+      (update :out #(normalize-text workdir %))
+      (update :err #(normalize-text workdir %))))
+
+(defn fixture-name [{:keys [id]}]
+  (str (namespace id) "__" (name id)))
+
+(defn run-fixture! [fixture bb gobb fixtures-root run-root]
+  (let [args (mapv #(expand-arg fixtures-root %) (:args fixture))
+        fixture-root (fs/path run-root (fixture-name fixture))
+        bb-dir (fs/path fixture-root "bb")
+        gobb-dir (fs/path fixture-root "gobb")]
+    (fs/create-dirs bb-dir)
+    (fs/create-dirs gobb-dir)
+    (let [bb-result (execute! bb args bb-dir)
+          gobb-result (execute! gobb args gobb-dir)
+          bb-normalized (normalized-result bb-dir bb-result)
+          gobb-normalized (normalized-result gobb-dir gobb-result)
+          equal? (= bb-normalized gobb-normalized)
+          expected-difference? (= :difference (:expect fixture))
+          status (cond
+                   (and expected-difference? (not equal?)) :known-difference
+                   (and expected-difference? equal?) :unexpected-match
+                   equal? :match
+                   :else :unexpected-difference)]
+      (assoc fixture
+             :status status
+             :args args
+             :bb bb-result
+             :gobb gobb-result
+             :normalized {:bb bb-normalized
+                          :gobb gobb-normalized}))))
+
+(defn run-compiled-fixture!
+  [fixture bb gobb gloat fixtures-root run-root]
+  (let [bb-args (mapv #(expand-arg fixtures-root %) (:bb-args fixture))
+        source (expand-arg fixtures-root (:source fixture))
+        fixture-root (fs/path run-root (fixture-name fixture))
+        bb-dir (fs/path fixture-root "bb")
+        gobb-dir (fs/path fixture-root "gobb")
+        program (fs/path gobb-dir "program")]
+    (fs/create-dirs bb-dir)
+    (fs/create-dirs gobb-dir)
+    (let [bb-result (execute! bb bb-args bb-dir)
+          build-result
+          (execute! "env"
+                    [(str "GOBB_GLOAT=" gloat)
+                     gobb "build" source "-o" (str program)]
+                    gobb-dir)
+          gobb-result
+          (if (zero? (:exit build-result))
+            (execute! (str program) [] gobb-dir)
+            {:command [(str program)]
+             :exit (:exit build-result)
+             :out ""
+             :err (str "gobb build failed\n" (:err build-result))
+             :files (filesystem-snapshot gobb-dir)})
+          bb-normalized (normalized-result bb-dir bb-result)
+          gobb-normalized (normalized-result gobb-dir gobb-result)
+          equal? (= bb-normalized
+                    (update gobb-normalized :files dissoc "program"))
+          status (if equal? :match :unexpected-difference)]
+      (assoc fixture
+             :status status
+             :bb bb-result
+             :gobb (assoc gobb-result :build build-result)
+             :normalized {:bb bb-normalized
+                          :gobb gobb-normalized}))))
+
+(defn write-diagnostic! [diagnostics-dir result]
+  (let [file (fs/path diagnostics-dir
+                      (str (fixture-name result) ".edn"))]
+    (spit (str file)
+          (with-out-str
+            (binding [*print-length* nil
+                      *print-level* nil]
+              (prn result))))))
+
+(def status-label
+  {:match "Match"
+   :known-difference "Known difference"
+   :unexpected-difference "Unexpected difference"
+   :unexpected-match "Unexpected match"})
+
+(def status-mark
+  {:match "✓"
+   :known-difference "○"
+   :unexpected-difference "✗"
+   :unexpected-match "!"})
+
+(defn markdown-cell [value]
+  (-> (str value)
+      (str/replace "|" "\\|")
+      (str/replace "\n" " ")))
+
+(defn report-markdown [manifest results counts]
+  (str
+   "---\n"
+   "title: Compatibility\n"
+   "description: Differential compatibility results for Gobb and Babashka\n"
+   "---\n\n"
+   "# Compatibility report\n\n"
+   "This report is generated by running the same fixtures under the pinned "
+   "Babashka release and the current Gobb binary. Each fixture runs in an "
+   "isolated working directory. The harness compares standard output, "
+   "standard error, exit status, and filesystem effects.\n\n"
+   "## Current result\n\n"
+   "<div class=\"compat-summary\" markdown>\n\n"
+   "- **" (get counts :match 0) "** exact matches\n"
+   "- **" (get counts :known-difference 0) "** documented differences\n"
+   "- **" (get counts :unexpected-difference 0)
+   "** unexpected differences\n"
+   "- **" (get counts :unexpected-match 0) "** unexpected matches\n\n"
+   "</div>\n\n"
+   "| Status | Area | Fixture | Description |\n"
+   "| --- | --- | --- | --- |\n"
+   (apply str
+          (for [{:keys [status area id description]} results]
+            (str "| " (status-mark status) " "
+                 (status-label status)
+                 " | `" (markdown-cell (name area))
+                 "` | `" (markdown-cell id)
+                 "` | " (markdown-cell description) " |\n")))
+   "\n"
+   (when-let [differences
+              (seq (filter #(contains? #{:known-difference
+                                         :unexpected-difference
+                                         :unexpected-match}
+                                       (:status %))
+                           results))]
+     (str "## Differences\n\n"
+          (apply str
+                 (for [{:keys [id status rationale]} differences]
+                   (str "### `" id "`\n\n"
+                        "**" (status-label status) ".** "
+                        (or rationale
+                            "The captured Babashka and Gobb results differ.")
+                        "\n\n")))))
+   "## Reproduce\n\n"
+   "```console\n"
+   "make compat\n"
+   "```\n\n"
+   "Full per-fixture commands and raw and normalized results are retained in "
+   "`.cache/compat/fixtures/`. The machine-readable aggregate is "
+   "`.cache/compat/report.edn`.\n\n"
+   "The harness normalizes only the declared sources of nondeterminism:\n\n"
+   (apply str
+          (for [{:keys [id description]} (:normalizations manifest)]
+            (str "- `" (name id) "`: " description "\n")))
+   "\n"))
+
+(let [[fixture-file bb gobb gloat fixtures-root output-dir website-report
+       & extra]
+      *command-line-args*]
+  (when (or extra
+            (some nil? [fixture-file bb gobb gloat fixtures-root
+                        output-dir website-report]))
+    (die (str "usage: compat FIXTURES BB GOBB GLOAT FIXTURES-ROOT "
+              "OUTPUT-DIR WEBSITE-REPORT")))
+  (let [manifest (edn/read-string (slurp fixture-file))
+        output-dir (fs/absolutize output-dir)
+        diagnostics-dir (fs/path output-dir "fixtures")
+        run-root (fs/path output-dir "work")
+        fixtures-root (fs/absolutize fixtures-root)]
+    (fs/delete-tree output-dir)
+    (fs/create-dirs diagnostics-dir)
+    (fs/create-dirs run-root)
+    (let [results (mapv #(if (= :compiled (:kind %))
+                           (run-compiled-fixture!
+                            % bb gobb gloat fixtures-root run-root)
+                           (run-fixture!
+                            % bb gobb fixtures-root run-root))
+                        (:fixtures manifest))
+          counts (frequencies (map :status results))
+          report {:schema (:schema manifest)
+                  :normalizations (:normalizations manifest)
+                  :counts counts
+                  :results results}
+          unexpected (+ (get counts :unexpected-difference 0)
+                        (get counts :unexpected-match 0))]
+      (doseq [result results]
+        (write-diagnostic! diagnostics-dir result))
+      (spit (str (fs/path output-dir "report.edn"))
+            (with-out-str (prn report)))
+      (spit website-report (report-markdown manifest results counts))
+      (fs/delete-tree run-root)
+      (doseq [status [:match :known-difference
+                      :unexpected-difference :unexpected-match]
+              :let [count (get counts status 0)]
+              :when (pos? count)]
+        (println (format "%-22s %d" (status-label status) count)))
+      (println "Report                 " website-report)
+      (println "Diagnostics            " (str diagnostics-dir))
+      (when (and (= "1" (System/getenv "STRICT"))
+                 (pos? unexpected))
+        (System/exit 1)))))
