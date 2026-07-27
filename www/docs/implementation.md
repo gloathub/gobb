@@ -65,6 +65,24 @@ The two modes share one project basis and one Glojure runtime.
     Source is read and evaluated at runtime, preserving the interactive and
     dynamic behavior expected from BB.
 
+### Runtime source loading
+
+Gobb initializes Glojure's native source loader with the current working
+directory. Additional source roots use BB's `-cp` or `--classpath` option and
+the host platform's path-list separator:
+
+```console
+$ gobb --classpath src -e \
+    "(require '[example.math :as math]) (math/answer)"
+42
+```
+
+The configured value is also exposed through the `java.class.path` system
+property. Namespace names follow Clojure resource conventions, including
+hyphen-to-underscore conversion. This phase covers filesystem source; project
+paths from `bb.edn` and dependency classpaths arrive with project
+configuration and dependency resolution.
+
 === "Build"
 
     ```console

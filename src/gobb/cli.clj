@@ -4,7 +4,7 @@
             [gobb.version]))
 
 (def usage
-  "Usage: gobb -e EXPR [ARGS...]\n       gobb --repl\n       gobb FILE [ARGS...]\n       SOURCE | gobb")
+  "Usage: gobb [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [-cp PATH|--classpath PATH] --repl\n       gobb [-cp PATH|--classpath PATH] FILE [ARGS...]\n       SOURCE | gobb")
 
 (defn fail! [message]
   (fmt.Fprintln os.Stderr (str "gobb: " message))
@@ -13,6 +13,25 @@
 
 (defn set-command-line-args! [args]
   (alter-var-root #'*command-line-args* (constantly (seq args))))
+
+(defn parse-global-options [argv]
+  (loop [args argv
+         classpath ""]
+    (if (contains? #{"-cp" "--classpath"} (first args))
+      (if-let [path (second args)]
+        (recur (drop 2 args) path)
+        (fail! (str (first args) " requires a path")))
+      {:argv args
+       :classpath classpath})))
+
+(defn configure-classpath! [classpath]
+  ;; BB always loads source from the working directory. Explicit classpath
+  ;; entries are searched after it in platform path-list order.
+  (add-load-path ".")
+  (doseq [path (path:filepath.SplitList classpath)]
+    (when-not (empty? path)
+      (add-load-path path)))
+  (System/setProperty "java.class.path" classpath))
 
 (defn evaluate-source [source print-result?]
   ;; A single enclosing do lets the runtime reader accept any number of forms
@@ -124,30 +143,31 @@
 (defn -main [& argv]
   (System/setProperty
    "babashka.version" gobb.version/babashka-version)
-  (System/setProperty "java.class.path" "")
-  (cond
-    (empty? argv)
-    (if (stdin-terminal?)
+  (let [{:keys [argv classpath]} (parse-global-options argv)]
+    (configure-classpath! classpath)
+    (cond
+      (empty? argv)
+      (if (stdin-terminal?)
+        (start-repl)
+        (evaluate-source (slurp *in*) true))
+
+      (= "--repl" (first argv))
       (start-repl)
-      (evaluate-source (slurp *in*) true))
 
-    (= "--repl" (first argv))
-    (start-repl)
+      (= "-e" (first argv))
+      (if-let [expression (second argv)]
+        (evaluate-expression expression (drop 2 argv))
+        (fail! "-e requires an expression"))
 
-    (= "-e" (first argv))
-    (if-let [expression (second argv)]
-      (evaluate-expression expression (drop 2 argv))
-      (fail! "-e requires an expression"))
+      (or (= "-h" (first argv))
+          (= "--help" (first argv)))
+      (println usage)
 
-    (or (= "-h" (first argv))
-        (= "--help" (first argv)))
-    (println usage)
+      (= "--version" (first argv))
+      (println (str "gobb v" gobb.version/version))
 
-    (= "--version" (first argv))
-    (println (str "gobb v" gobb.version/version))
+      (.startsWith (str (first argv)) "-")
+      (fail! (str "unknown option: " (first argv)))
 
-    (.startsWith (str (first argv)) "-")
-    (fail! (str "unknown option: " (first argv)))
-
-    :else
-    (evaluate-file (first argv) (rest argv))))
+      :else
+      (evaluate-file (first argv) (rest argv)))))

@@ -35,6 +35,22 @@ check "version output" "$expected_version" \
 check "definitions persist between forms" "42" \
   "$GOBB" -e '(def x 41) (inc x)'
 
+require_expression="(require '[gobb.fixture.math-ops :as math]) (math/answer 40)"
+check "explicit classpath require" "42" \
+  "$GOBB" --classpath test/fixtures/classpath -e "$require_expression"
+
+check "short classpath option" "42" \
+  "$GOBB" -cp test/fixtures/classpath -e "$require_expression"
+
+check "working directory require" "7" \
+  bash -c \
+  'cd test/fixtures/classpath && "$1" -e "(require '"'"'[gobb.fixture.math-ops :as math]) (math/answer 5)"' \
+  _ "$GOBB"
+
+check "classpath system property" '"test/fixtures/classpath"' \
+  "$GOBB" -cp test/fixtures/classpath \
+  -e '(System/getProperty "java.class.path")'
+
 check "stdin evaluation" "5" \
   bash -c "printf '(+ 2 3)\\n' | \"\$1\"" _ "$GOBB"
 
@@ -51,8 +67,21 @@ bb_output=$("$BB" -e '(str "go" "bb")')
 [[ $gobb_output == "$bb_output" ]] ||
   fail "BB comparison: Gobb '$gobb_output', BB '$bb_output'"
 
+gobb_require_output=$(
+  "$GOBB" --classpath test/fixtures/classpath -e "$require_expression"
+)
+bb_require_output=$(
+  "$BB" --classpath test/fixtures/classpath -e "$require_expression"
+)
+[[ $gobb_require_output == "$bb_require_output" ]] ||
+  fail "BB require comparison: Gobb '$gobb_require_output', BB '$bb_require_output'"
+
 if "$GOBB" -e >/dev/null 2>&1; then
   fail "missing -e expression succeeded"
+fi
+
+if "$GOBB" --classpath >/dev/null 2>&1; then
+  fail "missing --classpath path succeeded"
 fi
 
 if "$GOBB" --not-an-option >/dev/null 2>&1; then

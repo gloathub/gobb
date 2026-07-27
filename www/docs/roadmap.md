@@ -16,7 +16,7 @@ description: Current Gobb implementation progress and upcoming milestones
   </div>
   <div>
     <p class="summary-label">Last updated</p>
-    <p class="summary-value">July 24, 2026</p>
+    <p class="summary-value">July 27, 2026</p>
   </div>
 </div>
 
@@ -77,7 +77,7 @@ general BB replacement.
       <li class="task-done">Definitions persist across multiple forms</li>
       <li class="task-done">Useful CLI errors and nonzero exit status</li>
       <li class="task-done">Focused differential tests against BB</li>
-      <li>Runtime <code>require</code> and classpath loading</li>
+      <li class="task-done">Runtime <code>require</code> from the working directory and <code>-cp</code>/<code>--classpath</code></li>
       <li class="task-done">WASI and browser-Wasm smoke artifacts</li>
       <li class="task-done">Babashka REPL loop compiled with Gloat for the browser</li>
       <li class="task-done"><code>gobb</code> starts a native <code>user=&gt;</code> REPL</li>
@@ -85,7 +85,7 @@ general BB replacement.
       <li class="task-done">Persistent REPL values and <code>*1</code> history verified</li>
       <li class="task-done">BB-compatible <code>babashka.version</code>, <code>babashka.file</code>, and initial <code>java.class.path</code> properties</li>
       <li class="task-done">REPL errors expose the underlying evaluator message</li>
-      <li>Runtime <code>(ns ...)</code>: Glojure fix and Gloat regression complete; awaiting released versions and the Gobb dependency pin</li>
+      <li class="task-done">Runtime <code>(ns ...)</code> support with Gloat <code>0.1.64</code> and Glojure <code>0.7.2</code></li>
     </ul>
   </div>
 </div>

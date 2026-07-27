@@ -28,7 +28,8 @@ from Babashka's babashka.impl.clojure.main/repl.")
 (defn start [read-form]
   (System/setProperty
    "babashka.version" gobb.version/babashka-version)
-  (System/setProperty "java.class.path" "")
+  (when (nil? (System/getProperty "java.class.path"))
+    (System/setProperty "java.class.path" ""))
   (bb-repl/repl
    :init #(do
             (println (str "Gobb v" gobb.version/version))

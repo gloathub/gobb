@@ -170,6 +170,17 @@ Run the native and differential BB tests with `make test`.
 Print the generated Babashka namespace compatibility ledger with `make
 source-ledger`.
 
+Runtime namespaces load from the working directory by default. Add source
+roots with BB-compatible classpath options:
+
+```bash
+gobb -cp src -e "(require '[example.core :as example]) (example/run)"
+gobb --classpath src:lib script.clj
+```
+
+Classpath lists use the platform path separator and are reflected in the
+`java.class.path` system property.
+
 ## Makefile Targets
 
 | Target | Description |

@@ -32,8 +32,8 @@ hide:
 
 <div class="status-strip">
   <span class="status-pulse"></span>
-  <strong>Current phase:</strong> Foundation and architecture
-  <span class="status-note">Implementation has just begun.</span>
+  <strong>Current phase:</strong> Execution architecture
+  <span class="status-note">Expressions, files, REPLs, namespaces, and classpath source loading work.</span>
 </div>
 
 ## Install
