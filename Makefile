@@ -50,6 +50,10 @@ COMPAT-FIXTURES := $(TOP)/compat/fixtures.edn
 COMPAT-RUNNER := $(TOP)/util/compat
 COMPAT-DIR := $(TOP)/.cache/compat
 COMPAT-REPORT := $(TOP)/www/docs/compatibility.md
+INVENTORY-SPEC := $(TOP)/compat/inventory.edn
+INVENTORY-LEDGER := $(TOP)/compat/ledger.edn
+INVENTORY-RUNNER := $(TOP)/util/inventory
+INVENTORY-REPORT := $(TOP)/www/docs/inventory.md
 PREFIX ?= $(if $(filter 0,$(shell id -u)),/usr/local,$(HOME)/.local)
 
 MAKES-CLEAN := \
@@ -208,10 +212,22 @@ smoke: $(SMOKE-NATIVE) $(SMOKE-WASI) $(SMOKE-BROWSER) $(WASMTIME) $(NODE)
 	  echo "$$expected"
 	@$(ECHO)
 
+inventory: $(BABASHKA-SOURCE-DEP) $(BB) $(INVENTORY-SPEC) $(INVENTORY-RUNNER)
+	@$(ECHO) "* Inventorying the complete BB compatibility surface"
+	$Q $(BB) '$(INVENTORY-RUNNER)' \
+	  '$(INVENTORY-SPEC)' \
+	  '$(BABASHKA-SOURCE)' \
+	  '$(BB)' \
+	  '$(INVENTORY-LEDGER)' \
+	  '$(INVENTORY-REPORT)'
+	@$(ECHO)
+
 test: $(GOBB) $(BB) $(RG) smoke
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 
-compat: $(GOBB) $(BB) $(GLOAT) $(COMPAT-FIXTURES) $(COMPAT-RUNNER)
+compat: _compat
+
+_compat: $(GOBB) $(BB) $(GLOAT) $(COMPAT-FIXTURES) $(COMPAT-RUNNER)
 	@$(ECHO) "* Comparing Gobb with Babashka"
 	$Q STRICT='$(STRICT)' $(BB) '$(COMPAT-RUNNER)' \
 	  '$(COMPAT-FIXTURES)' \
@@ -249,10 +265,10 @@ release: $(GH) $(WASMTIME)
 source-ledger: $(SOURCE-STAGE-STAMP)
 	@cat '$(SOURCE-STAGE)/ledger.edn'
 
-site: repl-wasm
+site: inventory repl-wasm
 	$(MAKE) -C www site
 
-serve publish: repl-wasm
+serve publish: inventory repl-wasm
 	$(MAKE) -C www $@
 
 serve-www: serve

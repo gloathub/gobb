@@ -20,18 +20,28 @@ jobs:
       uses: actions/cache@v4
       with:
         path: .cache/
-        key: compat-${{ runner.os }}-${{ hashFiles('Makefile', 'VERSION', 'compat/fixtures.edn', 'util/compat') }}
+        key: compat-${{ runner.os }}-${{ hashFiles('Makefile', 'VERSION', 'compat/fixtures.edn', 'compat/inventory.edn', 'util/compat', 'util/inventory') }}
         restore-keys: compat-${{ runner.os }}-
+
+    - name: Generate BB surface inventory
+      run: make inventory
 
     - name: Compare Gobb with Babashka
       run: make compat STRICT=1
 
-    - name: Verify the tracked website report
-      run: git diff --exit-code -- www/docs/compatibility.md
+    - name: Verify tracked compatibility reports
+      run: |
+        git diff --exit-code -- \
+          compat/ledger.edn \
+          www/docs/compatibility.md \
+          www/docs/inventory.md
 
     - name: Publish compatibility summary
       if: always() && hashFiles('www/docs/compatibility.md') != ''
-      run: cat www/docs/compatibility.md >> "$GITHUB_STEP_SUMMARY"
+      run: |
+        cat www/docs/compatibility.md >> "$GITHUB_STEP_SUMMARY"
+        printf '\n\n' >> "$GITHUB_STEP_SUMMARY"
+        cat www/docs/inventory.md >> "$GITHUB_STEP_SUMMARY"
 
     - name: Publish compatibility diagnostics
       if: always()
@@ -40,6 +50,8 @@ jobs:
         name: gobb-compatibility-${{ github.run_id }}
         path: |
           .cache/compat/
+          compat/ledger.edn
           www/docs/compatibility.md
+          www/docs/inventory.md
         if-no-files-found: warn
         retention-days: 14

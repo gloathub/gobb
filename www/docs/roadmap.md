@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Compatibility ledger and test inventory</p>
+    <p class="summary-value">Platform capabilities</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">4 / 14</p>
+    <p class="summary-value">5 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 29%"></span>
+  <span style="width: 36%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -30,6 +30,9 @@ The same architecture now powers native and live browser-Wasm REPLs using
 Babashka's reusable REPL loop. A strict differential harness records current
 BB compatibility for interpreted and compiled programs. Gobb remains an
 architecture proof, not yet a general BB replacement.
+The generated BB surface ledger now tracks 1,012 CLI, project, namespace,
+library, Java-class, platform, upstream-test, and representative-program items
+with explicit compatibility states and milestone assignments.
 
 ## Completed foundation
 
@@ -157,27 +160,50 @@ architecture proof, not yet a general BB replacement.
   </div>
 </div>
 
-## Current work
+## Completed compatibility inventory
 
-<div class="milestone milestone-active">
+<div class="milestone milestone-done">
   <div class="milestone-marker">4</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Compatibility ledger and test inventory</h3>
     <p>
       Turn BB's complete user-visible surface into a machine-readable backlog
       before starting the larger feature ports.
     </p>
     <ul class="task-list">
-      <li>Inventory BB CLI commands and options</li>
-      <li>Inventory <code>bb.edn</code>, <code>deps.edn</code>, tasks, and exec behavior</li>
-      <li>Inventory bundled namespaces and libraries</li>
-      <li>Inventory BB-exposed Java classes</li>
-      <li>Inventory REPL, pod, server, process, platform, and architecture features</li>
-      <li>Map upstream BB tests and representative programs</li>
-      <li>Assign every item a compatibility state and tested evidence</li>
-      <li>Record rationales for intentional differences and platform limits</li>
-      <li>Generate concise Markdown and website reports from the ledger</li>
+      <li class="task-done">Inventory BB CLI commands and options</li>
+      <li class="task-done">Inventory <code>bb.edn</code>, <code>deps.edn</code>, tasks, and exec behavior</li>
+      <li class="task-done">Inventory bundled namespaces and libraries</li>
+      <li class="task-done">Inventory BB-exposed Java classes</li>
+      <li class="task-done">Inventory REPL, pod, server, process, platform, and architecture features</li>
+      <li class="task-done">Map upstream BB tests and representative programs</li>
+      <li class="task-done">Assign every item a compatibility state and require test or implementation evidence for support claims</li>
+      <li class="task-done">Record rationales for intentional differences and platform limits</li>
+      <li class="task-done">Generate concise Markdown and website reports from the ledger</li>
+    </ul>
+  </div>
+</div>
+
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">5</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Platform capabilities</h3>
+    <p>
+      Define and test consistent host behavior for native, WASI, and
+      browser-Wasm targets before higher-level libraries depend on it.
+    </p>
+    <ul class="task-list">
+      <li>Define the capability contract and target matrix</li>
+      <li>Classify filesystem, process, environment, clock, random, signal, and network behavior</li>
+      <li>Provide stable host-adapter boundaries for reusable runtime code</li>
+      <li>Return structured unsupported-capability errors</li>
+      <li>Test native, WASI, and browser-Wasm behavior independently</li>
+      <li>Record platform-limited and unavailable behavior in the generated inventory</li>
+      <li>Publish the platform capability matrix</li>
     </ul>
   </div>
 </div>
@@ -211,6 +237,7 @@ make build          # Build bin/gobb with Gloat
 make test           # Run native and differential BB tests
 make smoke          # Execute interpreted, native, WASI, and browser-Wasm proof
 make compat         # Generate the BB-vs-Gobb compatibility report
+make inventory      # Generate the complete BB surface ledger and report
 make repl-wasm      # Build the browser BB REPL with Gloat
 make source-ledger  # Print the generated namespace ledger
 ```
@@ -234,17 +261,12 @@ also removes the downloaded Babashka source checkout.
 
 ## Next concrete slice
 
-Generate the initial machine-readable ledger from BB's CLI, exposed classes,
-bundled namespaces, platform features, and upstream tests.
+Define the native, WASI, and browser-Wasm capability contract, then turn the
+inventory's platform dispositions into executable target-specific tests.
 
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>05</span>
-    <h3>Platform capabilities</h3>
-    <p>Define consistent native, WASI, and browser-Wasm host behavior.</p>
-  </article>
   <article class="roadmap-card">
     <span>06</span>
     <h3>Java compatibility</h3>

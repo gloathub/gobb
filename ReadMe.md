@@ -132,7 +132,8 @@ Gobb has completed its repository foundation and started native execution:
 - [x] Initial source ledger and differential BB tests
 - [x] Browser-Wasm BB REPL proof at [gobb.site/repl](https://gobb.site/repl/)
 - [x] Babashka-derived native CLI REPL
-- [ ] BB-compatible execution shell
+- [x] BB-compatible Glojure execution shell
+- [x] Generated BB surface inventory and compatibility backlog
 - [ ] Project dependencies, tasks, pods, and bundled libraries
 - [ ] Production `gobb build` command
 
@@ -175,9 +176,16 @@ make compat
 make compat STRICT=1
 ```
 
-CI runs the strict comparison, publishes the Markdown summary in the workflow
-run, and retains the machine-readable report and per-fixture diagnostics as an
-artifact.
+Generate and validate the complete BB surface inventory with `make inventory`.
+It discovers the pinned BB CLI, built-in namespaces and dependencies, exposed
+Java classes, upstream tests, examples, and platform features. Gobb's
+machine-readable states, milestone assignments, rationales, and evidence live
+in `compat/inventory.edn`; the generated full ledger is
+`compat/ledger.edn`.
+
+CI regenerates the inventory and strict comparison, rejects tracked-report
+drift, publishes both Markdown summaries in the workflow run, and retains the
+machine-readable ledger and per-fixture diagnostics as artifacts.
 
 Print the generated Babashka namespace compatibility ledger with `make
 source-ledger`.
@@ -232,6 +240,7 @@ configuration remain later milestones.
 | `stage` | Generate the source tree selected from Gobb and Babashka. |
 | `test` | Build Gobb and run native and differential BB tests. |
 | `smoke` | Build and execute equivalent interpreted, native, WASI, and browser-Wasm smoke programs. |
+| `inventory` | Generate and validate the complete machine-readable BB surface ledger and website report. |
 | `repl-wasm` | Compile the Babashka-derived browser REPL and install its Go Wasm runtime. |
 | `source-ledger` | Print the generated Babashka namespace compatibility ledger. |
 | `release-prep VERSION=X.Y.Z` | Update `VERSION` and prepend generated release notes to `Changes`. |

@@ -1,0 +1,391 @@
+#!/usr/bin/env bb
+
+(require '[babashka.fs :as fs]
+         '[babashka.process :as process]
+         '[clojure.data.csv :as csv]
+         '[clojure.edn :as edn]
+         '[clojure.java.io :as io]
+         '[clojure.pprint :as pprint]
+         '[clojure.string :as str])
+
+(def allowed-states
+  #{:supported :partial :planned :intentional-difference
+    :platform-limited :not-applicable})
+
+(def evidence-states
+  #{:supported :partial :intentional-difference :platform-limited})
+
+(defn fail! [message]
+  (binding [*out* *err*]
+    (println (str "inventory: " message)))
+  (System/exit 1))
+
+(defn read-edn [path]
+  (edn/read-string (slurp path)))
+
+(defn run! [command & args]
+  (let [result (apply process/shell
+                      {:out :string :err :string :continue true}
+                      command args)]
+    (when-not (zero? (:exit result))
+      (fail! (str "command failed: " command " "
+                  (str/join " " args) "\n" (:err result))))
+    (:out result)))
+
+(defn canonical-cli-name [syntax]
+  (-> syntax
+      (str/split #"\s+" 2)
+      first
+      (str/replace #",$" "")))
+
+(defn parse-help [bb]
+  (loop [lines (str/split-lines (run! bb "--help"))
+         section nil
+         entries []]
+    (if-let [line (first lines)]
+      (cond
+        (re-matches #"^[A-Za-z][A-Za-z -]+:$" line)
+        (recur (next lines)
+               (-> line (subs 0 (dec (count line)))
+                   str/lower-case
+                   (str/replace #" +" "-")
+                   keyword)
+               entries)
+
+        (and section (re-matches #"^  \S.*$" line))
+        (let [text (str/trim line)
+              [_ syntax description]
+              (or (re-matches #"^(\S.*?)(?:\s{2,})(\S.*)$" text)
+                  [text text ""])
+              name (canonical-cli-name text)]
+          (recur (next lines)
+                 section
+                 (conj entries
+                       {:id (str "cli/" name)
+                        :category :cli
+                        :name name
+                        :syntax syntax
+                        :section section
+                        :description description
+                        :source {:kind :bb-help
+                                 :command "bb --help"}})))
+
+        :else
+        (recur (next lines) section entries))
+      entries)))
+
+(defn read-forms [path]
+  (with-open [reader (java.io.PushbackReader. (io/reader path))]
+    (loop [forms []]
+      (let [form (read {:eof ::eof
+                        :read-cond :allow
+                        :features #{:bb}} reader)]
+        (if (= ::eof form)
+          forms
+          (recur (conj forms form)))))))
+
+(defn namespace-symbols [main-source]
+  (let [form (some #(when (and (seq? %)
+                               (= 'def (first %))
+                               (= 'namespaces (second %)))
+                      %)
+                   (read-forms main-source))]
+    (when-not form
+      (fail! (str "cannot find namespaces definition in " main-source)))
+    (->> (tree-seq coll? seq form)
+         (filter symbol?)
+         (filter #(and (nil? (namespace %))
+                       (or (= "user" (name %))
+                           (str/includes? (name %) "."))))
+         (map str)
+         distinct
+         sort
+         (mapv (fn [name]
+                 {:id (str "namespace/" name)
+                  :category :built-in-namespace
+                  :name name
+                  :source {:kind :upstream-source
+                           :path "src/babashka/main.clj"
+                           :definition "namespaces"}})))))
+
+(defn exposed-classes [bb]
+  (let [expression
+        (str "(require '[babashka.classes :as classes]) "
+             "(prn (vec (sort (map #(.getName %) "
+             "(classes/all-classes)))))")
+        names (edn/read-string (run! bb "-e" expression))]
+    (->> names
+         distinct
+         (mapv (fn [name]
+                 {:id (str "class/" name)
+                  :category :java-class
+                  :name name
+                  :source {:kind :runtime-query
+                           :command "bb -e '(babashka.classes/all-classes)'"}})))))
+
+(defn built-in-libraries [source]
+  (let [deps (:deps (read-edn (str source "/deps.edn")))]
+    (->> (keys deps)
+         (map str)
+         sort
+         (mapv (fn [name]
+                 {:id (str "built-in-library/" name)
+                  :category :built-in-library
+                  :name name
+                  :source {:kind :upstream-source
+                           :path "deps.edn"
+                           :definition ":deps"}})))))
+
+(defn compatible-libraries [source]
+  (with-open [reader (io/reader (str source "/doc/libraries.csv"))]
+    (->> (csv/read-csv reader)
+         rest
+         (map (fn [[name url]]
+                {:id (str "compatible-library/" name)
+                 :category :compatible-library
+                 :name name
+                 :url (not-empty url)
+                 :source {:kind :upstream-source
+                          :path "doc/libraries.csv"}}))
+         (sort-by :name)
+         vec)))
+
+(defn route-for [routes path]
+  (some (fn [{:keys [pattern] :as route}]
+          (when (re-find (re-pattern pattern) path)
+            (dissoc route :pattern)))
+        routes))
+
+(defn source-files [source directory category routes]
+  (let [root (io/file source directory)]
+    (->> (file-seq root)
+         (filter #(.isFile %))
+         (map #(str (fs/relativize source %)))
+         sort
+         (mapv (fn [path]
+                 (merge
+                  {:id (str (name category) "/" path)
+                   :category category
+                   :name path
+                   :source {:kind :upstream-source :path path}}
+                  (route-for routes path)))))))
+
+(defn merge-policy [spec item]
+  (let [defaults (get-in spec [:defaults (:category item)])
+        inline (dissoc item :category :id :name :source)
+        override (get-in spec [:overrides (:id item)])
+        item (merge defaults item inline override)]
+    (if (:evidence item)
+      item
+      (assoc item :evidence
+             [{:kind :inventory
+               :description "Discovered from pinned Babashka source"}]))))
+
+(defn validate! [spec items]
+  (when-not (= 1 (:schema spec))
+    (fail! "unsupported inventory schema"))
+  (let [ids (map :id items)
+        duplicates (->> ids frequencies
+                        (keep (fn [[id count]]
+                                (when (> count 1) id)))
+                        sort)]
+    (when (seq duplicates)
+      (fail! (str "duplicate ids: " (str/join ", " duplicates)))))
+  (doseq [item items]
+    (when-not (string? (:id item))
+      (fail! (str "item has no string id: " (pr-str item))))
+    (when-not (contains? (:defaults spec) (:category item))
+      (fail! (str (:id item) " has unknown category " (:category item))))
+    (when-not (allowed-states (:state item))
+      (fail! (str (:id item) " has invalid state " (:state item))))
+    (when-not (and (integer? (:milestone item))
+                   (<= 0 (:milestone item) 13))
+      (fail! (str (:id item) " has invalid milestone "
+                  (:milestone item))))
+    (when-not (seq (:evidence item))
+      (fail! (str (:id item) " has no evidence")))
+    (when (and (evidence-states (:state item))
+               (every? #(= :inventory (:kind %)) (:evidence item)))
+      (fail! (str (:id item) " claims " (:state item)
+                  " with inventory-only evidence"))))
+  (doseq [category (keys (:defaults spec))]
+    (when-not (some #(= category (:category %)) items)
+      (fail! (str "category has no entries: " category))))
+  (let [actual-counts (frequencies (map :category items))]
+    (doseq [[category expected] (:expected-counts spec)]
+      (when-not (= expected (get actual-counts category))
+        (fail! (str category " count changed: expected " expected
+                    ", got " (get actual-counts category 0))))))
+  (let [actual-ids (set (map :id items))
+        missing (sort (remove actual-ids (:required-ids spec)))]
+    (when (seq missing)
+      (fail! (str "required inventory ids are missing: "
+                  (str/join ", " missing)))))
+  items)
+
+(defn status-counts [items]
+  (into (sorted-map)
+        (frequencies (map :state items))))
+
+(defn category-summary [items]
+  (->> items
+       (group-by :category)
+       (map (fn [[category entries]]
+              {:category category
+               :count (count entries)
+               :states (status-counts entries)}))
+       (sort-by (comp name :category))
+       vec))
+
+(defn milestone-summary [items]
+  (->> items
+       (group-by :milestone)
+       (map (fn [[milestone entries]]
+              {:milestone milestone
+               :count (count entries)
+               :states (status-counts entries)}))
+       (sort-by :milestone)
+       vec))
+
+(defn table-count [states state]
+  (str (get states state 0)))
+
+(defn markdown-table [rows]
+  (str/join "\n" rows))
+
+(defn report [ledger]
+  (let [summary (:summary ledger)
+        actionable (filter #(not= :planned (:state %)) (:items ledger))
+        planned (filter #(= :planned (:state %)) (:items ledger))]
+    (str
+     "# BB surface inventory\n\n"
+     "This report is generated from Babashka **"
+     (get-in ledger [:babashka :version])
+     "** at `" (get-in ledger [:babashka :revision]) "`. "
+     "The complete machine-readable ledger contains **"
+     (get-in summary [:total]) "** uniquely identified compatibility items.\n\n"
+     "Discovery does not imply support. Gobb marks an item supported or partial "
+     "only when the ledger names concrete test or implementation evidence.\n\n"
+     "## Inventory summary\n\n"
+     (markdown-table
+      (concat
+       ["| Surface | Items | Supported | Partial | Planned | Other |"
+        "| --- | ---: | ---: | ---: | ---: | ---: |"]
+       (for [{:keys [category count states]} (:categories summary)]
+         (str "| " (name category)
+              " | " count
+              " | " (table-count states :supported)
+              " | " (table-count states :partial)
+              " | " (table-count states :planned)
+              " | " (+ (get states :intentional-difference 0)
+                       (get states :platform-limited 0)
+                       (get states :not-applicable 0))
+              " |"))))
+     "\n\n"
+     "## Evidence-backed current surface\n\n"
+     (markdown-table
+      (concat
+       ["| Item | Surface | State | Evidence |"
+        "| --- | --- | --- | --- |"]
+       (for [item (sort-by :id actionable)]
+         (str "| `" (:id item) "`"
+              " | " (name (:category item))
+              " | **" (name (:state item)) "**"
+              " | "
+              (str/join "<br>"
+                        (map (fn [evidence]
+                               (or (:path evidence)
+                                   (some-> (:id evidence) str)
+                                   (:description evidence)
+                                   (name (:kind evidence))))
+                             (:evidence item)))
+              " |"))))
+     "\n\n"
+     "## Planned queue\n\n"
+     (markdown-table
+      (concat
+       ["| Milestone | Planned items |"
+        "| ---: | ---: |"]
+       (for [[milestone entries]
+             (sort-by key (group-by :milestone planned))]
+         (str "| " milestone " | " (count entries) " |"))))
+     "\n\n"
+     "## Authoritative inputs\n\n"
+     "- `bb --help` for commands and options\n"
+     "- `src/babashka/main.clj` for built-in namespaces\n"
+     "- `deps.edn` for bundled dependencies\n"
+     "- `doc/libraries.csv` for BB-compatible libraries\n"
+     "- `babashka.classes/all-classes` for the exposed Java class surface\n"
+     "- `test/` and `examples/` for upstream tests and representative programs\n"
+     "- `compat/inventory.edn` for Gobb states, milestones, rationales, and evidence\n\n"
+     "The full ledger is tracked as "
+     "[`compat/ledger.edn`](https://github.com/clojurestar/gobb/blob/main/compat/ledger.edn).\n\n"
+     "Regenerate and validate both files with:\n\n"
+     "```sh\n"
+     "make inventory\n"
+     "```\n")))
+
+(defn ledger-edn [ledger]
+  (with-out-str
+    (println ";; Generated by make inventory. Do not edit.")
+    (println "{:schema" (:schema ledger))
+    (print " :babashka ")
+    (pprint/pprint (:babashka ledger))
+    (print " :states ")
+    (pprint/pprint (:states ledger))
+    (print " :summary ")
+    (pprint/pprint (:summary ledger))
+    (println " :items")
+    (println " [")
+    (doseq [item (:items ledger)]
+      (println (pr-str item)))
+    (println " ]}")))
+
+(let [[spec-path source bb ledger-path report-path] *command-line-args*]
+  (when-not (every? some?
+                    [spec-path source bb ledger-path report-path])
+    (fail! "usage: util/inventory SPEC BABASHKA-SOURCE BB LEDGER REPORT"))
+  (let [spec (read-edn spec-path)
+        source-revision (str/trim
+                         (run! "git" "-C" source "rev-parse" "HEAD"))
+        _ (when-not (= source-revision
+                       (get-in spec [:babashka :revision]))
+            (fail! (str "Babashka source revision changed: expected "
+                        (get-in spec [:babashka :revision])
+                        ", got " source-revision)))
+        discovered
+        (concat
+         (parse-help bb)
+         (:items spec)
+         (map #(assoc % :category :capability) (:capabilities spec))
+         (namespace-symbols (str source "/src/babashka/main.clj"))
+         (built-in-libraries source)
+         (compatible-libraries source)
+         (exposed-classes bb)
+         (source-files source "test" :upstream-test (:test-routes spec))
+         (source-files source "examples" :representative-program
+                       (:program-routes spec)))
+        items (->> discovered
+                   (map #(merge-policy spec %))
+                   (sort-by (juxt (comp name :category) :id))
+                   vec)
+        _ (validate! spec items)
+        ledger
+        {:schema 1
+         :babashka (:babashka spec)
+         :states (:states spec)
+         :summary {:total (count items)
+                   :states (status-counts items)
+                   :categories (category-summary items)
+                   :milestones (milestone-summary items)}
+         :items items}]
+    (fs/create-dirs (fs/parent ledger-path))
+    (fs/create-dirs (fs/parent report-path))
+    (spit ledger-path (ledger-edn ledger))
+    (spit report-path
+          (str "<!-- Generated by make inventory. Do not edit. -->\n\n"
+               (report ledger)))
+    (println
+     (format "Inventoried %d BB surface items across %d categories"
+             (count items)
+             (count (get-in ledger [:summary :categories]))))))

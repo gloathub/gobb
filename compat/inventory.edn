@@ -1,0 +1,293 @@
+{:schema 1
+
+ :babashka
+ {:version "1.12.218"
+  :tag "v1.12.218"
+  :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"}
+
+ :states
+ {:supported "Implemented with direct Gobb test evidence"
+  :partial "Some behavior is implemented, but the BB surface is incomplete"
+  :planned "Inventoried and assigned to a future milestone"
+  :intentional-difference "Gobb deliberately differs from BB"
+  :platform-limited "Support is intentionally limited by the target platform"
+  :not-applicable "The BB behavior does not apply to Gobb's architecture"}
+
+ :expected-counts
+ {:cli 36
+  :project-config 13
+  :task-config 9
+  :built-in-namespace 104
+  :built-in-library 38
+  :compatible-library 98
+  :java-class 583
+  :capability 31
+  :upstream-test 63
+  :representative-program 37}
+
+ :required-ids
+ #{"cli/-e"
+   "cli/-m"
+   "cli/-x"
+   "project/bb-edn-discovery"
+   "tasks/task-map"
+   "namespace/babashka.fs"
+   "namespace/babashka.process"
+   "built-in-library/babashka/fs"
+   "class/java.lang.System"
+   "capability/native-repl"
+   "capability/browser-wasm"
+   "upstream-test/test/babashka/main_test.clj"
+   "representative-program/examples/process_builder.clj"}
+
+ :defaults
+ {:cli {:state :planned :milestone 13}
+  :project-config {:state :planned :milestone 7}
+  :task-config {:state :planned :milestone 8}
+  :built-in-namespace {:state :planned :milestone 9}
+  :built-in-library {:state :planned :milestone 9}
+  :compatible-library {:state :planned :milestone 13}
+  :java-class {:state :planned :milestone 6}
+  :capability {:state :planned :milestone 5}
+  :upstream-test {:state :planned :milestone 13}
+  :representative-program {:state :planned :milestone 13}}
+
+ :overrides
+ {"cli/-D<property>=<value>" {:state :not-applicable
+                              :milestone 4
+                              :rationale "Gobb has no Substrate VM system-property option layer"
+                              :evidence [{:kind :implementation
+                                          :path "www/docs/implementation.md"}]}
+  "cli/-Xmx<size>[g|G|m|M|k|K]" {:state :not-applicable
+                                  :milestone 4
+                                  :rationale "Gobb is a Go binary and has no GraalVM heap"
+                                  :evidence [{:kind :implementation
+                                              :path "www/docs/implementation.md"}]}
+  "cli/-XX:PrintFlags=" {:state :not-applicable
+                         :milestone 4
+                         :rationale "Gobb does not use Substrate VM"
+                         :evidence [{:kind :implementation
+                                     :path "www/docs/implementation.md"}]}
+  "cli/-cp" {:state :supported
+             :milestone 1
+             :evidence [{:kind :test :path "test/gobb"
+                         :description "Short and long classpath options"}]}
+  "cli/--init" {:state :supported
+                :milestone 3
+                :evidence [{:kind :compat-fixture
+                            :id :loading/init}]}
+  "cli/-f" {:state :supported
+            :milestone 1
+            :evidence [{:kind :test :path "test/gobb"
+                        :description "File evaluation and arguments"}]}
+  "cli/-e" {:state :supported
+            :milestone 1
+            :evidence [{:kind :compat-fixture
+                        :id :cli/expression}]}
+  "cli/-m" {:state :supported
+            :milestone 3
+            :evidence [{:kind :compat-fixture
+                        :id :invocation/main}]}
+  "cli/-x" {:state :supported
+            :milestone 3
+            :evidence [{:kind :compat-fixture
+                        :id :invocation/exec}]}
+  "cli/repl" {:state :partial
+              :milestone 1
+              :rationale "Native and browser REPL loops work; BB's complete interactive surface does not"
+              :evidence [{:kind :test :path "test/gobb"
+                          :description "Native REPL banner, evaluation, history, and recovery"}]}
+  "namespace/clojure.java.io" {:state :partial
+                              :milestone 3
+                              :rationale "Classpath resource lookup is implemented; the complete JVM API is not"
+                              :evidence [{:kind :compat-fixture
+                                          :id :loading/resource}]}
+  "class/java.lang.System" {:state :partial
+                           :milestone 3
+                           :rationale "Properties, environment, time, and controlled exit are implemented"
+                           :evidence [{:kind :test :path "test/gobb"
+                                      :description "System properties, environment, time, and exit"}]}
+  "capability/native-repl" {:state :partial
+                            :milestone 1
+                            :rationale "Core loop works; terminal editing and persistent history remain"
+                            :evidence [{:kind :test :path "test/gobb"}]}
+  "capability/browser-repl" {:state :partial
+                             :milestone 1
+                             :rationale "Browser-Wasm evaluation and shared history work; browser files do not"
+                             :evidence [{:kind :test :path "test/gobb"}
+                                        {:kind :implementation
+                                         :path "www/docs/javascripts/repl.js"}]}
+  "capability/native-linux-amd64" {:state :supported
+                                   :milestone 0
+                                   :evidence [{:kind :test :path "test/gobb"}
+                                              {:kind :implementation
+                                               :path "util/release-dist"}]}
+  "capability/wasi-wasm" {:state :partial
+                          :milestone 1
+                          :rationale "Execution smoke test works; host capabilities require explicit dispositions"
+                          :evidence [{:kind :test :path "Makefile"
+                                     :description "make smoke executes the WASI artifact"}]}
+  "capability/browser-wasm" {:state :partial
+                             :milestone 1
+                             :rationale "Execution smoke test works; browser host capabilities remain limited"
+                             :evidence [{:kind :test :path "Makefile"
+                                        :description "make smoke executes the browser artifact"}]}
+  "capability/runtime-require" {:state :supported
+                                :milestone 1
+                                :evidence [{:kind :compat-fixture
+                                            :id :loading/require}]}
+  "capability/compiled-program" {:state :partial
+                                 :milestone 1
+                                 :rationale "Dependency-free programs compile; production dependency builds remain"
+                                 :evidence [{:kind :compat-fixture
+                                             :id :compiled/main}]}
+  "capability/browser-filesystem" {:state :platform-limited
+                                   :milestone 5
+                                   :rationale "Browser Wasm has no ambient host filesystem"
+                                   :evidence [{:kind :implementation
+                                               :path "www/docs/implementation.md"}]}
+  "capability/browser-subprocess" {:state :platform-limited
+                                   :milestone 5
+                                   :rationale "Browser Wasm cannot spawn host processes"
+                                   :evidence [{:kind :implementation
+                                               :path "www/docs/implementation.md"}]}
+  "capability/jvm-bytecode" {:state :not-applicable
+                             :milestone 4
+                             :rationale "Gobb deliberately runs Glojure code without a JVM"
+                             :evidence [{:kind :implementation
+                                         :path "www/docs/implementation.md"}]}
+  "capability/sci-runtime" {:state :not-applicable
+                            :milestone 4
+                            :rationale "Gobb uses the full Glojure runtime instead of SCI"
+                            :evidence [{:kind :test :path "test/gobb"
+                                       :description "Rejects SCI dependencies in Gobb-owned runtime source"}]}
+  "capability/gobb-reader-feature" {:state :intentional-difference
+                                    :milestone 1
+                                    :rationale "Gobb adds :gobb while retaining the :bb and :clj reader features"
+                                    :evidence [{:kind :compat-fixture
+                                                :id :reader/gobb-feature}]}}
+
+ :items
+ [{:id "project/bb-edn-discovery"
+   :category :project-config
+   :name "bb.edn discovery and --config replacement"}
+  {:id "project/paths"
+   :category :project-config
+   :name ":paths and :extra-paths"}
+  {:id "project/deps"
+   :category :project-config
+   :name ":deps and :extra-deps"}
+  {:id "project/mvn-coordinates"
+   :category :project-config
+   :name "Maven coordinates"}
+  {:id "project/git-coordinates"
+   :category :project-config
+   :name "Git coordinates"}
+  {:id "project/local-coordinates"
+   :category :project-config
+   :name "Local/root coordinates"}
+  {:id "project/aliases"
+   :category :project-config
+   :name "deps.edn aliases"}
+  {:id "project/deps-root"
+   :category :project-config
+   :name "--deps-root and relative path resolution"}
+  {:id "project/preloads"
+   :category :project-config
+   :name ":preloads"
+   :state :partial
+   :milestone 3
+   :rationale "BABASHKA_PRELOADS works; bb.edn preloads await project loading"
+   :evidence [{:kind :compat-fixture :id :loading/preloads}]}
+  {:id "project/pods"
+   :category :project-config
+   :name ":pods"}
+  {:id "project/min-bb-version"
+   :category :project-config
+   :name ":min-bb-version"}
+  {:id "project/classpath-cache"
+   :category :project-config
+   :name "Classpath calculation and cache"}
+  {:id "project/print-deps"
+   :category :project-config
+   :name "print-deps"}
+  {:id "tasks/task-map"
+   :category :task-config
+   :name ":tasks definitions"}
+  {:id "tasks/init"
+   :category :task-config
+   :name ":init"}
+  {:id "tasks/requires"
+   :category :task-config
+   :name ":requires"}
+  {:id "tasks/depends"
+   :category :task-config
+   :name ":depends dependency ordering"}
+  {:id "tasks/parallel"
+   :category :task-config
+   :name "Parallel task execution"}
+  {:id "tasks/private"
+   :category :task-config
+   :name ":private tasks"}
+  {:id "tasks/doc"
+   :category :task-config
+   :name ":doc task descriptions"}
+  {:id "tasks/enter-leave"
+   :category :task-config
+   :name ":enter and :leave hooks"}
+  {:id "tasks/run"
+   :category :task-config
+   :name "tasks and run subcommands"}]
+
+ :capabilities
+ [{:id "capability/native-repl" :name "Native terminal REPL"}
+  {:id "capability/browser-repl" :name "Browser-Wasm REPL"}
+  {:id "capability/socket-repl" :name "Socket REPL" :milestone 10}
+  {:id "capability/nrepl-server" :name "nREPL server" :milestone 10}
+  {:id "capability/pods" :name "Pod loading and invocation" :milestone 10}
+  {:id "capability/http-server" :name "HTTP server integrations" :milestone 10}
+  {:id "capability/runtime-require" :name "Runtime namespace loading"}
+  {:id "capability/compiled-program" :name "gobb build compiled program"}
+  {:id "capability/process" :name "Subprocess execution" :milestone 8}
+  {:id "capability/process-pipeline" :name "Process pipelines" :milestone 8}
+  {:id "capability/filesystem" :name "Filesystem operations" :milestone 9}
+  {:id "capability/network-client" :name "Network clients" :milestone 5}
+  {:id "capability/signals" :name "Signals and shutdown" :milestone 5}
+  {:id "capability/native-linux-amd64" :name "Linux amd64"}
+  {:id "capability/native-linux-arm64" :name "Linux arm64"}
+  {:id "capability/native-macos-amd64" :name "macOS amd64"}
+  {:id "capability/native-macos-arm64" :name "macOS arm64"}
+  {:id "capability/native-windows-amd64" :name "Windows amd64"}
+  {:id "capability/native-freebsd-amd64" :name "FreeBSD amd64"}
+  {:id "capability/native-freebsd-arm64" :name "FreeBSD arm64"}
+  {:id "capability/native-openbsd-amd64" :name "OpenBSD amd64"}
+  {:id "capability/native-openbsd-arm64" :name "OpenBSD arm64"}
+  {:id "capability/native-netbsd-amd64" :name "NetBSD amd64"}
+  {:id "capability/native-netbsd-arm64" :name "NetBSD arm64"}
+  {:id "capability/wasi-wasm" :name "WASI Wasm"}
+  {:id "capability/browser-wasm" :name "Browser Wasm"}
+  {:id "capability/browser-filesystem" :name "Browser host filesystem"}
+  {:id "capability/browser-subprocess" :name "Browser host subprocesses"}
+  {:id "capability/jvm-bytecode" :name "Arbitrary JVM bytecode"}
+  {:id "capability/sci-runtime" :name "SCI execution runtime"}
+  {:id "capability/gobb-reader-feature" :name "Additional :gobb reader feature"}]
+
+ :test-routes
+ [{:pattern "(bb_edn|deps|print_deps)" :area :projects :milestone 7}
+  {:pattern "tasks" :area :tasks :milestone 8}
+  {:pattern "(nrepl|socket_repl|server|pod)" :area :interactive-services
+   :milestone 10}
+  {:pattern "(classes|interop|proxy|reify|java_)" :area :java-compatibility
+   :milestone 6}
+  {:pattern "(io_test|file_var|classpath)" :area :filesystem
+   :milestone 9}
+  {:pattern "(shutdown_hook|interrupt|kill_child)" :area :platform
+   :milestone 5}
+  {:pattern "(uberjar|uberscript)" :area :build :milestone 11}]
+
+ :program-routes
+ [{:pattern "(process|pst|which|fzf)" :area :process :milestone 8}
+  {:pattern "(http|download|digitalocean|torrent)" :area :network
+   :milestone 5}
+  {:pattern "(ls_jar|tree|notes)" :area :filesystem :milestone 9}
+  {:pattern "(server|portal)" :area :interactive-services :milestone 10}]}
