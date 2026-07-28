@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Projects and dependencies</p>
+    <p class="summary-value">Tasks and commands</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">7 / 14</p>
+    <p class="summary-value">8 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 50%"></span>
+  <span style="width: 57%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -89,7 +89,7 @@ with explicit compatibility states and milestone assignments.
       <li class="task-done">Persistent REPL values and <code>*1</code> history verified</li>
       <li class="task-done">BB-compatible <code>babashka.version</code>, <code>babashka.file</code>, and initial <code>java.class.path</code> properties</li>
       <li class="task-done">REPL errors expose the underlying evaluator message</li>
-      <li class="task-done">Runtime <code>(ns ...)</code> support with Gloat <code>0.1.64</code> and Glojure <code>0.7.2</code></li>
+      <li class="task-done">Runtime <code>(ns ...)</code> support verified with Gloat <code>0.1.67</code> and Glojure <code>0.7.3</code></li>
       <li class="task-done">Dependency-free <code>gobb build</code> compilation spike</li>
       <li class="task-done">One portable smoke program produces equivalent evaluated and compiled output</li>
       <li class="task-done">Native, WASI, and browser-Wasm smoke artifacts are executed by tests</li>
@@ -237,6 +237,37 @@ with explicit compatibility states and milestone assignments.
   </div>
 </div>
 
+## Completed projects and dependencies
+
+<div class="milestone milestone-done">
+  <div class="milestone-marker">7</div>
+  <div>
+    <span class="status-badge status-done">Complete</span>
+    <h3>Projects and dependencies</h3>
+    <p>
+      Support the project files and dependency sources that BB uses to build
+      its runtime classpath.
+    </p>
+    <ul class="task-list">
+      <li class="task-done">Discover and read <code>bb.edn</code> and <code>deps.edn</code></li>
+      <li class="task-done">Resolve project paths and recursive local dependencies</li>
+      <li class="task-done">Resolve pinned Git dependencies into the Gobb cache</li>
+      <li class="task-done">Resolve source-bearing Maven coordinates and common transitive POM dependencies without a JVM</li>
+      <li class="task-done">Merge aliases, <code>-Sdeps</code>, and explicit <code>-cp</code>/<code>--classpath</code> entries</li>
+      <li class="task-done">Load source and non-source resources from the resolved classpath</li>
+      <li class="task-done">Report precise invalid configuration, coordinate, path, download, and extraction errors</li>
+      <li class="task-done">Cache dependencies with <code>prepare</code> and inspect them with <code>print-deps</code></li>
+      <li class="task-done">Exercise project loading under interpreted and compiled Gobb</li>
+      <li class="task-done">Run dependency-bearing builds under native, WASI, and browser-Wasm</li>
+    </ul>
+    <p>
+      See <a href="../projects/">Projects and dependencies</a> for discovery,
+      cache, coordinate, build, and target behavior. Maven artifacts must
+      contain portable source; Gobb does not execute JVM bytecode.
+    </p>
+  </div>
+</div>
+
 ## Babashka source integration
 
 Gobb builds against Babashka source without vendoring it and without adding
@@ -282,10 +313,10 @@ also removes the downloaded Babashka source checkout.
 
 - Most Babashka implementation namespaces still depend on SCI, JVM classes,
   GraalVM substitutions, or libraries that have not been ported.
-- Working-directory and explicit runtime classpaths work; project-derived
-  classpaths, `bb.edn`, and `deps.edn` are not supported yet.
-- Tasks, subprocesses, filesystem compatibility, networking, pods, and
-  network REPL services remain unimplemented.
+- Project-derived classpaths work, but Maven bytecode-only libraries remain
+  unavailable and advanced POM/BOM edge cases are not yet tools.deps-complete.
+- Tasks, subprocess pipelines, bundled filesystem/network libraries, pods,
+  and network REPL services remain unimplemented.
 - The native and browser REPLs are focused proofs. Terminal line editing and
   command history, nREPL, socket REPL, browser filesystem loading, and the rest
   of BB's interactive surface remain.
@@ -294,30 +325,30 @@ also removes the downloaded Babashka source checkout.
 
 ## Next concrete slice
 
-Resolve project configuration and dependency classpaths, beginning with local
-and Git dependencies before adding Maven coordinates and resource lookup.
+Port BB's task graph and command dispatch, then connect task process pipelines
+to the native platform capability layer.
 
 ## Current work
 
 <div class="milestone milestone-active">
-  <div class="milestone-marker">7</div>
+  <div class="milestone-marker">8</div>
   <div>
     <span class="status-badge status-active">In progress</span>
-    <h3>Projects and dependencies</h3>
+    <h3>Tasks and commands</h3>
     <p>
-      Support the project files and dependency sources that BB uses to build
-      its runtime classpath.
+      Port BB's task model, command selection, exec functions, and process
+      pipelines onto the resolved project basis.
     </p>
     <ul class="task-list">
-      <li>Discover and read <code>bb.edn</code> and <code>deps.edn</code></li>
-      <li>Resolve project paths and local dependencies</li>
-      <li>Resolve Git dependencies into the Makes-managed cache</li>
-      <li>Resolve Maven coordinates without requiring a JVM at runtime</li>
-      <li>Merge aliases and explicit <code>-cp</code>/<code>--classpath</code> entries</li>
-      <li>Load source and non-source resources from the resolved classpath</li>
-      <li>Match BB diagnostics for invalid project and dependency configuration</li>
-      <li>Exercise project loading under interpreted and compiled Gobb</li>
-      <li>Record target-specific dependency limits for native, WASI, and browser-Wasm</li>
+      <li>Dispatch named tasks and the explicit <code>run</code> command</li>
+      <li>Evaluate global and per-task <code>:init</code> and <code>:requires</code></li>
+      <li>Order task graphs through <code>:depends</code></li>
+      <li>Support task arguments, <code>:private</code>, and <code>:doc</code></li>
+      <li>Run <code>:enter</code> and <code>:leave</code> hooks</li>
+      <li>Implement sequential and parallel task execution</li>
+      <li>Port process invocation and pipelines without JVM process classes</li>
+      <li>Preserve task exit status, streams, environment, and working directory</li>
+      <li>Exercise task and command behavior against pinned BB fixtures</li>
     </ul>
   </div>
 </div>
@@ -325,11 +356,6 @@ and Git dependencies before adding Maven coordinates and resource lookup.
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>08</span>
-    <h3>Tasks and commands</h3>
-    <p>Port BB tasks, exec functions, process pipelines, and aliases.</p>
-  </article>
   <article class="roadmap-card">
     <span>09</span>
     <h3>Batteries included</h3>

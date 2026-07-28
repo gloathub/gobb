@@ -12,14 +12,14 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | --- | ---: | ---: | ---: | ---: | ---: |
 | built-in-library | 38 | 0 | 0 | 38 | 0 |
 | built-in-namespace | 104 | 0 | 1 | 103 | 0 |
-| capability | 41 | 6 | 18 | 8 | 9 |
+| capability | 41 | 7 | 17 | 8 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
 | compatible-library | 98 | 0 | 0 | 98 | 0 |
 | java-class | 583 | 35 | 1 | 524 | 23 |
-| project-config | 13 | 0 | 1 | 12 | 0 |
+| project-config | 13 | 10 | 2 | 1 | 0 |
 | representative-program | 37 | 0 | 0 | 37 | 0 |
 | task-config | 9 | 0 | 0 | 9 | 0 |
-| upstream-test | 63 | 0 | 0 | 63 | 0 |
+| upstream-test | 63 | 0 | 3 | 60 | 0 |
 
 ## Evidence-backed current surface
 
@@ -31,7 +31,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `capability/browser-subprocess` | capability | **platform-limited** | www/docs/implementation.md |
 | `capability/browser-wasm` | capability | **partial** | Makefile |
 | `capability/clock` | capability | **supported** | test/capabilities |
-| `capability/compiled-program` | capability | **partial** | :compiled/main |
+| `capability/compiled-program` | capability | **supported** | :compiled/main<br>test/projects |
 | `capability/environment` | capability | **supported** | test/capabilities |
 | `capability/gobb-reader-feature` | capability | **intentional-difference** | :reader/gobb-feature |
 | `capability/jvm-bytecode` | capability | **not-applicable** | www/docs/implementation.md |
@@ -128,19 +128,31 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `cli/-x` | cli | **supported** | :invocation/exec |
 | `cli/repl` | cli | **partial** | test/gobb |
 | `namespace/clojure.java.io` | built-in-namespace | **partial** | :loading/resource |
-| `project/preloads` | project-config | **partial** | :loading/preloads |
+| `project/aliases` | project-config | **supported** | test/projects |
+| `project/bb-edn-discovery` | project-config | **supported** | test/projects |
+| `project/classpath-cache` | project-config | **supported** | test/projects |
+| `project/deps` | project-config | **supported** | test/projects |
+| `project/deps-root` | project-config | **supported** | test/projects |
+| `project/git-coordinates` | project-config | **supported** | test/projects |
+| `project/local-coordinates` | project-config | **supported** | test/projects |
+| `project/min-bb-version` | project-config | **supported** | test/projects |
+| `project/mvn-coordinates` | project-config | **partial** | test/projects<br>src/gobb/project.clj |
+| `project/paths` | project-config | **supported** | test/projects |
+| `project/preloads` | project-config | **supported** | :loading/preloads |
+| `project/print-deps` | project-config | **partial** | test/projects |
+| `upstream-test/test/babashka/bb_edn_test.clj` | upstream-test | **partial** | test/projects |
+| `upstream-test/test/babashka/deps_test.clj` | upstream-test | **partial** | test/projects |
+| `upstream-test/test/babashka/print_deps_test.clj` | upstream-test | **partial** | test/projects |
 
 ## Planned queue
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 6 | 531 |
-| 7 | 15 |
 | 8 | 16 |
 | 9 | 153 |
-| 10 | 10 |
+| 10 | 11 |
 | 11 | 2 |
-| 13 | 191 |
+| 13 | 722 |
 
 ## Authoritative inputs
 

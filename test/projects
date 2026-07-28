@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${GOBB_GLOAT:?GOBB_GLOAT must name the Gloat executable}"
+: "${WASMTIME:?WASMTIME must name the Wasmtime executable}"
+: "${NODE:?NODE must name the Node.js executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+projects=$root/test/fixtures/projects
+
+fail() {
+  echo "test/projects: $*" >&2
+  exit 1
+}
+
+check() {
+  local description=$1 expected=$2
+  shift 2
+  local actual
+  actual=$("$@")
+  [[ $actual == "$expected" ]] ||
+    fail "$description: expected '$expected', got '$actual'"
+}
+
+check "bb.edn paths, local dependency, and resources" \
+  '{:project :bb-edn, :local [:local-dependency "local resource\n"], :resource "resource from bb.edn\n"}' \
+  "$GOBB" --config "$projects/basic/bb.edn" \
+  -e "(require '[project.basic :as basic]) (prn (basic/result))"
+
+check "automatic bb.edn discovery" \
+  ':local-dependency' \
+  bash -c \
+  'cd "$1" && "$2" -e "$3"' \
+  _ "$projects/basic" "$GOBB" \
+  "(require '[fixture.local :as local]) (local/value)"
+
+check "configuration adjacent to invoked file" \
+  '{:project :bb-edn, :local [:local-dependency "local resource\n"], :resource "resource from bb.edn\n"}' \
+  "$GOBB" "$projects/basic/adjacent.clj"
+
+check "deps.edn discovery" \
+  ':deps-edn-loaded' \
+  bash -c \
+  'cd "$1" && "$2" -e "$3"' \
+  _ "$projects/deps-only" "$GOBB" \
+  "(require '[project.deps-only :as project]) project/value"
+
+check "extra-path alias" \
+  ':alias-loaded' \
+  "$GOBB" --config "$projects/basic/bb.edn" -A:dev \
+  -e "(require '[project.dev :as dev]) dev/value"
+
+check "replace-path alias" \
+  ':replacement-loaded' \
+  "$GOBB" --config "$projects/basic/bb.edn" -A replacement \
+  -e "(require '[project.replacement :as replacement]) replacement/value"
+
+check "-Sdeps merge" \
+  ':deps-edn-loaded' \
+  "$GOBB" -Sdeps \
+  "{:paths [\"$projects/deps-only/source\"]}" \
+  -e "(require '[project.deps-only :as project]) project/value"
+
+check "explicit classpath overrides project classpath" \
+  ':deps-edn-loaded' \
+  "$GOBB" --config "$projects/basic/bb.edn" \
+  -cp "$projects/deps-only/source" \
+  -e "(require '[project.deps-only :as project]) project/value"
+
+classpath=$(
+  "$GOBB" --config "$projects/basic/bb.edn" \
+    print-deps --format classpath
+)
+[[ $classpath == *"projects/basic/src"* &&
+   $classpath == *"projects/local-lib/src"* ]] ||
+  fail "print-deps classpath omitted resolved project paths: $classpath"
+
+deps=$(
+  "$GOBB" --config "$projects/basic/bb.edn" \
+    print-deps --format deps
+)
+[[ $deps == *"fixture/local"* && $deps == *":local/root"* ]] ||
+  fail "print-deps deps output omitted the configured dependency: $deps"
+
+config_property=$(
+  "$GOBB" --config "$projects/basic/bb.edn" \
+    -e '(System/getProperty "babashka.config")'
+)
+[[ $config_property == "\"$(realpath "$projects/basic/bb.edn")\"" ]] ||
+  fail "babashka.config property is incorrect: $config_property"
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+printf '[:not-a-map]\n' > "$tmp/invalid.edn"
+if "$GOBB" --config "$tmp/invalid.edn" -e 1 >"$tmp/out" 2>"$tmp/err"; then
+  fail "invalid project configuration succeeded"
+fi
+grep -q 'expected an EDN map' "$tmp/err" ||
+  fail "invalid project configuration lacked a useful diagnostic"
+
+printf '{} {}\n' > "$tmp/multiple.edn"
+if "$GOBB" --config "$tmp/multiple.edn" -e 1 >"$tmp/out" 2>"$tmp/err"; then
+  fail "multiple project configuration forms succeeded"
+fi
+grep -q 'zero or one form' "$tmp/err" ||
+  fail "multiple project forms lacked a useful diagnostic"
+
+cat > "$tmp/deps-root.edn" <<'EOF'
+{:paths ["source"]}
+EOF
+check "--deps-root relative path resolution" \
+  ':deps-edn-loaded' \
+  "$GOBB" --config "$tmp/deps-root.edn" \
+  --deps-root "$projects/deps-only" \
+  -e "(require '[project.deps-only :as project]) project/value"
+
+cat > "$tmp/minimum.edn" <<'EOF'
+{:min-bb-version "300.0.0"}
+EOF
+"$GOBB" --config "$tmp/minimum.edn" -e nil \
+  >"$tmp/out" 2>"$tmp/err"
+grep -q 'requires babashka 300.0.0 or newer' "$tmp/err" ||
+  fail ":min-bb-version did not produce a warning"
+
+cp -R "$projects/git-lib" "$tmp/git-lib"
+git -C "$tmp/git-lib" init -q
+git -C "$tmp/git-lib" add .
+git -C "$tmp/git-lib" \
+  -c user.name=Gobb -c user.email=gobb@example.invalid \
+  commit -qm fixture
+git_revision=$(git -C "$tmp/git-lib" rev-parse HEAD)
+cat > "$tmp/git-project.edn" <<EOF
+{:deps {fixture/git
+        {:git/url "file://$tmp/git-lib"
+         :git/sha "$git_revision"}}}
+EOF
+
+check "Git dependency and resource" \
+  '[:git-dependency "git resource\n"]' \
+  env GOBB_CACHE="$tmp/cache" \
+  "$GOBB" --config "$tmp/git-project.edn" \
+  -e "(require '[fixture.git :as fixture]) (prn (fixture/value))"
+env GOBB_CACHE="$tmp/cache" \
+  "$GOBB" --config "$tmp/git-project.edn" prepare
+
+maven_root="$tmp/maven-repository/fixture/maven/1.0.0"
+transitive_root="$tmp/maven-repository/fixture/transitive/1.0.0"
+mkdir -p "$maven_root"
+mkdir -p "$transitive_root"
+(
+  cd "$projects/maven-lib/src"
+  zip -qr "$maven_root/maven-1.0.0.jar" .
+)
+(
+  cd "$projects/maven-lib/resources"
+  zip -qr "$maven_root/maven-1.0.0.jar" .
+)
+(
+  cd "$projects/maven-transitive/src"
+  zip -qr "$transitive_root/transitive-1.0.0.jar" .
+)
+cat > "$maven_root/maven-1.0.0.pom" <<'EOF'
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fixture</groupId>
+  <artifactId>maven</artifactId>
+  <version>1.0.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>fixture</groupId>
+      <artifactId>transitive</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+</project>
+EOF
+cat > "$transitive_root/transitive-1.0.0.pom" <<'EOF'
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fixture</groupId>
+  <artifactId>transitive</artifactId>
+  <version>1.0.0</version>
+</project>
+EOF
+cat > "$tmp/maven-project.edn" <<EOF
+{:mvn/repos {"central" {:url "file://$tmp/maven-repository"}}
+ :deps {fixture/maven {:mvn/version "1.0.0"}}}
+EOF
+
+check "Maven dependency and resource without a JVM" \
+  '[:maven-dependency :transitive-dependency "maven resource\n"]' \
+  env GOBB_CACHE="$tmp/cache" \
+  "$GOBB" --config "$tmp/maven-project.edn" \
+  -e "(require '[fixture.maven :as fixture]) (prn (fixture/value))"
+env GOBB_CACHE="$tmp/cache" \
+  "$GOBB" --config "$tmp/maven-project.edn" prepare
+
+compiled="$tmp/project-program"
+GOBB_GLOAT="$GOBB_GLOAT" \
+  "$GOBB" --config "$projects/basic/build.edn" \
+  build "$projects/basic/main.clj" -o "$compiled"
+check "compiled project and local dependency" \
+  '{:compiled :local-dependency, :args ("one" "two")}' \
+  "$compiled" one two
+
+wasi="$tmp/project-program.wasm"
+GOBB_GLOAT="$GOBB_GLOAT" \
+  "$GOBB" --config "$projects/basic/build.edn" \
+  build "$projects/basic/main.clj" -o "$wasi" \
+  --platform wasip1/wasm
+check "compiled WASI project and local dependency" \
+  '{:compiled :local-dependency, :args ("one" "two")}' \
+  "$WASMTIME" "$wasi" one two
+
+browser="$tmp/project-program-browser.wasm"
+GOBB_GLOAT="$GOBB_GLOAT" \
+  "$GOBB" --config "$projects/basic/build.edn" \
+  build "$projects/basic/main.clj" -o "$browser" \
+  --platform js/wasm
+go=$("$GOBB_GLOAT" --which=go)
+goroot=$("$go" env GOROOT)
+check "compiled browser-Wasm project and local dependency" \
+  '{:compiled :local-dependency, :args ("one" "two")}' \
+  env -i HOME=/tmp PATH="$(dirname "$NODE"):/usr/bin:/bin" \
+  "$goroot/lib/wasm/go_js_wasm_exec" "$browser" one two
+
+echo "All project and dependency tests passed"

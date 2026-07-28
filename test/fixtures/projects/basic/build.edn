@@ -1,0 +1,1 @@
+{:deps {fixture/local {:local/root "../local-lib"}}}

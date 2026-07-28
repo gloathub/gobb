@@ -1,0 +1,5 @@
+{:paths ["src" "resources"]
+ :deps {fixture/local {:local/root "../local-lib"}}
+ :aliases
+ {:dev {:extra-paths ["dev"]}
+  :replacement {:replace-paths ["replacement"]}}}

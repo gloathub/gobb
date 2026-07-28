@@ -221,9 +221,27 @@ evaluation. Reader conditionals recognize `:clj`, `:bb`, and the additional
 `:gobb` feature. Runtime classpaths also provide namespaces,
 `data_readers.clj`, and resources through `clojure.java.io/resource`.
 
+## Projects and Dependencies
+
+Gobb discovers `bb.edn` and `deps.edn` beside the invoked script or in the
+current directory. It supports project paths, aliases, local roots, pinned Git
+dependencies, and source-bearing Maven dependencies without invoking a JVM:
+
+```bash
+gobb --config bb.edn -A:dev -e "(require '[example.core :as example])"
+gobb prepare
+gobb print-deps --format classpath
+```
+
+Git and Maven artifacts are cached under `GOBB_CACHE`,
+`$XDG_CACHE_HOME/gobb`, or `$HOME/.cache/gobb`. Maven artifacts containing
+portable Clojure source can be loaded; JVM bytecode-only libraries remain
+outside Gobb's architecture. Maven dependency resolution additionally uses
+`curl` and `unzip` on the native host.
+
 ## Build Programs
 
-The initial `gobb build` spike compiles a dependency-free namespace containing
+`gobb build` stages the resolved project and compiles a namespace containing
 `-main` through Gloat:
 
 ```bash
@@ -233,8 +251,8 @@ gobb build src/example/core.clj -o example.wasm --platform js/wasm
 ```
 
 Gobb uses the `gloat` executable on `PATH`. Set `GOBB_GLOAT=/path/to/gloat`
-to select it explicitly. Project dependencies, resources, and `bb.edn` build
-configuration remain later milestones.
+to select it explicitly. Dependency-bearing builds are tested as native,
+WASI, and browser-Wasm executables.
 
 ## Makefile Targets
 

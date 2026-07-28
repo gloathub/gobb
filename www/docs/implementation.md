@@ -79,9 +79,9 @@ $ gobb --classpath src -e \
 
 The configured value is also exposed through the `java.class.path` system
 property. Namespace names follow Clojure resource conventions, including
-hyphen-to-underscore conversion. This phase covers filesystem source; project
-paths from `bb.edn` and dependency classpaths arrive with project
-configuration and dependency resolution.
+hyphen-to-underscore conversion. Project paths from `bb.edn` and `deps.edn`,
+aliases, local roots, Git checkouts, and source-bearing Maven artifacts use
+the same loader. See [Projects and dependencies](projects.md).
 
 === "Build"
 
@@ -95,10 +95,10 @@ configuration and dependency resolution.
     inside the resulting program unless a future explicit optimization mode
     disables it.
 
-    The initial build spike accepts a dependency-free Clojure namespace with
-    `-main` and delegates compilation to Gloat. Gobb finds `gloat` on `PATH`,
-    or uses the executable named by `GOBB_GLOAT`. Native targets use
-    `--platform OS/ARCH`; `js/wasm` selects Gloat's browser-Wasm output.
+    Gobb stages the resolved project source graph and delegates compilation to
+    Gloat. Gobb finds `gloat` on `PATH`, or uses the executable named by
+    `GOBB_GLOAT`. Native targets use `--platform OS/ARCH`; `js/wasm` selects
+    Gloat's browser-Wasm output.
 
     `make smoke` proves the path by evaluating one namespace with Gobb, then
     building and executing it as a native program, WASI under Wasmtime, and
@@ -139,22 +139,22 @@ Unavailable operations use structured exception data:
 ## Project configuration
 
 Gobb preserves `bb.edn` and `deps.edn` wherever their behavior can be matched.
-Gobb-specific build and host configuration uses namespaced keys:
+Project configuration supplies paths, aliases, and local, Git, or Maven
+dependencies:
 
 ```clojure
 {:paths ["src"]
  :deps  {example/tool {:git/url "https://example.invalid/tool"
-                       :git/sha "abc123"}}
-
- :gobb/build
- {:platforms ["linux/amd64" "darwin/arm64" "wasip1/wasm"]}
-
- :gobb/go-deps
- {example.com/adapter "v1.2.3"}
-
- :gobb/capabilities
- #{:filesystem :http-client}}
+                       :git/sha "abc123"}
+          local/tool {:local/root "../tool"}
+          medley/medley {:mvn/version "1.4.0"}}
+ :aliases
+ {:dev {:extra-paths ["dev"]
+        :extra-deps {example/test-support
+                     {:local/root "../test-support"}}}}}
 ```
+
+Resolution is implemented by Gobb and does not invoke Clojure or a JVM.
 
 ## Repository boundaries
 

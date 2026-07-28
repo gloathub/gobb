@@ -55,6 +55,7 @@ nav:
   - Gobb: index.md
   - REPL: repl.md
   - Implementation: implementation.md
+  - Projects: projects.md
   - Platforms: platforms.md
   - Java: java-compatibility.md
   - BB Inventory: inventory.md

@@ -48,7 +48,7 @@
   :built-in-namespace {:state :planned :milestone 9}
   :built-in-library {:state :planned :milestone 9}
   :compatible-library {:state :planned :milestone 13}
-  :java-class {:state :planned :milestone 6}
+  :java-class {:state :planned :milestone 13}
   :capability {:state :planned :milestone 5}
   :upstream-test {:state :planned :milestone 13}
   :representative-program {:state :planned :milestone 13}}
@@ -98,6 +98,74 @@
               :rationale "Native and browser REPL loops work; BB's complete interactive surface does not"
               :evidence [{:kind :test :path "test/gobb"
                           :description "Native REPL banner, evaluation, history, and recovery"}]}
+  "project/bb-edn-discovery" {:state :supported
+                              :milestone 7
+                              :evidence [{:kind :test :path "test/projects"
+                                          :description "Current-directory, adjacent-file, and explicit config discovery"}]}
+  "project/paths" {:state :supported
+                    :milestone 7
+                    :evidence [{:kind :test :path "test/projects"
+                                :description "Project, replacement, and extra paths"}]}
+  "project/deps" {:state :supported
+                   :milestone 7
+                   :evidence [{:kind :test :path "test/projects"
+                               :description "Base, extra, replacement, override, and -Sdeps maps"}]}
+  "project/mvn-coordinates" {:state :partial
+                             :milestone 7
+                             :rationale "Source-bearing Maven artifacts and transitive POM dependencies work; JVM bytecode-only artifacts remain intentionally unavailable"
+                             :evidence [{:kind :test :path "test/projects"
+                                         :description "JVM-free local Maven repository with transitive source dependency"}
+                                        {:kind :test :path "src/gobb/project.clj"
+                                         :description "Central and Clojars resolution with persistent cache"}]}
+  "project/git-coordinates" {:state :supported
+                             :milestone 7
+                             :evidence [{:kind :test :path "test/projects"
+                                         :description "Pinned Git SHA, nested project paths, resources, and cache"}]}
+  "project/local-coordinates" {:state :supported
+                               :milestone 7
+                               :evidence [{:kind :test :path "test/projects"
+                                           :description "Recursive relative local/root project"}]}
+  "project/aliases" {:state :supported
+                     :milestone 7
+                     :evidence [{:kind :test :path "test/projects"
+                                 :description "Extra and replacement path/dependency aliases"}]}
+  "project/deps-root" {:state :supported
+                       :milestone 7
+                       :evidence [{:kind :test :path "test/projects"
+                                   :description "Explicit dependency root and config-relative paths"}]}
+  "project/preloads" {:state :supported
+                      :milestone 3
+                      :evidence [{:kind :compat-fixture :id :loading/preloads}]}
+  "project/pods" {:state :planned
+                  :milestone 10
+                  :rationale "Pod loading belongs to the interactive services milestone"}
+  "project/min-bb-version" {:state :supported
+                            :milestone 7
+                            :evidence [{:kind :test :path "test/projects"
+                                        :description "BB-compatible minimum-version warning"}]}
+  "project/classpath-cache" {:state :supported
+                             :milestone 7
+                             :evidence [{:kind :test :path "test/projects"
+                                         :description "Repeatable Git and Maven prepare cache"}]}
+  "project/print-deps" {:state :partial
+                        :milestone 7
+                        :rationale "Resolved user deps and classpath formats work; BB built-in library coordinates arrive with the batteries milestone"
+                        :evidence [{:kind :test :path "test/projects"}]}
+  "upstream-test/test/babashka/bb_edn_test.clj"
+  {:state :partial
+   :milestone 7
+   :rationale "Focused Gobb fixtures cover project discovery, paths, aliases, and configuration errors; the complete upstream BB test file is not yet run unchanged"
+   :evidence [{:kind :test :path "test/projects"}]}
+  "upstream-test/test/babashka/deps_test.clj"
+  {:state :partial
+   :milestone 7
+   :rationale "Focused Gobb fixtures cover local, Git, and source-bearing Maven dependencies; the complete upstream BB test file includes JVM-specific behavior"
+   :evidence [{:kind :test :path "test/projects"}]}
+  "upstream-test/test/babashka/print_deps_test.clj"
+  {:state :partial
+   :milestone 7
+   :rationale "Gobb prints resolved user dependencies and classpaths; BB built-in dependency coordinates remain assigned to the batteries milestone"
+   :evidence [{:kind :test :path "test/projects"}]}
   "namespace/clojure.java.io" {:state :partial
                               :milestone 3
                               :rationale "Classpath resource lookup is implemented; the complete JVM API is not"
@@ -137,11 +205,13 @@
                                 :milestone 1
                                 :evidence [{:kind :compat-fixture
                                             :id :loading/require}]}
-  "capability/compiled-program" {:state :partial
-                                 :milestone 1
-                                 :rationale "Dependency-free programs compile; production dependency builds remain"
+  "capability/compiled-program" {:state :supported
+                                 :milestone 7
                                  :evidence [{:kind :compat-fixture
-                                             :id :compiled/main}]}
+                                             :id :compiled/main}
+                                            {:kind :test
+                                             :path "test/projects"
+                                             :description "Dependency-bearing native, WASI, and browser-Wasm builds"}]}
   "capability/browser-filesystem" {:state :platform-limited
                                    :milestone 5
                                    :rationale "Browser Wasm has no ambient host filesystem"
@@ -278,9 +348,8 @@
   {:id "project/preloads"
    :category :project-config
    :name ":preloads"
-   :state :partial
+   :state :supported
    :milestone 3
-   :rationale "BABASHKA_PRELOADS works; bb.edn preloads await project loading"
    :evidence [{:kind :compat-fixture :id :loading/preloads}]}
   {:id "project/pods"
    :category :project-config
@@ -371,7 +440,7 @@
   {:pattern "(nrepl|socket_repl|server|pod)" :area :interactive-services
    :milestone 10}
   {:pattern "(classes|interop|proxy|reify|java_)" :area :java-compatibility
-   :milestone 6}
+   :milestone 13}
   {:pattern "(io_test|file_var|classpath)" :area :filesystem
    :milestone 9}
   {:pattern "(shutdown_hook|interrupt|kill_child)" :area :platform

@@ -8,6 +8,8 @@ ifdef MAKES_REPO_DIR
 MAKES_LOCAL_DIR ?= $(TOP)/.cache/local
 endif
 
+BABASHKA-VERSION ?= 1.12.218
+
 GLOAT-DIR ?= $(or $(GLOAT_DIR),$(LOCAL-CACHE)/gloat-$(GLOAT-VERSION))
 
 include $M/babashka.mk
@@ -428,6 +430,8 @@ java-compat-test: \
 test: $(GOBB) $(BB) $(RG) smoke capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 	$Q GOBB='$(GOBB)' test/java-lang
+	$Q GOBB='$(GOBB)' GOBB_GLOAT='$(GLOAT)' \
+	  WASMTIME='$(WASMTIME)' NODE='$(NODE)' test/projects
 
 compat: _compat
 

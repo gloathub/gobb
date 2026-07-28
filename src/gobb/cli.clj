@@ -1,11 +1,12 @@
 (ns gobb.cli
   (:require [babashka.impl.exceptions]
             [gobb.host :as host]
+            [gobb.project :as project]
             [gobb.repl :as repl]
             [gobb.version]))
 
 (def usage
-  "Usage: gobb [--init FILE] [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [--init FILE] [-cp PATH|--classpath PATH] -m NS|VAR [ARGS...]\n       gobb [--init FILE] [-cp PATH|--classpath PATH] -x VAR [ARGS...]\n       gobb [-cp PATH|--classpath PATH] --repl\n       gobb [--init FILE] [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb")
+  "Usage: gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -m NS|VAR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -x VAR [ARGS...]\n       gobb [PROJECT-OPTS] [-cp PATH|--classpath PATH] --repl\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb [PROJECT-OPTS] build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb\n\nPROJECT-OPTS:\n  --config FILE       Use an explicit bb.edn or deps.edn\n  --deps-root DIR     Resolve relative project paths from DIR\n  -Sdeps EDN          Merge dependency EDN after project configuration\n  -A ALIASES          Apply comma- or colon-separated aliases")
 
 (def build-usage
   "Usage: gobb build INPUT -o OUTPUT [--platform OS/ARCH]")
@@ -17,33 +18,69 @@
 
 (defn parse-global-options [argv]
   (loop [args argv
-         classpath ""
-         init nil]
+         options {:classpath nil
+                  :init nil
+                  :config nil
+                  :deps-root nil
+                  :merge-deps nil
+                  :aliases []}]
     (cond
       (contains? #{"-cp" "--classpath"} (first args))
       (if-let [path (second args)]
-        (recur (drop 2 args) path init)
+        (recur (drop 2 args) (assoc options :classpath path))
         (fail! (str (first args) " requires a path")))
 
       (= "--init" (first args))
       (if-let [file (second args)]
-        (recur (drop 2 args) classpath file)
+        (recur (drop 2 args) (assoc options :init file))
         (fail! "--init requires a file"))
 
-      :else
-      {:argv args
-       :classpath classpath
-       :init init})))
+      (= "--config" (first args))
+      (if-let [file (second args)]
+        (recur (drop 2 args) (assoc options :config file))
+        (fail! "--config requires a file"))
 
-(defn configure-classpath! [classpath]
+      (= "--deps-root" (first args))
+      (if-let [directory (second args)]
+        (recur (drop 2 args) (assoc options :deps-root directory))
+        (fail! "--deps-root requires a directory"))
+
+      (= "-Sdeps" (first args))
+      (if-let [deps (second args)]
+        (recur (drop 2 args) (assoc options :merge-deps deps))
+        (fail! "-Sdeps requires EDN"))
+
+      (= "-A" (first args))
+      (if-let [aliases (second args)]
+        (recur
+         (drop 2 args)
+         (update options :aliases into
+                 (remove empty?
+                         (strings.FieldsFunc
+                          aliases
+                          #(contains? #{\, \:} %)))))
+        (fail! "-A requires aliases"))
+
+      (and (first args)
+           (.startsWith (str (first args)) "-A:"))
+      (recur
+       (next args)
+       (update options :aliases into
+               (remove empty?
+                       (strings.Split (subs (first args) 3) ":"))))
+
+      :else
+      (assoc options :argv args))))
+
+(defn configure-classpath! [paths]
   ;; BB always loads source from the working directory. Explicit classpath
-  ;; entries are searched after it in platform path-list order.
+  ;; and resolved project entries are searched after it.
   (host/add-load-path! ".")
-  (doseq [path (path:filepath.SplitList classpath)]
-    (when-not (empty? path)
-      (host/add-load-path! path)))
+  (doseq [path paths]
+    (host/add-load-path! path))
   (host/install-data-readers!)
-  (System/setProperty "java.class.path" classpath))
+  (System/setProperty "java.class.path"
+                      (project/configured-classpath-string)))
 
 (defn build-fail! [message]
   (fmt.Fprintln os.Stderr (str "gobb build: " message))
@@ -101,6 +138,7 @@
               (build-fail!
                (str "cannot create temporary directory: "
                     temporary-error)))
+            (project/stage-classpath! temporary-dir)
             (let [staged-input (path:filepath.Join
                                 temporary-dir "main.clj")
                   staged-source
@@ -119,23 +157,31 @@
                               (if (= "js/wasm" platform)
                                 "--to=js"
                                 (str "--platform=" platform)))
-              args (cond-> [gloat staged-input
+              args (cond-> [gloat temporary-dir
                             (str "--out=" output)
                             "--force"
                             "--quiet"
                             "--ext=goimports"]
                      target-option (conj target-option))
               command (apply os:exec.Command args)
+              _ (set! (.Env command)
+                      (apply
+                       go/append
+                       (go/make (go/slice-of go/string) 0)
+                       (concat
+                        (os.Environ)
+                        [(str "GLJ_CLASSPATH=" temporary-dir)])))
               [command-output command-error] (.CombinedOutput command)]
-          (os.RemoveAll temporary-dir)
           (when command-error
             (let [details (strings.TrimSpace (go/string command-output))]
+              (os.RemoveAll temporary-dir)
               (build-fail!
                (str "Gloat failed"
                     (if (empty? details)
                       (str ": " (fmt.Sprint command-error))
                       (str ":\n" details))))))
-                output))))))))
+          (os.RemoveAll temporary-dir)
+          output))))))))
 
 (defn evaluate-expression [expression args]
   (host/evaluate-source
@@ -248,8 +294,10 @@
    "babashka.version" gobb.version/babashka-version)
   (host/run-main!
    (fn []
-     (let [{:keys [argv classpath init]} (parse-global-options argv)]
-       (configure-classpath! classpath)
+     (let [{:keys [argv init] :as options}
+           (parse-global-options argv)
+           paths (project/configure! options)]
+       (configure-classpath! paths)
        (host/run-preloads!)
        (host/run-init! init)
        (cond
@@ -266,6 +314,28 @@
 
          (= "build" (first argv))
          (build-program (rest argv))
+
+         (= "prepare" (first argv))
+         nil
+
+         (= "print-deps" (first argv))
+         (let [arguments (rest argv)]
+           (cond
+             (empty? arguments)
+             (prn (project/printable-deps))
+
+             (and (= "--format" (first arguments))
+                  (= "classpath" (second arguments))
+                  (= 2 (count arguments)))
+             (println (project/classpath-string))
+
+             (and (= "--format" (first arguments))
+                  (= "deps" (second arguments))
+                  (= 2 (count arguments)))
+             (prn (project/printable-deps))
+
+             :else
+             (fail! "print-deps expects --format deps|classpath")))
 
          (contains? #{"-e" "--eval"} (first argv))
          (if-let [expression (second argv)]
