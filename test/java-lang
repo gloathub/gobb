@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+
+check() {
+  local description=$1 expected=$2 expression=$3 actual
+  actual=$("$GOBB" -e "$expression")
+  if [[ $actual != "$expected" ]]; then
+    printf 'java-lang: %s: expected %q, got %q\n' \
+      "$description" "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+check 'scalar java.lang statics' \
+  '[true true 1.5 42 42 9 "42" true]' \
+  '(prn [(Boolean/parseBoolean "true")
+         (Character/isDigit 55)
+         (Double/parseDouble "1.5")
+         (Integer/parseInt "42")
+         (Long/parseLong "42")
+         (Math/max 3 9)
+         (String/valueOf 42)
+         (string? (System/lineSeparator))])'
+
+check 'String instance methods' \
+  '["bcd" true true]' \
+  '(prn [(.substring "abcdef" 1 4)
+         (.startsWith "gobb" "go")
+         (instance? String "gobb")])'
+
+check 'Instant static bridge' \
+  '2020-01-01T00:00:00Z' \
+  '(println (.toString (Instant/parse "2020-01-01T00:00:00Z")))'
+
+check 'UUID static bridge' \
+  '123e4567-e89b-12d3-a456-426614174000' \
+  '(println (.toString
+            (UUID/fromString "123e4567-e89b-12d3-a456-426614174000")))'
+
+check 'regex static and instance bridges' \
+  'true' \
+  '(println (.find (.matcher (Pattern/compile "bb") "gobb")))'
+
+echo 'All released Java compatibility tests passed'

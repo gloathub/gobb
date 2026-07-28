@@ -1,0 +1,68 @@
+{:schema 1
+ :owners
+ {:glojure "Clojure/JVM language types and the reusable host-class bridge"
+  :gojava "Portable Java API semantics implemented as focused Go packages"
+  :go-adapter "Operating-system or target-host behavior implemented with Go adapters"
+  :explicit-limitation "JVM internals, generated JVM classes, or architecture-specific behavior Gobb will not emulate"}
+
+ :supported
+ #{"java.lang.Boolean"
+   "java.lang.Character"
+   "java.lang.Double"
+   "java.lang.Integer"
+   "java.lang.Long"
+   "java.lang.Math"
+   "java.lang.Exception"
+   "java.lang.IllegalArgumentException"
+   "java.lang.IllegalStateException"
+   "java.lang.RuntimeException"
+   "java.lang.String"
+   "java.lang.StringBuilder"
+   "java.lang.System"
+   "java.lang.Throwable"
+   "java.lang.UnsupportedOperationException"
+   "java.io.BufferedInputStream"
+   "java.io.BufferedOutputStream"
+   "java.io.ByteArrayInputStream"
+   "java.io.ByteArrayOutputStream"
+   "java.io.File"
+   "java.io.FileInputStream"
+   "java.io.FileOutputStream"
+   "java.io.InputStream"
+   "java.io.OutputStream"
+   "java.io.Reader"
+   "java.io.StringReader"
+   "java.io.StringWriter"
+   "java.io.Writer"
+   "java.nio.file.Files"
+   "java.nio.file.Path"
+   "java.nio.file.Paths"
+   "java.time.Instant"
+   "java.util.UUID"
+   "java.util.regex.Matcher"
+   "java.util.regex.Pattern"}
+
+ :partial
+ #{"java.lang.Thread"}
+
+ :staged #{}
+
+ :limitation-patterns
+ ["^\\["
+  "^babashka\\.impl\\.proxy\\."
+  "^com\\.oracle\\.svm\\."
+  "^org\\.graalvm\\."
+  "^sun\\."
+  "^jdk\\."
+  "^borkdude\\.graal\\."]
+
+ :owner-routes
+ [{:pattern "^(clojure|java\\.lang)(\\.|$)" :owner :glojure}
+  {:pattern "^java\\.(math|time|util\\.regex)(\\.|$)" :owner :gojava}
+  {:pattern "^java\\.(io|net|nio|security|util|x\\.net)(\\.|$)" :owner :go-adapter}
+  {:pattern ".*" :owner :glojure}]
+
+ :core-wave-prefixes
+ ["java.lang."
+  "java.io."
+  "java.nio.file."]}

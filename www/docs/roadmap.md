@@ -8,20 +8,20 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Java compatibility</p>
+    <p class="summary-value">Projects and dependencies</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">6 / 14</p>
+    <p class="summary-value">7 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
-    <p class="summary-value">July 27, 2026</p>
+    <p class="summary-value">July 28, 2026</p>
   </div>
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 43%"></span>
+  <span style="width: 50%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -208,26 +208,32 @@ with explicit compatibility states and milestone assignments.
   </div>
 </div>
 
-## Current work
+## Completed Java compatibility wave
 
-<div class="milestone milestone-active">
+<div class="milestone milestone-done">
   <div class="milestone-marker">6</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Java compatibility</h3>
     <p>
       Implement BB's highest-value exposed Java surface through Glojure,
       gojava, and reusable Go adapters without introducing a JVM.
     </p>
     <ul class="task-list">
-      <li>Rank the 583 exposed classes by BB and bundled-library demand</li>
-      <li>Assign each class to Glojure, gojava, a Go adapter, or an explicit limitation</li>
-      <li>Complete the core <code>java.lang</code>, file, path, and stream wave</li>
-      <li>Cover constructors, methods, fields, and instance checks</li>
-      <li>Add library-shaped Java compatibility fixtures</li>
-      <li>Verify applicable behavior across native and Wasm targets</li>
-      <li>Update the generated inventory with class-level evidence</li>
+      <li class="task-done">Rank all 583 exposed classes by pinned BB source, test, and example demand</li>
+      <li class="task-done">Assign every class to Glojure, gojava, a Go adapter, or an explicit limitation</li>
+      <li class="task-done">Implement the first <code>java.lang</code>, file, path, and stream wave in Glojure</li>
+      <li class="task-done">Cover constructors, methods, static fields, catches, and instance checks</li>
+      <li class="task-done">Add BB/library-shaped Java compatibility fixtures</li>
+      <li class="task-done">Verify the Glojure bridge across native, WASI, and browser-Wasm builds</li>
+      <li class="task-done">Update the generated inventory with class-level ownership and evidence</li>
     </ul>
+    <p>
+      The generated <a href="../java-compatibility/">Java compatibility report</a>
+      contains the full ranked ledger. The reusable bridge implementation and
+      its AOT compiler support are tested in Glojure, and Gobb's compiled probe
+      passes under native, WASI, and browser-Wasm.
+    </p>
   </div>
 </div>
 
@@ -263,6 +269,8 @@ make capabilities   # Generate the runtime and website platform matrix
 make capability-test # Execute the matrix under all three target families
 make compat         # Generate the BB-vs-Gobb compatibility report
 make inventory      # Generate the complete BB surface ledger and report
+make java-compat    # Rank and assign all exposed Java classes
+make java-compat-test # Exercise the core class wave on all target families
 make repl-wasm      # Build the browser BB REPL with Gloat
 make source-ledger  # Print the generated namespace ledger
 ```
@@ -286,17 +294,37 @@ also removes the downloaded Babashka source checkout.
 
 ## Next concrete slice
 
-Rank the exposed Java classes by demand, assign implementation ownership, and
-complete the first class wave needed by core BB namespaces and libraries.
+Resolve project configuration and dependency classpaths, beginning with local
+and Git dependencies before adding Maven coordinates and resource lookup.
+
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">7</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Projects and dependencies</h3>
+    <p>
+      Support the project files and dependency sources that BB uses to build
+      its runtime classpath.
+    </p>
+    <ul class="task-list">
+      <li>Discover and read <code>bb.edn</code> and <code>deps.edn</code></li>
+      <li>Resolve project paths and local dependencies</li>
+      <li>Resolve Git dependencies into the Makes-managed cache</li>
+      <li>Resolve Maven coordinates without requiring a JVM at runtime</li>
+      <li>Merge aliases and explicit <code>-cp</code>/<code>--classpath</code> entries</li>
+      <li>Load source and non-source resources from the resolved classpath</li>
+      <li>Match BB diagnostics for invalid project and dependency configuration</li>
+      <li>Exercise project loading under interpreted and compiled Gobb</li>
+      <li>Record target-specific dependency limits for native, WASI, and browser-Wasm</li>
+    </ul>
+  </div>
+</div>
 
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>07</span>
-    <h3>Projects and dependencies</h3>
-    <p>Support <code>bb.edn</code>, <code>deps.edn</code>, Git, Maven source, and resources.</p>
-  </article>
   <article class="roadmap-card">
     <span>08</span>
     <h3>Tasks and commands</h3>

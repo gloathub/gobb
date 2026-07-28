@@ -1,0 +1,54 @@
+#!/usr/bin/env bb
+
+(require '[clojure.edn :as edn])
+
+(defn fail! [message]
+  (binding [*out* *err*]
+    (println (str "test/java-compat: " message)))
+  (System/exit 1))
+
+(defn check! [condition message]
+  (when-not condition
+    (fail! message)))
+
+(def expected-language
+  {:builder true
+   :value "Go + bb!"
+   :exception "portable error"})
+
+(def expected-streams
+  {:input-stream true
+   :input-available 4
+   :output-stream true
+   :output-value "java"})
+
+(defn check-probe! [target probe]
+  (check! (= target (:target probe))
+          (str target " probe reported " (:target probe)))
+  (check! (= expected-language
+             (dissoc (:language probe) :separator))
+          (str target " java.lang constructor/method/catch proof failed"))
+  (check! (string? (get-in probe [:language :separator]))
+          (str target " java.io.File static field proof failed"))
+  (check! (= expected-streams (:streams probe))
+          (str target " stream constructor/instance proof failed"))
+  (if (= :browser target)
+    (check! (nil? (:filesystem probe))
+            "browser unexpectedly claimed host filesystem access")
+    (check! (= {:file true
+                :path true
+                :exists true
+                :name "proof.txt"
+                :content "portable"
+                :size 8}
+               (:filesystem probe))
+            (str target " file/path method proof failed"))))
+
+(let [[native-path wasi-path browser-path] *command-line-args*]
+  (when-not (every? some? [native-path wasi-path browser-path])
+    (fail! "usage: test/java-compat NATIVE WASI BROWSER"))
+  (doseq [[target path] [[:native native-path]
+                         [:wasi wasi-path]
+                         [:browser browser-path]]]
+    (check-probe! target (edn/read-string (slurp path))))
+  (println "All Java compatibility target probes passed"))

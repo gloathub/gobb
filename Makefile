@@ -65,6 +65,16 @@ INVENTORY-SPEC := $(TOP)/compat/inventory.edn
 INVENTORY-LEDGER := $(TOP)/compat/ledger.edn
 INVENTORY-RUNNER := $(TOP)/util/inventory
 INVENTORY-REPORT := $(TOP)/www/docs/inventory.md
+JAVA-COMPAT-SPEC := $(TOP)/compat/java-compat.edn
+JAVA-COMPAT-LEDGER := $(TOP)/compat/java-classes.edn
+JAVA-COMPAT-RUNNER := $(TOP)/util/java-compat
+JAVA-COMPAT-REPORT := $(TOP)/www/docs/java-compatibility.md
+JAVA-COMPAT-DIR := $(TOP)/.cache/java-compat
+JAVA-COMPAT-SOURCE := $(TOP)/test/fixtures/gobb/java_compat_probe.clj
+JAVA-COMPAT-NATIVE := $(JAVA-COMPAT-DIR)/native
+JAVA-COMPAT-WASI := $(JAVA-COMPAT-DIR)/wasi.wasm
+JAVA-COMPAT-BROWSER := $(JAVA-COMPAT-DIR)/browser.wasm
+JAVA-COMPAT-TEST := $(TOP)/test/java-compat
 PREFIX ?= $(if $(filter 0,$(shell id -u)),/usr/local,$(HOME)/.local)
 
 MAKES-CLEAN := \
@@ -76,6 +86,7 @@ MAKES-CLEAN := \
   $(SMOKE-DIR) \
   $(CAPABILITY-STAGE) \
   $(CAPABILITY-DIR) \
+  $(JAVA-COMPAT-DIR) \
   $(COMPAT-DIR) \
   $(GOBB-WASM) \
   $(WASM-EXEC) \
@@ -342,11 +353,81 @@ inventory: \
 	  '$(BABASHKA-SOURCE)' \
 	  '$(BB)' \
 	  '$(INVENTORY-LEDGER)' \
-	  '$(INVENTORY-REPORT)'
+	  '$(INVENTORY-REPORT)' \
+	  '$(JAVA-COMPAT-SPEC)'
+	@$(ECHO)
+
+java-compat: inventory $(JAVA-COMPAT-SPEC) $(JAVA-COMPAT-RUNNER)
+	@$(ECHO) "* Ranking and assigning the BB Java compatibility surface"
+	$Q $(BB) '$(JAVA-COMPAT-RUNNER)' \
+	  '$(JAVA-COMPAT-SPEC)' \
+	  '$(INVENTORY-LEDGER)' \
+	  '$(BABASHKA-SOURCE)' \
+	  '$(JAVA-COMPAT-LEDGER)' \
+	  '$(JAVA-COMPAT-REPORT)'
+	@$(ECHO)
+
+$(JAVA-COMPAT-NATIVE): $(JAVA-COMPAT-SOURCE) $(GLOAT)
+	@$(ECHO) "* Building the native Java compatibility probe"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(JAVA-COMPAT-SOURCE)' \
+	  --out='$@' \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
+$(JAVA-COMPAT-WASI): $(JAVA-COMPAT-SOURCE) $(GLOAT)
+	@$(ECHO) "* Building the WASI Java compatibility probe"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(JAVA-COMPAT-SOURCE)' \
+	  --out='$@' \
+	  --platform=wasip1/wasm \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
+$(JAVA-COMPAT-BROWSER): $(JAVA-COMPAT-SOURCE) $(GLOAT)
+	@$(ECHO) "* Building the browser Java compatibility probe"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(JAVA-COMPAT-SOURCE)' \
+	  --out='$@' \
+	  --to=js \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
+java-compat-test: \
+  $(JAVA-COMPAT-NATIVE) \
+  $(JAVA-COMPAT-WASI) \
+  $(JAVA-COMPAT-BROWSER) \
+  $(JAVA-COMPAT-TEST) \
+  $(WASMTIME) \
+  $(NODE) \
+  $(BB)
+	@$(ECHO) "* Executing native, WASI, and browser Java compatibility probes"
+	$Q '$(JAVA-COMPAT-NATIVE)' > '$(JAVA-COMPAT-DIR)/native.edn'
+	$Q '$(WASMTIME)' --dir /tmp '$(JAVA-COMPAT-WASI)' \
+	  > '$(JAVA-COMPAT-DIR)/wasi.edn'
+	$Q go=$$('$(GLOAT)' --which=go); \
+	  goroot=$$($$go env GOROOT); \
+	  env -i HOME=/tmp PATH='$(dir $(NODE)):/usr/bin:/bin' \
+	    "$$goroot/lib/wasm/go_js_wasm_exec" \
+	    '$(JAVA-COMPAT-BROWSER)' > '$(JAVA-COMPAT-DIR)/browser.edn'
+	$Q $(BB) '$(JAVA-COMPAT-TEST)' \
+	  '$(JAVA-COMPAT-DIR)/native.edn' \
+	  '$(JAVA-COMPAT-DIR)/wasi.edn' \
+	  '$(JAVA-COMPAT-DIR)/browser.edn'
 	@$(ECHO)
 
 test: $(GOBB) $(BB) $(RG) smoke capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
+	$Q GOBB='$(GOBB)' test/java-lang
 
 compat: _compat
 
@@ -388,10 +469,10 @@ release: $(GH) $(WASMTIME)
 source-ledger: $(SOURCE-STAGE-STAMP)
 	@cat '$(SOURCE-STAGE)/ledger.edn'
 
-site: capabilities inventory repl-wasm
+site: capabilities inventory java-compat repl-wasm
 	$(MAKE) -C www site
 
-serve publish: capabilities inventory repl-wasm
+serve publish: capabilities inventory java-compat repl-wasm
 	$(MAKE) -C www $@
 
 serve-www: serve
