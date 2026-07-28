@@ -317,6 +317,7 @@
      "- `doc/libraries.csv` for BB-compatible libraries\n"
      "- `babashka.classes/all-classes` for the exposed Java class surface\n"
      "- `test/` and `examples/` for upstream tests and representative programs\n"
+     "- `compat/capabilities.edn` for native, WASI, and browser dispositions\n"
      "- `compat/inventory.edn` for Gobb states, milestones, rationales, and evidence\n\n"
      "The full ledger is tracked as "
      "[`compat/ledger.edn`](https://github.com/clojurestar/gobb/blob/main/compat/ledger.edn).\n\n"

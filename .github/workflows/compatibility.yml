@@ -20,8 +20,13 @@ jobs:
       uses: actions/cache@v4
       with:
         path: .cache/
-        key: compat-${{ runner.os }}-${{ hashFiles('Makefile', 'VERSION', 'compat/fixtures.edn', 'compat/inventory.edn', 'util/compat', 'util/inventory') }}
+        key: compat-${{ runner.os }}-${{ hashFiles('Makefile', 'VERSION', 'compat/capabilities.edn', 'compat/fixtures.edn', 'compat/inventory.edn', 'util/capabilities', 'util/compat', 'util/inventory') }}
         restore-keys: compat-${{ runner.os }}-
+
+    - name: Test target capability contract
+      run: |
+        make capabilities
+        make capability-test
 
     - name: Generate BB surface inventory
       run: make inventory
@@ -33,8 +38,10 @@ jobs:
       run: |
         git diff --exit-code -- \
           compat/ledger.edn \
+          src/gobb/capability_matrix.clj \
           www/docs/compatibility.md \
-          www/docs/inventory.md
+          www/docs/inventory.md \
+          www/docs/platforms.md
 
     - name: Publish compatibility summary
       if: always() && hashFiles('www/docs/compatibility.md') != ''
@@ -42,6 +49,8 @@ jobs:
         cat www/docs/compatibility.md >> "$GITHUB_STEP_SUMMARY"
         printf '\n\n' >> "$GITHUB_STEP_SUMMARY"
         cat www/docs/inventory.md >> "$GITHUB_STEP_SUMMARY"
+        printf '\n\n' >> "$GITHUB_STEP_SUMMARY"
+        cat www/docs/platforms.md >> "$GITHUB_STEP_SUMMARY"
 
     - name: Publish compatibility diagnostics
       if: always()
@@ -50,8 +59,10 @@ jobs:
         name: gobb-compatibility-${{ github.run_id }}
         path: |
           .cache/compat/
+          .cache/capabilities/*.edn
           compat/ledger.edn
           www/docs/compatibility.md
           www/docs/inventory.md
+          www/docs/platforms.md
         if-no-files-found: warn
         retention-days: 14

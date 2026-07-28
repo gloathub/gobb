@@ -134,6 +134,7 @@ Gobb has completed its repository foundation and started native execution:
 - [x] Babashka-derived native CLI REPL
 - [x] BB-compatible Glojure execution shell
 - [x] Generated BB surface inventory and compatibility backlog
+- [x] Tested native, WASI, and browser-Wasm capability contract
 - [ ] Project dependencies, tasks, pods, and bundled libraries
 - [ ] Production `gobb build` command
 
@@ -182,6 +183,11 @@ Java classes, upstream tests, examples, and platform features. Gobb's
 machine-readable states, milestone assignments, rationales, and evidence live
 in `compat/inventory.edn`; the generated full ledger is
 `compat/ledger.edn`.
+
+Generate the platform contract with `make capabilities`. Run its compiled
+native, WASI, and browser-Wasm probes with `make capability-test`. Unsupported
+operations return stable `:gobb/unsupported-capability` exception data instead
+of exposing target-specific Go failures.
 
 CI regenerates the inventory and strict comparison, rejects tracked-report
 drift, publishes both Markdown summaries in the workflow run, and retains the
@@ -240,6 +246,8 @@ configuration remain later milestones.
 | `stage` | Generate the source tree selected from Gobb and Babashka. |
 | `test` | Build Gobb and run native and differential BB tests. |
 | `smoke` | Build and execute equivalent interpreted, native, WASI, and browser-Wasm smoke programs. |
+| `capabilities` | Generate the runtime platform contract and website capability matrix. |
+| `capability-test` | Compile and execute the capability probe under native, WASI, and browser Wasm. |
 | `inventory` | Generate and validate the complete machine-readable BB surface ledger and website report. |
 | `repl-wasm` | Compile the Babashka-derived browser REPL and install its Go Wasm runtime. |
 | `source-ledger` | Print the generated Babashka namespace compatibility ledger. |

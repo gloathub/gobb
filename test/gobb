@@ -28,6 +28,19 @@ check "expression source marker" '"NO_SOURCE_PATH"' \
 check "initial execution namespace" "user" \
   "$GOBB" -e '(ns-name *ns*)'
 
+check "native capability target" ":native" \
+  "$GOBB" -e \
+  "(require '[gobb.capabilities :as capabilities])
+   (capabilities/target)"
+
+check "structured unsupported capability" \
+  ":gobb/unsupported-capability" \
+  "$GOBB" -e \
+  "(require '[gobb.capabilities :as capabilities])
+   (:type
+    (capabilities/unsupported-data
+     :jvm-bytecode :load-class))"
+
 check "BB reader feature" ":bb" \
   "$GOBB" -e '#?(:bb :bb :default :other)'
 

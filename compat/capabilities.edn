@@ -1,0 +1,136 @@
+{:schema 1
+
+ :statuses
+ {:available "The operation is provided directly by the target"
+  :limited "The operation exists with documented host or sandbox limits"
+  :unavailable "The target cannot provide the operation"}
+
+ :targets
+ [{:id :native
+   :label "Native"
+   :platform "GOOS/GOARCH"
+   :description "A normal Go executable on its host operating system"}
+  {:id :wasi
+   :label "WASI"
+   :platform "wasip1/wasm"
+   :description "A WASI module whose host explicitly grants resources"}
+  {:id :browser
+   :label "Browser Wasm"
+   :platform "js/wasm"
+   :description "A Go Wasm module inside a browser JavaScript sandbox"}]
+
+ :capabilities
+ [{:id :evaluation
+   :label "Clojure evaluation"
+   :operations [:evaluate]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :available}
+    :browser {:status :available}}}
+
+  {:id :standard-streams
+   :label "Standard streams"
+   :operations [:stdin :stdout :stderr]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :available}
+    :browser {:status :limited
+              :rationale "The JavaScript host supplies virtual streams"}}}
+
+  {:id :environment
+   :label "Environment variables"
+   :operations [:get]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :limited
+           :rationale "Only variables explicitly inherited by the WASI host are visible"}
+    :browser {:status :limited
+              :rationale "Only variables supplied by the JavaScript host are visible"}}}
+
+  {:id :clock
+   :label "Wall clock"
+   :operations [:now]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :available}
+    :browser {:status :available}}}
+
+  {:id :random
+   :label "Secure random bytes"
+   :operations [:bytes]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :available}
+    :browser {:status :available}}}
+
+  {:id :filesystem
+   :label "Host filesystem"
+   :operations [:read :write :stat :remove]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :limited
+           :rationale "Access is restricted to directories preopened by the WASI host"}
+    :browser {:status :unavailable
+              :rationale "Browsers expose no ambient host filesystem"}}}
+
+  {:id :working-directory
+   :label "Working directory"
+   :operations [:get :change]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :limited
+           :rationale "The directory exists only inside the host's preopened view"}
+    :browser {:status :unavailable
+              :rationale "Browser Wasm has no host working directory"}}}
+
+  {:id :process
+   :label "Subprocesses"
+   :operations [:spawn :wait :kill]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :unavailable
+           :rationale "WASI preview 1 has no process creation API"}
+    :browser {:status :unavailable
+              :rationale "Browsers cannot spawn host processes"}}}
+
+  {:id :signals
+   :label "Signals"
+   :operations [:interrupt :shutdown]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :unavailable
+           :rationale "WASI preview 1 does not expose POSIX signal handling"}
+    :browser {:status :unavailable
+              :rationale "Browser events are not operating-system signals"}}}
+
+  {:id :network
+   :label "Networking"
+   :operations [:http :tcp :udp :listen]
+   :targets
+   {:native {:status :available}
+    :wasi {:status :unavailable
+           :rationale "The current WASI target has no socket proposal enabled"}
+    :browser {:status :limited
+              :rationale "Fetch and WebSocket are possible; raw TCP, UDP, and listeners are not"}}}
+
+  {:id :terminal
+   :label "Interactive terminal"
+   :operations [:repl :line-editing]
+   :targets
+   {:native {:status :limited
+             :rationale "The REPL works; line editing and persistent history remain"}
+    :wasi {:status :limited
+           :rationale "Interactive behavior depends entirely on the WASI host"}
+    :browser {:status :limited
+              :rationale "The website supplies a terminal-like REPL UI"}}}
+
+  {:id :jvm-bytecode
+   :label "Arbitrary JVM bytecode"
+   :operations [:load-class]
+   :targets
+   {:native {:status :unavailable
+             :rationale "Gobb deliberately runs without a JVM"}
+    :wasi {:status :unavailable
+           :rationale "Gobb deliberately runs without a JVM"}
+    :browser {:status :unavailable
+              :rationale "Gobb deliberately runs without a JVM"}}}]}

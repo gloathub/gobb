@@ -32,8 +32,8 @@ hide:
 
 <div class="status-strip">
   <span class="status-pulse"></span>
-  <strong>Current phase:</strong> Compatibility inventory
-  <span class="status-note">The native, WASI, and browser-Wasm execution architecture is proven.</span>
+  <strong>Current phase:</strong> Java compatibility
+  <span class="status-note">The native, WASI, and browser-Wasm capability contract is tested.</span>
 </div>
 
 ## Install

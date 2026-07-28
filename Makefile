@@ -50,6 +50,17 @@ COMPAT-FIXTURES := $(TOP)/compat/fixtures.edn
 COMPAT-RUNNER := $(TOP)/util/compat
 COMPAT-DIR := $(TOP)/.cache/compat
 COMPAT-REPORT := $(TOP)/www/docs/compatibility.md
+CAPABILITY-SPEC := $(TOP)/compat/capabilities.edn
+CAPABILITY-RUNNER := $(TOP)/util/capabilities
+CAPABILITY-SOURCE := $(TOP)/src/gobb/capability_matrix.clj
+CAPABILITY-REPORT := $(TOP)/www/docs/platforms.md
+CAPABILITY-STAGE := $(TOP)/.cache/capability-stage
+CAPABILITY-STAGE-STAMP := $(CAPABILITY-STAGE)/.stamp
+CAPABILITY-DIR := $(TOP)/.cache/capabilities
+CAPABILITY-NATIVE := $(CAPABILITY-DIR)/native
+CAPABILITY-WASI := $(CAPABILITY-DIR)/wasi.wasm
+CAPABILITY-BROWSER := $(CAPABILITY-DIR)/browser.wasm
+CAPABILITY-TEST := $(TOP)/test/capabilities
 INVENTORY-SPEC := $(TOP)/compat/inventory.edn
 INVENTORY-LEDGER := $(TOP)/compat/ledger.edn
 INVENTORY-RUNNER := $(TOP)/util/inventory
@@ -63,6 +74,8 @@ MAKES-CLEAN := \
   $(SOURCE-STAGE) \
   $(REPL-SOURCE-STAGE) \
   $(SMOKE-DIR) \
+  $(CAPABILITY-STAGE) \
+  $(CAPABILITY-DIR) \
   $(COMPAT-DIR) \
   $(GOBB-WASM) \
   $(WASM-EXEC) \
@@ -72,6 +85,29 @@ MAKES-REALCLEAN := \
   $(BABASHKA-SOURCE-STAMP) \
 
 default:: build
+
+$(CAPABILITY-SOURCE): $(CAPABILITY-SPEC) $(CAPABILITY-RUNNER) $(BB)
+	@$(ECHO) "* Generating the platform capability contract"
+	$Q $(BB) '$(CAPABILITY-RUNNER)' \
+	  '$(CAPABILITY-SPEC)' \
+	  '$(CAPABILITY-SOURCE)' \
+	  '$(CAPABILITY-REPORT)'
+	$Q touch '$@'
+	@$(ECHO)
+
+$(CAPABILITY-REPORT): $(CAPABILITY-SOURCE)
+	$Q test -f '$@'
+	$Q touch '$@'
+
+capabilities: _capabilities
+
+_capabilities: $(CAPABILITY-SPEC) $(CAPABILITY-RUNNER) $(BB)
+	@$(ECHO) "* Generating the platform capability contract"
+	$Q $(BB) '$(CAPABILITY-RUNNER)' \
+	  '$(CAPABILITY-SPEC)' \
+	  '$(CAPABILITY-SOURCE)' \
+	  '$(CAPABILITY-REPORT)'
+	@$(ECHO)
 
 ifndef BABASHKA_DIR
 $(BABASHKA-SOURCE-STAMP):
@@ -136,6 +172,26 @@ $(REPL-SOURCE-STAGE-STAMP): \
 	$Q touch '$@'
 	@$(ECHO)
 
+$(CAPABILITY-STAGE-STAMP): \
+  $(BABASHKA-SOURCE-DEP) \
+  $(BABASHKA-SOURCES) \
+  $(BB) \
+  $(GOBB-SOURCES) \
+  $(CAPABILITY-SOURCE) \
+  $(SOURCE-MANIFEST) \
+  $(STAGE-SOURCES) \
+  $(VERSION-FILE)
+	@$(ECHO) "* Staging the cross-target capability probe"
+	$Q $(BB) '$(STAGE-SOURCES)' \
+	  '$(SOURCE-MANIFEST)' \
+	  '$(BABASHKA-SOURCE)' \
+	  '$(TOP)/src' \
+	  '$(CAPABILITY-STAGE)' \
+	  '$(VERSION-FILE)' \
+	  'gobb.capability-probe'
+	$Q touch '$@'
+	@$(ECHO)
+
 $(GOBB): $(SOURCE-STAGE-STAMP) $(GLOAT)
 	@$(ECHO) "* Building Gobb"
 	$Q mkdir -p '$(@D)'
@@ -195,6 +251,41 @@ $(SMOKE-BROWSER): $(GOBB) $(GLOAT) $(SMOKE-SOURCE)
 	  '$(SMOKE-SOURCE)' -o '$@' --platform js/wasm
 	@$(ECHO)
 
+$(CAPABILITY-NATIVE): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
+	@$(ECHO) "* Building the native capability probe"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(CAPABILITY-STAGE)' \
+	  --out='$@' \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
+$(CAPABILITY-WASI): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
+	@$(ECHO) "* Building the WASI capability probe"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(CAPABILITY-STAGE)' \
+	  --out='$@' \
+	  --platform=wasip1/wasm \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
+$(CAPABILITY-BROWSER): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
+	@$(ECHO) "* Building the browser-Wasm capability probe"
+	$Q mkdir -p '$(@D)'
+	$Q $(GLOAT) '$(CAPABILITY-STAGE)' \
+	  --out='$@' \
+	  --to=js \
+	  --force \
+	  --quiet \
+	  --ext=goimports \
+	  --module=github.com/clojurestar/gobb
+	@$(ECHO)
+
 smoke: $(SMOKE-NATIVE) $(SMOKE-WASI) $(SMOKE-BROWSER) $(WASMTIME) $(NODE)
 	@$(ECHO) "* Executing Gobb smoke programs"
 	$Q expected=$$('$(GOBB)' -cp '$(TOP)/test/fixtures' -e \
@@ -212,7 +303,39 @@ smoke: $(SMOKE-NATIVE) $(SMOKE-WASI) $(SMOKE-BROWSER) $(WASMTIME) $(NODE)
 	  echo "$$expected"
 	@$(ECHO)
 
-inventory: $(BABASHKA-SOURCE-DEP) $(BB) $(INVENTORY-SPEC) $(INVENTORY-RUNNER)
+capability-test: \
+  $(CAPABILITY-NATIVE) \
+  $(CAPABILITY-WASI) \
+  $(CAPABILITY-BROWSER) \
+  $(CAPABILITY-TEST) \
+  $(WASMTIME) \
+  $(NODE) \
+  $(BB)
+	@$(ECHO) "* Executing native, WASI, and browser capability probes"
+	$Q mkdir -p '$(CAPABILITY-DIR)'
+	$Q GOBB_CAPABILITY_ENV=visible \
+	  '$(CAPABILITY-NATIVE)' > '$(CAPABILITY-DIR)/native.edn'
+	$Q '$(WASMTIME)' --env GOBB_CAPABILITY_ENV=visible \
+	  '$(CAPABILITY-WASI)' > '$(CAPABILITY-DIR)/wasi.edn'
+	$Q go=$$('$(GLOAT)' --which=go); \
+	  goroot=$$($$go env GOROOT); \
+	  env -i HOME=/tmp GOBB_CAPABILITY_ENV=visible \
+	    PATH='$(dir $(NODE)):/usr/bin:/bin' \
+	    "$$goroot/lib/wasm/go_js_wasm_exec" \
+	    '$(CAPABILITY-BROWSER)' > '$(CAPABILITY-DIR)/browser.edn'
+	$Q $(BB) '$(CAPABILITY-TEST)' \
+	  '$(CAPABILITY-SPEC)' \
+	  '$(CAPABILITY-DIR)/native.edn' \
+	  '$(CAPABILITY-DIR)/wasi.edn' \
+	  '$(CAPABILITY-DIR)/browser.edn'
+	@$(ECHO)
+
+inventory: \
+  $(BABASHKA-SOURCE-DEP) \
+  $(BB) \
+  $(CAPABILITY-SPEC) \
+  $(INVENTORY-SPEC) \
+  $(INVENTORY-RUNNER)
 	@$(ECHO) "* Inventorying the complete BB compatibility surface"
 	$Q $(BB) '$(INVENTORY-RUNNER)' \
 	  '$(INVENTORY-SPEC)' \
@@ -222,7 +345,7 @@ inventory: $(BABASHKA-SOURCE-DEP) $(BB) $(INVENTORY-SPEC) $(INVENTORY-RUNNER)
 	  '$(INVENTORY-REPORT)'
 	@$(ECHO)
 
-test: $(GOBB) $(BB) $(RG) smoke
+test: $(GOBB) $(BB) $(RG) smoke capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 
 compat: _compat
@@ -265,10 +388,10 @@ release: $(GH) $(WASMTIME)
 source-ledger: $(SOURCE-STAGE-STAMP)
 	@cat '$(SOURCE-STAGE)/ledger.edn'
 
-site: inventory repl-wasm
+site: capabilities inventory repl-wasm
 	$(MAKE) -C www site
 
-serve publish: inventory repl-wasm
+serve publish: capabilities inventory repl-wasm
 	$(MAKE) -C www $@
 
 serve-www: serve

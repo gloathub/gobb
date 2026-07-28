@@ -1,0 +1,73 @@
+#!/usr/bin/env bb
+
+(require '[clojure.edn :as edn]
+         '[clojure.string :as str])
+
+(defn fail! [message]
+  (binding [*out* *err*]
+    (println (str "test/capabilities: " message)))
+  (System/exit 1))
+
+(defn check! [condition message]
+  (when-not condition
+    (fail! message)))
+
+(defn expected-statuses [spec target]
+  (into (sorted-map)
+        (for [{:keys [id targets]} (:capabilities spec)]
+          [id (get-in targets [target :status])])))
+
+(defn expected-error [target platform capability operation]
+  {:type :gobb/unsupported-capability
+   :capability capability
+   :target target
+   :platform platform
+   :operation operation
+   :status :unavailable})
+
+(defn check-probe! [spec target probe]
+  (let [platform (:platform probe)]
+    (check! (= target (:target probe))
+            (str target " probe reported target " (:target probe)))
+    (check! (= (expected-statuses spec target) (:statuses probe))
+            (str target " capability statuses differ from the contract"))
+    (check! (case target
+              :native (and (not (str/starts-with? platform "js/"))
+                           (not (str/starts-with? platform "wasip1/")))
+              :wasi (= "wasip1/wasm" platform)
+              :browser (= "js/wasm" platform))
+            (str target " reported unexpected platform " platform))
+    (doseq [probe-key [:environment :clock :random]]
+      (check! (true? (get probe probe-key))
+              (str target " " (name probe-key) " adapter failed")))
+    (check! (= (expected-error target platform
+                               :jvm-bytecode :load-class)
+               (:jvm-error probe))
+            (str target " did not return the structured JVM error"))
+    (if (= :native target)
+      (do
+        (check! (nil? (:process-error probe))
+                "native process was reported unavailable")
+        (check! (every? true? (vals (:native-adapters probe)))
+                "one or more native host adapters failed"))
+      (check! (= (expected-error target platform :process :spawn)
+                 (:process-error probe))
+              (str target " did not return the structured process error")))
+    (if (= :browser target)
+      (check! (= (expected-error target platform :filesystem :read)
+                 (:filesystem-error probe))
+              "browser did not return the structured filesystem error")
+      (check! (nil? (:filesystem-error probe))
+              (str target " unexpectedly rejected filesystem capability")))))
+
+(let [[spec-path native-path wasi-path browser-path] *command-line-args*]
+  (when-not (every? some?
+                    [spec-path native-path wasi-path browser-path])
+    (fail! "usage: test/capabilities SPEC NATIVE WASI BROWSER"))
+  (let [spec (edn/read-string (slurp spec-path))
+        probes {:native (edn/read-string (slurp native-path))
+                :wasi (edn/read-string (slurp wasi-path))
+                :browser (edn/read-string (slurp browser-path))}]
+    (doseq [[target probe] probes]
+      (check-probe! spec target probe))
+    (println "All target capability probes passed")))

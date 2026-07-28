@@ -1,4 +1,5 @@
-(ns gobb.host)
+(ns gobb.host
+  (:require [gobb.capabilities :as capabilities]))
 
 (def no-source-path "NO_SOURCE_PATH")
 (def repl-source-path "<repl>")
@@ -427,7 +428,8 @@
 
 (defn run-preloads! []
   (let [preloads (strings.TrimSpace
-                  (or (os.Getenv "BABASHKA_PRELOADS") ""))]
+                  (or (capabilities/environment
+                       "BABASHKA_PRELOADS") ""))]
     (when-not (empty? preloads)
       (evaluate-source
        preloads

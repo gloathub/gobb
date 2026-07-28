@@ -121,24 +121,19 @@ than a Gobb-only workaround.
 
 ## Platform capabilities
 
-One capability layer covers interpreted and compiled programs.
-
-| Capability | Native | WASI | Browser Wasm |
-|---|---:|---:|---:|
-| Clojure evaluation | Initial | Planned | Initial |
-| Filesystem | Planned | Host-limited | Browser-limited |
-| Processes | Planned | Unavailable | Unavailable |
-| HTTP client | Planned | Host-limited | Planned |
-| TCP/UDP | Planned | Host-limited | Browser-limited |
-| Terminal REPL | BB loop prototype | Host-limited | [BB loop prototype](repl.md) |
+One generated capability contract covers interpreted and compiled programs.
+It is compiled and executed independently under native Go, WASI, and browser
+Wasm. See the complete, tested [platform capability matrix](platforms.md).
 
 Unavailable operations use structured exception data:
 
 ```clojure
 {:type :gobb/unsupported-capability
  :capability :process
+ :target :browser
  :platform "js/wasm"
- :operation :spawn}
+ :operation :spawn
+ :status :unavailable}
 ```
 
 ## Project configuration

@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Platform capabilities</p>
+    <p class="summary-value">Java compatibility</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">5 / 14</p>
+    <p class="summary-value">6 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 36%"></span>
+  <span style="width: 43%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -30,7 +30,7 @@ The same architecture now powers native and live browser-Wasm REPLs using
 Babashka's reusable REPL loop. A strict differential harness records current
 BB compatibility for interpreted and compiled programs. Gobb remains an
 architecture proof, not yet a general BB replacement.
-The generated BB surface ledger now tracks 1,012 CLI, project, namespace,
+The generated BB surface ledger now tracks 1,022 CLI, project, namespace,
 library, Java-class, platform, upstream-test, and representative-program items
 with explicit compatibility states and milestone assignments.
 
@@ -185,25 +185,48 @@ with explicit compatibility states and milestone assignments.
   </div>
 </div>
 
-## Current work
+## Completed platform contract
 
-<div class="milestone milestone-active">
+<div class="milestone milestone-done">
   <div class="milestone-marker">5</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Platform capabilities</h3>
     <p>
       Define and test consistent host behavior for native, WASI, and
       browser-Wasm targets before higher-level libraries depend on it.
     </p>
     <ul class="task-list">
-      <li>Define the capability contract and target matrix</li>
-      <li>Classify filesystem, process, environment, clock, random, signal, and network behavior</li>
-      <li>Provide stable host-adapter boundaries for reusable runtime code</li>
-      <li>Return structured unsupported-capability errors</li>
-      <li>Test native, WASI, and browser-Wasm behavior independently</li>
-      <li>Record platform-limited and unavailable behavior in the generated inventory</li>
-      <li>Publish the platform capability matrix</li>
+      <li class="task-done">Define the capability contract and target matrix</li>
+      <li class="task-done">Classify filesystem, process, environment, clock, random, signal, and network behavior</li>
+      <li class="task-done">Provide stable host-adapter boundaries for reusable runtime code</li>
+      <li class="task-done">Return structured unsupported-capability errors</li>
+      <li class="task-done">Test native, WASI, and browser-Wasm behavior independently</li>
+      <li class="task-done">Record platform-limited and unavailable behavior in the generated inventory</li>
+      <li class="task-done">Publish the platform capability matrix</li>
+    </ul>
+  </div>
+</div>
+
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">6</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Java compatibility</h3>
+    <p>
+      Implement BB's highest-value exposed Java surface through Glojure,
+      gojava, and reusable Go adapters without introducing a JVM.
+    </p>
+    <ul class="task-list">
+      <li>Rank the 583 exposed classes by BB and bundled-library demand</li>
+      <li>Assign each class to Glojure, gojava, a Go adapter, or an explicit limitation</li>
+      <li>Complete the core <code>java.lang</code>, file, path, and stream wave</li>
+      <li>Cover constructors, methods, fields, and instance checks</li>
+      <li>Add library-shaped Java compatibility fixtures</li>
+      <li>Verify applicable behavior across native and Wasm targets</li>
+      <li>Update the generated inventory with class-level evidence</li>
     </ul>
   </div>
 </div>
@@ -236,6 +259,8 @@ make deps           # Download and verify pinned Babashka source
 make build          # Build bin/gobb with Gloat
 make test           # Run native and differential BB tests
 make smoke          # Execute interpreted, native, WASI, and browser-Wasm proof
+make capabilities   # Generate the runtime and website platform matrix
+make capability-test # Execute the matrix under all three target families
 make compat         # Generate the BB-vs-Gobb compatibility report
 make inventory      # Generate the complete BB surface ledger and report
 make repl-wasm      # Build the browser BB REPL with Gloat
@@ -261,17 +286,12 @@ also removes the downloaded Babashka source checkout.
 
 ## Next concrete slice
 
-Define the native, WASI, and browser-Wasm capability contract, then turn the
-inventory's platform dispositions into executable target-specific tests.
+Rank the exposed Java classes by demand, assign implementation ownership, and
+complete the first class wave needed by core BB namespaces and libraries.
 
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>06</span>
-    <h3>Java compatibility</h3>
-    <p>Expand gojava and Glojure support based on BB and library demand.</p>
-  </article>
   <article class="roadmap-card">
     <span>07</span>
     <h3>Projects and dependencies</h3>

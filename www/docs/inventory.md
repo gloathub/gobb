@@ -2,7 +2,7 @@
 
 # BB surface inventory
 
-This report is generated from Babashka **1.12.218** at `0fb349c414e717800be775ba9cb77c95a9eb700d`. The complete machine-readable ledger contains **1012** uniquely identified compatibility items.
+This report is generated from Babashka **1.12.218** at `0fb349c414e717800be775ba9cb77c95a9eb700d`. The complete machine-readable ledger contains **1022** uniquely identified compatibility items.
 
 Discovery does not imply support. Gobb marks an item supported or partial only when the ledger names concrete test or implementation evidence.
 
@@ -12,7 +12,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | --- | ---: | ---: | ---: | ---: | ---: |
 | built-in-library | 38 | 0 | 0 | 38 | 0 |
 | built-in-namespace | 104 | 0 | 1 | 103 | 0 |
-| capability | 31 | 2 | 5 | 19 | 5 |
+| capability | 41 | 6 | 18 | 8 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
 | compatible-library | 98 | 0 | 0 | 98 | 0 |
 | java-class | 583 | 0 | 1 | 582 | 0 |
@@ -26,17 +26,38 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | Item | Surface | State | Evidence |
 | --- | --- | --- | --- |
 | `capability/browser-filesystem` | capability | **platform-limited** | www/docs/implementation.md |
+| `capability/browser-network` | capability | **platform-limited** | test/capabilities |
 | `capability/browser-repl` | capability | **partial** | test/gobb<br>www/docs/javascripts/repl.js |
 | `capability/browser-subprocess` | capability | **platform-limited** | www/docs/implementation.md |
 | `capability/browser-wasm` | capability | **partial** | Makefile |
+| `capability/clock` | capability | **supported** | test/capabilities |
 | `capability/compiled-program` | capability | **partial** | :compiled/main |
+| `capability/environment` | capability | **supported** | test/capabilities |
 | `capability/gobb-reader-feature` | capability | **intentional-difference** | :reader/gobb-feature |
 | `capability/jvm-bytecode` | capability | **not-applicable** | www/docs/implementation.md |
+| `capability/native-freebsd-amd64` | capability | **partial** | util/release-dist |
+| `capability/native-freebsd-arm64` | capability | **partial** | util/release-dist |
 | `capability/native-linux-amd64` | capability | **supported** | test/gobb<br>util/release-dist |
+| `capability/native-linux-arm64` | capability | **partial** | util/release-dist |
+| `capability/native-macos-amd64` | capability | **partial** | util/release-dist |
+| `capability/native-macos-arm64` | capability | **partial** | util/release-dist |
+| `capability/native-netbsd-amd64` | capability | **partial** | util/release-dist |
+| `capability/native-netbsd-arm64` | capability | **partial** | util/release-dist |
+| `capability/native-openbsd-amd64` | capability | **partial** | util/release-dist |
+| `capability/native-openbsd-arm64` | capability | **partial** | util/release-dist |
 | `capability/native-repl` | capability | **partial** | test/gobb |
+| `capability/native-windows-amd64` | capability | **partial** | util/release-dist |
+| `capability/platform-contract` | capability | **supported** | test/capabilities |
+| `capability/random` | capability | **supported** | test/capabilities |
 | `capability/runtime-require` | capability | **supported** | :loading/require |
 | `capability/sci-runtime` | capability | **not-applicable** | test/gobb |
+| `capability/signals` | capability | **partial** | test/gobb |
+| `capability/standard-streams` | capability | **partial** | test/capabilities |
+| `capability/wasi-filesystem` | capability | **platform-limited** | test/capabilities |
+| `capability/wasi-network` | capability | **platform-limited** | test/capabilities |
+| `capability/wasi-process` | capability | **platform-limited** | test/capabilities |
 | `capability/wasi-wasm` | capability | **partial** | Makefile |
+| `capability/working-directory` | capability | **partial** | test/capabilities |
 | `class/java.lang.System` | java-class | **partial** | test/gobb |
 | `cli/--init` | cli | **supported** | :loading/init |
 | `cli/-D<property>=<value>` | cli | **not-applicable** | www/docs/implementation.md |
@@ -55,14 +76,13 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 5 | 21 |
 | 6 | 589 |
 | 7 | 15 |
 | 8 | 16 |
-| 9 | 152 |
+| 9 | 153 |
 | 10 | 10 |
 | 11 | 2 |
-| 13 | 182 |
+| 13 | 191 |
 
 ## Authoritative inputs
 
@@ -72,6 +92,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 - `doc/libraries.csv` for BB-compatible libraries
 - `babashka.classes/all-classes` for the exposed Java class surface
 - `test/` and `examples/` for upstream tests and representative programs
+- `compat/capabilities.edn` for native, WASI, and browser dispositions
 - `compat/inventory.edn` for Gobb states, milestones, rationales, and evidence
 
 The full ledger is tracked as [`compat/ledger.edn`](https://github.com/clojurestar/gobb/blob/main/compat/ledger.edn).

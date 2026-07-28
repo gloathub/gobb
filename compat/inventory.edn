@@ -21,7 +21,7 @@
   :built-in-library 38
   :compatible-library 98
   :java-class 583
-  :capability 31
+  :capability 41
   :upstream-test 63
   :representative-program 37}
 
@@ -36,6 +36,7 @@
    "built-in-library/babashka/fs"
    "class/java.lang.System"
    "capability/native-repl"
+   "capability/platform-contract"
    "capability/browser-wasm"
    "upstream-test/test/babashka/main_test.clj"
    "representative-program/examples/process_builder.clj"}
@@ -165,7 +166,89 @@
                                     :milestone 1
                                     :rationale "Gobb adds :gobb while retaining the :bb and :clj reader features"
                                     :evidence [{:kind :compat-fixture
-                                                :id :reader/gobb-feature}]}}
+                                                :id :reader/gobb-feature}]}
+  "capability/platform-contract" {:state :supported
+                                  :milestone 5
+                                  :evidence [{:kind :test
+                                              :path "test/capabilities"
+                                              :description "Native, WASI, and browser contract parity"}]}
+  "capability/environment" {:state :supported
+                            :milestone 5
+                            :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/clock" {:state :supported
+                      :milestone 5
+                      :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/random" {:state :supported
+                       :milestone 5
+                       :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/standard-streams" {:state :partial
+                                :milestone 5
+                                :rationale "Native and WASI streams are direct; browser streams are JavaScript-hosted"
+                                :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/working-directory" {:state :partial
+                                  :milestone 5
+                                  :rationale "Native access works; WASI is host-limited and browsers have none"
+                                  :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/signals" {:state :partial
+                        :milestone 5
+                        :rationale "Native shutdown and interrupt behavior works; Wasm targets have no OS signals"
+                        :evidence [{:kind :test :path "test/gobb"}]}
+  "capability/wasi-filesystem" {:state :platform-limited
+                                :milestone 5
+                                :rationale "WASI filesystem access requires host-preopened directories"
+                                :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/wasi-process" {:state :platform-limited
+                             :milestone 5
+                             :rationale "WASI preview 1 cannot spawn subprocesses"
+                             :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/wasi-network" {:state :platform-limited
+                             :milestone 5
+                             :rationale "The current WASI target has no socket proposal enabled"
+                             :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/browser-network" {:state :platform-limited
+                                :milestone 5
+                                :rationale "Browsers offer Fetch and WebSocket but no raw sockets or listeners"
+                                :evidence [{:kind :test :path "test/capabilities"}]}
+  "capability/native-linux-arm64" {:state :partial
+                                   :milestone 5
+                                   :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                   :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-macos-amd64" {:state :partial
+                                   :milestone 5
+                                   :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                   :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-macos-arm64" {:state :partial
+                                   :milestone 5
+                                   :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                   :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-windows-amd64" {:state :partial
+                                     :milestone 5
+                                     :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                     :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-freebsd-amd64" {:state :partial
+                                     :milestone 5
+                                     :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                     :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-freebsd-arm64" {:state :partial
+                                     :milestone 5
+                                     :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                     :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-openbsd-amd64" {:state :partial
+                                     :milestone 5
+                                     :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                     :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-openbsd-arm64" {:state :partial
+                                     :milestone 5
+                                     :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                     :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-netbsd-amd64" {:state :partial
+                                    :milestone 5
+                                    :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                    :evidence [{:kind :implementation :path "util/release-dist"}]}
+  "capability/native-netbsd-arm64" {:state :partial
+                                    :milestone 5
+                                    :rationale "Release cross-compilation is configured; the capability probe runs on CI's native host"
+                                    :evidence [{:kind :implementation :path "util/release-dist"}]}}
 
  :items
  [{:id "project/bb-edn-discovery"
@@ -251,7 +334,7 @@
   {:id "capability/process" :name "Subprocess execution" :milestone 8}
   {:id "capability/process-pipeline" :name "Process pipelines" :milestone 8}
   {:id "capability/filesystem" :name "Filesystem operations" :milestone 9}
-  {:id "capability/network-client" :name "Network clients" :milestone 5}
+  {:id "capability/network-client" :name "Network clients" :milestone 9}
   {:id "capability/signals" :name "Signals and shutdown" :milestone 5}
   {:id "capability/native-linux-amd64" :name "Linux amd64"}
   {:id "capability/native-linux-arm64" :name "Linux arm64"}
@@ -270,7 +353,17 @@
   {:id "capability/browser-subprocess" :name "Browser host subprocesses"}
   {:id "capability/jvm-bytecode" :name "Arbitrary JVM bytecode"}
   {:id "capability/sci-runtime" :name "SCI execution runtime"}
-  {:id "capability/gobb-reader-feature" :name "Additional :gobb reader feature"}]
+  {:id "capability/gobb-reader-feature" :name "Additional :gobb reader feature"}
+  {:id "capability/platform-contract" :name "Cross-target capability contract"}
+  {:id "capability/environment" :name "Environment-variable adapter"}
+  {:id "capability/clock" :name "Wall-clock adapter"}
+  {:id "capability/random" :name "Secure-random adapter"}
+  {:id "capability/standard-streams" :name "Standard-stream adapter"}
+  {:id "capability/working-directory" :name "Working-directory adapter"}
+  {:id "capability/wasi-filesystem" :name "WASI filesystem disposition"}
+  {:id "capability/wasi-process" :name "WASI subprocess disposition"}
+  {:id "capability/wasi-network" :name "WASI networking disposition"}
+  {:id "capability/browser-network" :name "Browser networking disposition"}]
 
  :test-routes
  [{:pattern "(bb_edn|deps|print_deps)" :area :projects :milestone 7}
@@ -282,12 +375,12 @@
   {:pattern "(io_test|file_var|classpath)" :area :filesystem
    :milestone 9}
   {:pattern "(shutdown_hook|interrupt|kill_child)" :area :platform
-   :milestone 5}
+   :milestone 13}
   {:pattern "(uberjar|uberscript)" :area :build :milestone 11}]
 
  :program-routes
  [{:pattern "(process|pst|which|fzf)" :area :process :milestone 8}
   {:pattern "(http|download|digitalocean|torrent)" :area :network
-   :milestone 5}
+   :milestone 13}
   {:pattern "(ls_jar|tree|notes)" :area :filesystem :milestone 9}
   {:pattern "(server|portal)" :area :interactive-services :milestone 10}]}
