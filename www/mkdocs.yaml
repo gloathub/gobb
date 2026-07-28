@@ -56,6 +56,7 @@ nav:
   - REPL: repl.md
   - Implementation: implementation.md
   - Projects: projects.md
+  - Tasks: tasks.md
   - Platforms: platforms.md
   - Java: java-compatibility.md
   - BB Inventory: inventory.md

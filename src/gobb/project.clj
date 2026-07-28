@@ -7,6 +7,8 @@
 (def configured-classpath (atom ""))
 (def resolved-config (atom nil))
 
+(def task-order-key ::task-order)
+
 (defn exists? [path]
   (let [[_ error] (os.Stat path)]
     (nil? error)))
@@ -28,6 +30,37 @@
     {:gobb/project :invalid-config
      :path path})))
 
+(defn map-forms [source map-start]
+  (let [map-end (host/form-end source map-start)]
+    (loop [index (inc map-start)
+           forms []]
+      (let [key-start (host/skip-layout source index)]
+        (if (>= key-start (dec map-end))
+          forms
+          (let [key-end (host/form-end source key-start)
+                value-start (host/skip-layout source key-end)
+                value-end (host/form-end source value-start)]
+            (recur value-end
+                   (conj forms
+                         [(subs source key-start key-end)
+                          (subs source value-start value-end)]))))))))
+
+(defn task-order-from-source [source]
+  (let [start (host/skip-layout source 0)]
+    (when (and (< start (count source))
+               (= \{ (.charAt source start)))
+      (some
+       (fn [[key-source value-source]]
+         (when (= :tasks (read-string key-source))
+           (let [task-start (host/skip-layout value-source 0)]
+             (when (and (< task-start (count value-source))
+                        (= \{ (.charAt value-source task-start)))
+               (->> (map-forms value-source task-start)
+                    (map (comp read-string first))
+                    (filter symbol?)
+                    vec)))))
+       (map-forms source start)))))
+
 (defn read-config [path]
   (try
     (let [source (slurp path)
@@ -43,7 +76,9 @@
              "configuration should contain zero or one form"))
           (when-not (map? value)
             (config-error path "expected an EDN map"))
-          value)))
+          (if-let [task-order (task-order-from-source source)]
+            (assoc value task-order-key task-order)
+            value))))
     (catch Exception error
       (if (= :invalid-config
              (:gobb/project (ex-data error)))
@@ -557,11 +592,16 @@
         base-config (merge-config-files config-paths)
         base-config (if merge-deps
                       (deep-merge base-config
-                                  (let [value (read-string merge-deps)]
+                                  (let [value (read-string merge-deps)
+                                        task-order
+                                        (task-order-from-source merge-deps)]
                                     (when-not (map? value)
                                       (config-error "-Sdeps"
                                                     "expected an EDN map"))
-                                    value))
+                                    (if task-order
+                                      (assoc value task-order-key
+                                             task-order)
+                                      value)))
                       base-config)
         config (apply-aliases base-config aliases)
         root (absolute

@@ -1,0 +1,14 @@
+{:tasks
+ {:init (def events (atom []))
+  :enter (swap! events conj [:enter (:name (current-task))])
+  :leave (swap! events conj
+                [:leave
+                 (:name (current-task))
+                 (:result (current-task))])
+
+  first-task
+  1
+
+  final-task
+  {:depends [first-task]
+   :task [first-task (deref events)]}}}

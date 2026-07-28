@@ -3,10 +3,11 @@
             [gobb.host :as host]
             [gobb.project :as project]
             [gobb.repl :as repl]
-            [gobb.version]))
+            [gobb.version]
+            [babashka.tasks :as tasks]))
 
 (def usage
-  "Usage: gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -m NS|VAR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -x VAR [ARGS...]\n       gobb [PROJECT-OPTS] [-cp PATH|--classpath PATH] --repl\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb [PROJECT-OPTS] build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb\n\nPROJECT-OPTS:\n  --config FILE       Use an explicit bb.edn or deps.edn\n  --deps-root DIR     Resolve relative project paths from DIR\n  -Sdeps EDN          Merge dependency EDN after project configuration\n  -A ALIASES          Apply comma- or colon-separated aliases")
+  "Usage: gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -m NS|VAR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -x VAR [ARGS...]\n       gobb [PROJECT-OPTS] [-cp PATH|--classpath PATH] --repl\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb [PROJECT-OPTS] run [--parallel] [--prn] TASK [ARGS...]\n       gobb [PROJECT-OPTS] tasks\n       gobb [PROJECT-OPTS] build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb\n\nPROJECT-OPTS:\n  --config FILE       Use an explicit bb.edn or deps.edn\n  --deps-root DIR     Resolve relative project paths from DIR\n  -Sdeps EDN          Merge dependency EDN after project configuration\n  -A ALIASES          Apply comma- or colon-separated aliases")
 
 (def build-usage
   "Usage: gobb build INPUT -o OUTPUT [--platform OS/ARCH]")
@@ -288,6 +289,29 @@
   (host/set-file! host/repl-source-path)
   (repl/start read-native-form))
 
+(defn run-task-command [arguments]
+  (loop [arguments arguments
+         options {:parallel false
+                  :print-result false}]
+    (cond
+      (= "--parallel" (first arguments))
+      (recur (next arguments) (assoc options :parallel true))
+
+      (= "--prn" (first arguments))
+      (recur (next arguments) (assoc options :print-result true))
+
+      (and (first arguments)
+           (.startsWith (str (first arguments)) "-"))
+      (fail! (str "unknown run option: " (first arguments)))
+
+      (empty? arguments)
+      (fail! "run requires a task")
+
+      :else
+      (tasks/execute-task! (first arguments)
+                           (rest arguments)
+                           options))))
+
 (defn -main [& argv]
   (host/initialize!)
   (System/setProperty
@@ -337,6 +361,17 @@
              :else
              (fail! "print-deps expects --format deps|classpath")))
 
+         (= "run" (first argv))
+         (run-task-command (rest argv))
+
+         (= "tasks" (first argv))
+         (tasks/list-tasks!)
+
+         (= "doc" (first argv))
+         (if-let [task-name (second argv)]
+           (tasks/task-doc! task-name)
+           (fail! "doc requires a task"))
+
          (contains? #{"-e" "--eval"} (first argv))
          (if-let [expression (second argv)]
            (evaluate-expression expression (drop 2 argv))
@@ -358,6 +393,13 @@
 
          (= "--version" (first argv))
          (println (str "gobb v" gobb.version/version))
+
+         (and (project/exists? (first argv))
+              (not (.startsWith (str (first argv)) "-")))
+         (evaluate-file (first argv) (rest argv))
+
+         (tasks/task-defined? (first argv))
+         (tasks/execute-task! (first argv) (rest argv))
 
          (.startsWith (str (first argv)) "-")
          (fail! (str "unknown option: " (first argv)))

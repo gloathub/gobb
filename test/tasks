@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the Babashka executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+fixtures=$root/test/fixtures/tasks
+
+fail() {
+  echo "test/tasks: $*" >&2
+  exit 1
+}
+
+check() {
+  local description=$1 expected=$2
+  shift 2
+  local actual
+  actual=$("$@")
+  [[ $actual == "$expected" ]] ||
+    fail "$description: expected '$expected', got '$actual'"
+}
+
+compare() {
+  local description=$1
+  shift
+  local bb_output gobb_output
+  bb_output=$("$BB" "$@")
+  gobb_output=$("$GOBB" "$@")
+  [[ $gobb_output == "$bb_output" ]] ||
+    fail "$description differs from BB: expected '$bb_output', got '$gobb_output'"
+}
+
+basic=$fixtures/basic.edn
+hooks=$fixtures/hooks.edn
+process=$fixtures/process.edn
+cycle=$fixtures/cycle.edn
+
+compare "simple task result" \
+  --config "$basic" run --prn simple
+compare "direct task dispatch" \
+  --config "$basic" simple
+compare "task arguments" \
+  --config "$basic" run --prn arguments one two
+compare "dependency ordering and result vars" \
+  --config "$basic" run --prn dependency
+compare "qualified function task" \
+  --config "$basic" run --prn qualified one two
+compare "nested run" \
+  --config "$basic" run --prn nested
+compare "global and per-task requires" \
+  --config "$basic" run --prn required
+compare "parallel task graph result" \
+  --config "$basic" run --parallel --prn parallel-result
+compare "global enter and leave hooks" \
+  --config "$hooks" run --prn final-task
+compare "task listing, docs, and private filtering" \
+  --config "$basic" tasks
+compare "task documentation" \
+  --config "$basic" doc simple
+
+compare "process pipeline" \
+  --config "$process" run --prn pipeline
+compare "process environment" \
+  --config "$process" run --prn environment
+compare "process stdin and captured stdout" \
+  --config "$process" run --prn input
+compare "process working directory" \
+  --config "$process" run --prn directory
+compare "continued nonzero process" \
+  --config "$process" run --prn continue
+compare "custom process error function" \
+  --config "$process" run --prn handled
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+if "$GOBB" --config "$process" run failure >"$tmp/out" 2>"$tmp/err"; then
+  fail "nonzero process task succeeded"
+fi
+grep -q "Error while executing task: failure" "$tmp/err" ||
+  fail "nonzero process task omitted its task name"
+
+if "$GOBB" --config "$cycle" run missing >"$tmp/out" 2>"$tmp/err"; then
+  fail "missing dependency succeeded"
+fi
+grep -q "No such task: unknown" "$tmp/err" ||
+  fail "missing dependency lacked a useful diagnostic"
+
+if "$GOBB" --config "$cycle" run cyclic-a >"$tmp/out" 2>"$tmp/err"; then
+  fail "cyclic task graph succeeded"
+fi
+grep -q "Cyclic task:" "$tmp/err" ||
+  fail "cyclic task graph lacked a useful diagnostic"
+
+echo "All task and process tests passed"

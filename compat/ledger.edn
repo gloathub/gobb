@@ -16,10 +16,10 @@
  :states
  {:intentional-difference 24,
   :not-applicable 5,
-  :partial 25,
-  :planned 904,
+  :partial 30,
+  :planned 888,
   :platform-limited 6,
-  :supported 58},
+  :supported 69},
  :categories
  [{:category :built-in-library, :count 38, :states {:planned 38}}
   {:category :built-in-namespace,
@@ -31,9 +31,9 @@
    {:intentional-difference 1,
     :not-applicable 2,
     :partial 17,
-    :planned 8,
+    :planned 6,
     :platform-limited 6,
-    :supported 7}}
+    :supported 9}}
   {:category :cli,
    :count 36,
    :states {:not-applicable 3, :partial 1, :planned 26, :supported 6}}
@@ -48,11 +48,13 @@
   {:category :project-config,
    :count 13,
    :states {:partial 2, :planned 1, :supported 10}}
-  {:category :representative-program, :count 37, :states {:planned 37}}
-  {:category :task-config, :count 9, :states {:planned 9}}
+  {:category :representative-program,
+   :count 37,
+   :states {:partial 4, :planned 33}}
+  {:category :task-config, :count 9, :states {:supported 9}}
   {:category :upstream-test,
    :count 63,
-   :states {:partial 3, :planned 60}}],
+   :states {:partial 4, :planned 59}}],
  :milestones
  [{:milestone 0, :count 1, :states {:supported 1}}
   {:milestone 1,
@@ -64,7 +66,7 @@
    :count 23,
    :states {:partial 13, :platform-limited 6, :supported 4}}
   {:milestone 7, :count 15, :states {:partial 5, :supported 10}}
-  {:milestone 8, :count 16, :states {:planned 16}}
+  {:milestone 8, :count 16, :states {:partial 5, :supported 11}}
   {:milestone 9, :count 153, :states {:planned 153}}
   {:milestone 10, :count 11, :states {:planned 11}}
   {:milestone 11, :count 2, :states {:planned 2}}
@@ -247,8 +249,8 @@
 {:state :planned, :milestone 10, :id "capability/nrepl-server", :name "nREPL server", :category :capability, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :supported, :milestone 5, :id "capability/platform-contract", :name "Cross-target capability contract", :category :capability, :evidence [{:kind :test, :path "test/capabilities", :description "Native, WASI, and browser contract parity"}]}
 {:state :planned, :milestone 10, :id "capability/pods", :name "Pod loading and invocation", :category :capability, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "capability/process", :name "Subprocess execution", :category :capability, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "capability/process-pipeline", :name "Process pipelines", :category :capability, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :supported, :milestone 8, :id "capability/process", :name "Subprocess execution", :category :capability, :evidence [{:kind :test, :path "test/tasks", :description "Native exit status, streams, environment, and working directory"} {:kind :implementation, :path "src/gobb/tasks.clj"}]}
+{:state :supported, :milestone 8, :id "capability/process-pipeline", :name "Process pipelines", :category :capability, :evidence [{:kind :test, :path "test/tasks", :description "Captured output piped between native subprocesses"}]}
 {:state :supported, :milestone 5, :id "capability/random", :name "Secure-random adapter", :category :capability, :evidence [{:kind :test, :path "test/capabilities"}]}
 {:state :supported, :milestone 1, :id "capability/runtime-require", :name "Runtime namespace loading", :category :capability, :evidence [{:kind :compat-fixture, :id :loading/require}]}
 {:state :not-applicable, :milestone 4, :id "capability/sci-runtime", :name "SCI execution runtime", :category :capability, :rationale "Gobb uses the full Glojure runtime instead of SCI", :evidence [{:kind :test, :path "test/gobb", :description "Rejects SCI dependencies in Gobb-owned runtime source"}]}
@@ -997,7 +999,7 @@
 {:state :planned, :milestone 13, :id "representative-program/examples/db_who.clj", :category :representative-program, :name "examples/db_who.clj", :source {:kind :upstream-source, :path "examples/db_who.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/digitalocean-ping.clj", :category :representative-program, :name "examples/digitalocean-ping.clj", :source {:kind :upstream-source, :path "examples/digitalocean-ping.clj"}, :area :network, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/download-aliases.clj", :category :representative-program, :name "examples/download-aliases.clj", :source {:kind :upstream-source, :path "examples/download-aliases.clj"}, :area :network, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "representative-program/examples/fzf.clj", :category :representative-program, :name "examples/fzf.clj", :source {:kind :upstream-source, :path "examples/fzf.clj"}, :area :process, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:category :representative-program, :milestone 8, :name "examples/fzf.clj", :evidence [{:kind :test, :path "test/tasks"}], :state :partial, :source {:kind :upstream-source, :path "examples/fzf.clj"}, :rationale "The native process and pipeline substrate is implemented; this example still depends on bundled libraries assigned to the batteries milestone", :id "representative-program/examples/fzf.clj", :area :process}
 {:state :planned, :milestone 13, :id "representative-program/examples/hsqldb_unused_vars.clj", :category :representative-program, :name "examples/hsqldb_unused_vars.clj", :source {:kind :upstream-source, :path "examples/hsqldb_unused_vars.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/htmx_todoapp.clj", :category :representative-program, :name "examples/htmx_todoapp.clj", :source {:kind :upstream-source, :path "examples/htmx_todoapp.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/http-server.clj", :category :representative-program, :name "examples/http-server.clj", :source {:kind :upstream-source, :path "examples/http-server.clj"}, :area :network, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
@@ -1016,26 +1018,26 @@
 {:state :planned, :milestone 13, :id "representative-program/examples/pom_version_get_xml_zip.clj", :category :representative-program, :name "examples/pom_version_get_xml_zip.clj", :source {:kind :upstream-source, :path "examples/pom_version_get_xml_zip.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/pom_version_set.clj", :category :representative-program, :name "examples/pom_version_set.clj", :source {:kind :upstream-source, :path "examples/pom_version_set.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 10, :id "representative-program/examples/portal.clj", :category :representative-program, :name "examples/portal.clj", :source {:kind :upstream-source, :path "examples/portal.clj"}, :area :interactive-services, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "representative-program/examples/process_builder.clj", :category :representative-program, :name "examples/process_builder.clj", :source {:kind :upstream-source, :path "examples/process_builder.clj"}, :area :process, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "representative-program/examples/pst.clj", :category :representative-program, :name "examples/pst.clj", :source {:kind :upstream-source, :path "examples/pst.clj"}, :area :process, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:category :representative-program, :milestone 8, :name "examples/process_builder.clj", :evidence [{:kind :test, :path "test/tasks"}], :state :partial, :source {:kind :upstream-source, :path "examples/process_builder.clj"}, :rationale "Equivalent native process behaviors are covered without relying on JVM ProcessBuilder", :id "representative-program/examples/process_builder.clj", :area :process}
+{:category :representative-program, :milestone 8, :name "examples/pst.clj", :evidence [{:kind :test, :path "test/tasks"}], :state :partial, :source {:kind :upstream-source, :path "examples/pst.clj"}, :rationale "The native process substrate is implemented; the unchanged example awaits its bundled namespace dependencies", :id "representative-program/examples/pst.clj", :area :process}
 {:state :planned, :milestone 13, :id "representative-program/examples/random_doc.clj", :category :representative-program, :name "examples/random_doc.clj", :source {:kind :upstream-source, :path "examples/random_doc.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/sqlite.clj", :category :representative-program, :name "examples/sqlite.clj", :source {:kind :upstream-source, :path "examples/sqlite.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/torrent-viewer.clj", :category :representative-program, :name "examples/torrent-viewer.clj", :source {:kind :upstream-source, :path "examples/torrent-viewer.clj"}, :area :network, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "representative-program/examples/tree.clj", :category :representative-program, :name "examples/tree.clj", :source {:kind :upstream-source, :path "examples/tree.clj"}, :area :filesystem, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/vim.clj", :category :representative-program, :name "examples/vim.clj", :source {:kind :upstream-source, :path "examples/vim.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/whatsapp_frequencies.clj", :category :representative-program, :name "examples/whatsapp_frequencies.clj", :source {:kind :upstream-source, :path "examples/whatsapp_frequencies.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "representative-program/examples/which.clj", :category :representative-program, :name "examples/which.clj", :source {:kind :upstream-source, :path "examples/which.clj"}, :area :process, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:category :representative-program, :milestone 8, :name "examples/which.clj", :evidence [{:kind :test, :path "test/tasks"}], :state :partial, :source {:kind :upstream-source, :path "examples/which.clj"}, :rationale "The native process substrate is implemented; the unchanged example awaits its bundled filesystem namespace", :id "representative-program/examples/which.clj", :area :process}
 {:state :planned, :milestone 13, :id "representative-program/examples/wiki-translate.clj", :category :representative-program, :name "examples/wiki-translate.clj", :source {:kind :upstream-source, :path "examples/wiki-translate.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "representative-program/examples/xml-example.clj", :category :representative-program, :name "examples/xml-example.clj", :source {:kind :upstream-source, :path "examples/xml-example.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/depends", :category :task-config, :name ":depends dependency ordering", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/doc", :category :task-config, :name ":doc task descriptions", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/enter-leave", :category :task-config, :name ":enter and :leave hooks", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/init", :category :task-config, :name ":init", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/parallel", :category :task-config, :name "Parallel task execution", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/private", :category :task-config, :name ":private tasks", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/requires", :category :task-config, :name ":requires", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/run", :category :task-config, :name "tasks and run subcommands", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "tasks/task-map", :category :task-config, :name ":tasks definitions", :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :supported, :milestone 8, :id "tasks/depends", :category :task-config, :name ":depends dependency ordering", :evidence [{:kind :test, :path "test/tasks", :description "Dependency ordering, result Vars, missing tasks, and cycles"}]}
+{:state :supported, :milestone 8, :id "tasks/doc", :category :task-config, :name ":doc task descriptions", :evidence [{:kind :test, :path "test/tasks", :description "Task listing and explicit documentation"}]}
+{:state :supported, :milestone 8, :id "tasks/enter-leave", :category :task-config, :name ":enter and :leave hooks", :evidence [{:kind :test, :path "test/tasks", :description "Global hooks and current-task result context"}]}
+{:state :supported, :milestone 8, :id "tasks/init", :category :task-config, :name ":init", :evidence [{:kind :test, :path "test/tasks", :description "One-time task initialization"}]}
+{:state :supported, :milestone 8, :id "tasks/parallel", :category :task-config, :name "Parallel task execution", :evidence [{:kind :test, :path "test/tasks", :description "Parallel dependency levels using Glojure futures"}]}
+{:state :supported, :milestone 8, :id "tasks/private", :category :task-config, :name ":private tasks", :evidence [{:kind :test, :path "test/tasks", :description "Private and dash-prefixed task filtering"}]}
+{:state :supported, :milestone 8, :id "tasks/requires", :category :task-config, :name ":requires", :evidence [{:kind :test, :path "test/tasks", :description "Global and per-task namespace requirements"}]}
+{:state :supported, :milestone 8, :id "tasks/run", :category :task-config, :name "tasks and run subcommands", :evidence [{:kind :test, :path "test/tasks", :description "run command, shorthand dispatch, arguments, and nested run"}]}
+{:state :supported, :milestone 8, :id "tasks/task-map", :category :task-config, :name ":tasks definitions", :evidence [{:kind :test, :path "test/tasks", :description "Direct and explicit task dispatch against BB"}]}
 {:state :planned, :milestone 13, :id "upstream-test/test/babashka/agent_test.clj", :category :upstream-test, :name "test/babashka/agent_test.clj", :source {:kind :upstream-source, :path "test/babashka/agent_test.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "upstream-test/test/babashka/async_test.clj", :category :upstream-test, :name "test/babashka/async_test.clj", :source {:kind :upstream-source, :path "test/babashka/async_test.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:category :upstream-test, :milestone 7, :name "test/babashka/bb_edn_test.clj", :evidence [{:kind :test, :path "test/projects"}], :state :partial, :source {:kind :upstream-source, :path "test/babashka/bb_edn_test.clj"}, :rationale "Focused Gobb fixtures cover project discovery, paths, aliases, and configuration errors; the complete upstream BB test file is not yet run unchanged", :id "upstream-test/test/babashka/bb_edn_test.clj", :area :projects}
@@ -1058,7 +1060,7 @@
 {:state :planned, :milestone 13, :id "upstream-test/test/babashka/impl/repl_test.clj", :category :upstream-test, :name "test/babashka/impl/repl_test.clj", :source {:kind :upstream-source, :path "test/babashka/impl/repl_test.clj"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 10, :id "upstream-test/test/babashka/impl/server_test.clj", :category :upstream-test, :name "test/babashka/impl/server_test.clj", :source {:kind :upstream-source, :path "test/babashka/impl/server_test.clj"}, :area :interactive-services, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 10, :id "upstream-test/test/babashka/impl/socket_repl_test.clj", :category :upstream-test, :name "test/babashka/impl/socket_repl_test.clj", :source {:kind :upstream-source, :path "test/babashka/impl/socket_repl_test.clj"}, :area :interactive-services, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 8, :id "upstream-test/test/babashka/impl/tasks_test.clj", :category :upstream-test, :name "test/babashka/impl/tasks_test.clj", :source {:kind :upstream-source, :path "test/babashka/impl/tasks_test.clj"}, :area :tasks, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:category :upstream-test, :milestone 8, :name "test/babashka/impl/tasks_test.clj", :evidence [{:kind :test, :path "test/tasks"}], :state :partial, :source {:kind :upstream-source, :path "test/babashka/impl/tasks_test.clj"}, :rationale "Focused Gobb fixtures cover the portable task graph and process contract; the complete SCI/JVM-oriented upstream implementation suite is not run unchanged", :id "upstream-test/test/babashka/impl/tasks_test.clj", :area :tasks}
 {:state :planned, :milestone 13, :id "upstream-test/test/babashka/interop_test.clj", :category :upstream-test, :name "test/babashka/interop_test.clj", :source {:kind :upstream-source, :path "test/babashka/interop_test.clj"}, :area :java-compatibility, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "upstream-test/test/babashka/java_net_http_test.clj", :category :upstream-test, :name "test/babashka/java_net_http_test.clj", :source {:kind :upstream-source, :path "test/babashka/java_net_http_test.clj"}, :area :java-compatibility, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 13, :id "upstream-test/test/babashka/java_security_test.clj", :category :upstream-test, :name "test/babashka/java_security_test.clj", :source {:kind :upstream-source, :path "test/babashka/java_security_test.clj"}, :area :java-compatibility, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}

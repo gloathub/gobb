@@ -1,0 +1,42 @@
+{:paths ["src"]
+ :tasks
+ {:requires ([task.helper :as helper])
+  :init (def initialized (atom [:init]))
+
+  simple
+  {:doc "Return a small calculation."
+   :task (+ 1 2 3)}
+
+  arguments
+  (vec *command-line-args*)
+
+  dependency
+  {:depends [simple]
+   :task (+ simple 4)}
+
+  qualified
+  task.helper/arguments
+
+  nested
+  (run 'simple)
+
+  required
+  {:requires ([task.extra :as extra])
+   :task [helper/value (extra/value) (deref initialized)]}
+
+  parallel-a
+  (do (Thread/sleep 20) :a)
+
+  parallel-b
+  (do (Thread/sleep 20) :b)
+
+  parallel-result
+  {:depends [parallel-a parallel-b]
+   :task [parallel-a parallel-b]}
+
+  -hidden
+  :hidden
+
+  private
+  {:private true
+   :task :private}}}

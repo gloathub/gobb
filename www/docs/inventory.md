@@ -12,14 +12,14 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | --- | ---: | ---: | ---: | ---: | ---: |
 | built-in-library | 38 | 0 | 0 | 38 | 0 |
 | built-in-namespace | 104 | 0 | 1 | 103 | 0 |
-| capability | 41 | 7 | 17 | 8 | 9 |
+| capability | 41 | 9 | 17 | 6 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
 | compatible-library | 98 | 0 | 0 | 98 | 0 |
 | java-class | 583 | 35 | 1 | 524 | 23 |
 | project-config | 13 | 10 | 2 | 1 | 0 |
-| representative-program | 37 | 0 | 0 | 37 | 0 |
-| task-config | 9 | 0 | 0 | 9 | 0 |
-| upstream-test | 63 | 0 | 3 | 60 | 0 |
+| representative-program | 37 | 0 | 4 | 33 | 0 |
+| task-config | 9 | 9 | 0 | 0 | 0 |
+| upstream-test | 63 | 0 | 4 | 59 | 0 |
 
 ## Evidence-backed current surface
 
@@ -48,6 +48,8 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `capability/native-repl` | capability | **partial** | test/gobb |
 | `capability/native-windows-amd64` | capability | **partial** | util/release-dist |
 | `capability/platform-contract` | capability | **supported** | test/capabilities |
+| `capability/process` | capability | **supported** | test/tasks<br>src/gobb/tasks.clj |
+| `capability/process-pipeline` | capability | **supported** | test/tasks |
 | `capability/random` | capability | **supported** | test/capabilities |
 | `capability/runtime-require` | capability | **supported** | :loading/require |
 | `capability/sci-runtime` | capability | **not-applicable** | test/gobb |
@@ -140,15 +142,28 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `project/paths` | project-config | **supported** | test/projects |
 | `project/preloads` | project-config | **supported** | :loading/preloads |
 | `project/print-deps` | project-config | **partial** | test/projects |
+| `representative-program/examples/fzf.clj` | representative-program | **partial** | test/tasks |
+| `representative-program/examples/process_builder.clj` | representative-program | **partial** | test/tasks |
+| `representative-program/examples/pst.clj` | representative-program | **partial** | test/tasks |
+| `representative-program/examples/which.clj` | representative-program | **partial** | test/tasks |
+| `tasks/depends` | task-config | **supported** | test/tasks |
+| `tasks/doc` | task-config | **supported** | test/tasks |
+| `tasks/enter-leave` | task-config | **supported** | test/tasks |
+| `tasks/init` | task-config | **supported** | test/tasks |
+| `tasks/parallel` | task-config | **supported** | test/tasks |
+| `tasks/private` | task-config | **supported** | test/tasks |
+| `tasks/requires` | task-config | **supported** | test/tasks |
+| `tasks/run` | task-config | **supported** | test/tasks |
+| `tasks/task-map` | task-config | **supported** | test/tasks |
 | `upstream-test/test/babashka/bb_edn_test.clj` | upstream-test | **partial** | test/projects |
 | `upstream-test/test/babashka/deps_test.clj` | upstream-test | **partial** | test/projects |
+| `upstream-test/test/babashka/impl/tasks_test.clj` | upstream-test | **partial** | test/tasks |
 | `upstream-test/test/babashka/print_deps_test.clj` | upstream-test | **partial** | test/projects |
 
 ## Planned queue
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 8 | 16 |
 | 9 | 153 |
 | 10 | 11 |
 | 11 | 2 |

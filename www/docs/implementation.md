@@ -156,6 +156,19 @@ dependencies:
 
 Resolution is implemented by Gobb and does not invoke Clojure or a JVM.
 
+## Tasks and native processes
+
+The `babashka.tasks` compatibility namespace evaluates task forms in a stable
+Glojure namespace. Gobb validates dependency graphs, interns dependency
+results under their task names, applies initialization, requirements, and
+hooks, and uses Glojure futures for parallel dependency levels.
+
+The task `shell` helper maps process options onto Go's `os/exec`: streams,
+environment, working directory, exit status, and captured pipeline output
+never pass through Java process classes. The platform capability layer rejects
+process creation predictably under WASI and browser-Wasm. See
+[Tasks and processes](tasks.md).
+
 ## Repository boundaries
 
 Gobb selectively ports BB behavior rather than maintaining a wholesale fork.

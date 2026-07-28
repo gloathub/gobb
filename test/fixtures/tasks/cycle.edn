@@ -1,0 +1,12 @@
+{:tasks
+ {missing
+  {:depends [unknown]
+   :task :never}
+
+  cyclic-a
+  {:depends [cyclic-b]
+   :task :a}
+
+  cyclic-b
+  {:depends [cyclic-a]
+   :task :b}}}

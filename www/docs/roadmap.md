@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Tasks and commands</p>
+    <p class="summary-value">Batteries included</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">8 / 14</p>
+    <p class="summary-value">9 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 57%"></span>
+  <span style="width: 64%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -315,8 +315,9 @@ also removes the downloaded Babashka source checkout.
   GraalVM substitutions, or libraries that have not been ported.
 - Project-derived classpaths work, but Maven bytecode-only libraries remain
   unavailable and advanced POM/BOM edge cases are not yet tools.deps-complete.
-- Tasks, subprocess pipelines, bundled filesystem/network libraries, pods,
-  and network REPL services remain unimplemented.
+- Bundled filesystem/network libraries, pods, and network REPL services remain
+  unimplemented. Native task subprocesses work; WASI and browser targets
+  intentionally reject process creation.
 - The native and browser REPLs are focused proofs. Terminal line editing and
   command history, nREPL, socket REPL, browser filesystem loading, and the rest
   of BB's interactive surface remain.
@@ -325,30 +326,58 @@ also removes the downloaded Babashka source checkout.
 
 ## Next concrete slice
 
-Port BB's task graph and command dispatch, then connect task process pipelines
-to the native platform capability layer.
+Port BB's bundled libraries in dependency-shaped waves, starting with
+filesystem and process namespaces that unlock the largest number of upstream
+examples.
 
-## Current work
+## Completed tasks and commands
 
-<div class="milestone milestone-active">
+<div class="milestone milestone-done">
   <div class="milestone-marker">8</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Tasks and commands</h3>
     <p>
       Port BB's task model, command selection, exec functions, and process
       pipelines onto the resolved project basis.
     </p>
     <ul class="task-list">
-      <li>Dispatch named tasks and the explicit <code>run</code> command</li>
-      <li>Evaluate global and per-task <code>:init</code> and <code>:requires</code></li>
-      <li>Order task graphs through <code>:depends</code></li>
-      <li>Support task arguments, <code>:private</code>, and <code>:doc</code></li>
-      <li>Run <code>:enter</code> and <code>:leave</code> hooks</li>
-      <li>Implement sequential and parallel task execution</li>
-      <li>Port process invocation and pipelines without JVM process classes</li>
-      <li>Preserve task exit status, streams, environment, and working directory</li>
-      <li>Exercise task and command behavior against pinned BB fixtures</li>
+      <li class="task-done">Dispatch named tasks and the explicit <code>run</code> command</li>
+      <li class="task-done">Evaluate global and per-task <code>:init</code> and <code>:requires</code></li>
+      <li class="task-done">Order task graphs through <code>:depends</code></li>
+      <li class="task-done">Support task arguments, <code>:private</code>, and <code>:doc</code></li>
+      <li class="task-done">Run <code>:enter</code> and <code>:leave</code> hooks</li>
+      <li class="task-done">Implement sequential and parallel task execution</li>
+      <li class="task-done">Port process invocation and pipelines without JVM process classes</li>
+      <li class="task-done">Preserve task exit status, streams, environment, and working directory</li>
+      <li class="task-done">Exercise task and command behavior against pinned BB fixtures</li>
+    </ul>
+    <p>
+      See <a href="../tasks/">Tasks and processes</a> for command, graph,
+      hook, parallelism, process-option, and target behavior.
+    </p>
+  </div>
+</div>
+
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">9</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Batteries included</h3>
+    <p>
+      Bring over BB's bundled libraries in tested dependency-shaped waves.
+    </p>
+    <ul class="task-list">
+      <li>Port <code>babashka.fs</code> and its filesystem dependency wave</li>
+      <li>Port the public <code>babashka.process</code> API onto the native process adapter</li>
+      <li>Port curl, HTTP client, and portable networking helpers</li>
+      <li>Fill out <code>clojure.java.io</code> compatibility used by bundled libraries</li>
+      <li>Bring over common data libraries for JSON, CSV, YAML, and Transit</li>
+      <li>Port CLI, template, logging, and source-rewriting libraries in dependency order</li>
+      <li>Run each library's focused tests under interpreted and compiled Gobb</li>
+      <li>Record native, WASI, and browser limitations in the generated inventory</li>
     </ul>
   </div>
 </div>
@@ -356,11 +385,6 @@ to the native platform capability layer.
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>09</span>
-    <h3>Batteries included</h3>
-    <p>Bring over BB's bundled libraries in tested dependency-shaped waves.</p>
-  </article>
   <article class="roadmap-card">
     <span>10</span>
     <h3>Interactive services</h3>

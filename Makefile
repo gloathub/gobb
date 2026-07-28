@@ -432,6 +432,7 @@ test: $(GOBB) $(BB) $(RG) smoke capability-test
 	$Q GOBB='$(GOBB)' test/java-lang
 	$Q GOBB='$(GOBB)' GOBB_GLOAT='$(GLOAT)' \
 	  WASMTIME='$(WASMTIME)' NODE='$(NODE)' test/projects
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/tasks
 
 compat: _compat
 

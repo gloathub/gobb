@@ -1,0 +1,39 @@
+{:tasks
+ {pipeline
+  (-> (shell {:out :string} "printf hello")
+      (shell {:out :string} "cat")
+      :out)
+
+  environment
+  (-> (shell {:out :string
+              :extra-env {"GOBB_TASK_ENV" "visible"}}
+             "sh" "-c" "printf %s \"$GOBB_TASK_ENV\"")
+      :out)
+
+  input
+  (-> (shell {:in "from stdin"
+              :out :string}
+             "cat")
+      :out)
+
+  directory
+  (-> (shell {:dir "."
+              :out :string}
+             "pwd")
+      :out)
+
+  continue
+  (:exit (shell {:continue true
+                 :out :string
+                 :err :string}
+                "sh" "-c" "exit 7"))
+
+  handled
+  (shell {:error-fn (fn [info]
+                      [:handled (:babashka/exit info)])
+          :out :string
+          :err :string}
+         "sh" "-c" "exit 9")
+
+  failure
+  (shell "sh" "-c" "exit 5")}}

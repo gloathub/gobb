@@ -166,6 +166,87 @@
    :milestone 7
    :rationale "Gobb prints resolved user dependencies and classpaths; BB built-in dependency coordinates remain assigned to the batteries milestone"
    :evidence [{:kind :test :path "test/projects"}]}
+  "tasks/task-map"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Direct and explicit task dispatch against BB"}]}
+  "tasks/init"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "One-time task initialization"}]}
+  "tasks/requires"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Global and per-task namespace requirements"}]}
+  "tasks/depends"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Dependency ordering, result Vars, missing tasks, and cycles"}]}
+  "tasks/parallel"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Parallel dependency levels using Glojure futures"}]}
+  "tasks/private"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Private and dash-prefixed task filtering"}]}
+  "tasks/doc"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Task listing and explicit documentation"}]}
+  "tasks/enter-leave"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Global hooks and current-task result context"}]}
+  "tasks/run"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "run command, shorthand dispatch, arguments, and nested run"}]}
+  "capability/process"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Native exit status, streams, environment, and working directory"}
+              {:kind :implementation :path "src/gobb/tasks.clj"}]}
+  "capability/process-pipeline"
+  {:state :supported
+   :milestone 8
+   :evidence [{:kind :test :path "test/tasks"
+               :description "Captured output piped between native subprocesses"}]}
+  "upstream-test/test/babashka/impl/tasks_test.clj"
+  {:state :partial
+   :milestone 8
+   :rationale "Focused Gobb fixtures cover the portable task graph and process contract; the complete SCI/JVM-oriented upstream implementation suite is not run unchanged"
+   :evidence [{:kind :test :path "test/tasks"}]}
+  "representative-program/examples/fzf.clj"
+  {:state :partial
+   :milestone 8
+   :rationale "The native process and pipeline substrate is implemented; this example still depends on bundled libraries assigned to the batteries milestone"
+   :evidence [{:kind :test :path "test/tasks"}]}
+  "representative-program/examples/process_builder.clj"
+  {:state :partial
+   :milestone 8
+   :rationale "Equivalent native process behaviors are covered without relying on JVM ProcessBuilder"
+   :evidence [{:kind :test :path "test/tasks"}]}
+  "representative-program/examples/pst.clj"
+  {:state :partial
+   :milestone 8
+   :rationale "The native process substrate is implemented; the unchanged example awaits its bundled namespace dependencies"
+   :evidence [{:kind :test :path "test/tasks"}]}
+  "representative-program/examples/which.clj"
+  {:state :partial
+   :milestone 8
+   :rationale "The native process substrate is implemented; the unchanged example awaits its bundled filesystem namespace"
+   :evidence [{:kind :test :path "test/tasks"}]}
   "namespace/clojure.java.io" {:state :partial
                               :milestone 3
                               :rationale "Classpath resource lookup is implemented; the complete JVM API is not"

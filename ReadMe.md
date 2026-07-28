@@ -239,6 +239,24 @@ portable Clojure source can be loaded; JVM bytecode-only libraries remain
 outside Gobb's architecture. Maven dependency resolution additionally uses
 `curl` and `unzip` on the native host.
 
+## Tasks and Processes
+
+Gobb runs BB-style task graphs from `bb.edn`, including initialization,
+requirements, dependencies, hooks, private tasks, documentation, nested task
+runs, arguments, and parallel dependency levels:
+
+```bash
+gobb tasks
+gobb run --parallel --prn test
+gobb build-assets --watch
+```
+
+Inside tasks, `shell` runs native subprocesses through Go and supports
+captured or inherited streams, pipelines, environment changes, working
+directories, and nonzero-exit handling. WASI and browser-Wasm builds report a
+structured unsupported-capability error because those targets cannot create
+host processes.
+
 ## Build Programs
 
 `gobb build` stages the resolved project and compiles a namespace containing
