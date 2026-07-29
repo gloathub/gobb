@@ -392,7 +392,16 @@ examples.
           <li>Complete direct stream records, true process destruction, and replace-image <code>exec</code></li>
         </ul>
       </li>
-      <li>Port curl, HTTP client, and portable networking helpers</li>
+      <li class="task-progress">
+        Port curl, HTTP client, and portable networking helpers
+        <ul>
+          <li class="task-done">Pin and verify the upstream <code>babashka.curl</code> source revision</li>
+          <li class="task-done">Implement native methods, headers, parameters, bodies, redirects, byte responses, and error maps</li>
+          <li class="task-done">Differentially test file URLs and local HTTP requests without a public network dependency</li>
+          <li class="task-done">Pin and implement the core <code>babashka.http-client</code> client, method, async, redirect, and function-client surface</li>
+          <li>Complete live streaming, custom interceptors, WebSocket, JVM client constructors, and browser Fetch adapters</li>
+        </ul>
+      </li>
       <li>Fill out <code>clojure.java.io</code> compatibility used by bundled libraries</li>
       <li>Bring over common data libraries for JSON, CSV, YAML, and Transit</li>
       <li>Port CLI, template, logging, and source-rewriting libraries in dependency order</li>

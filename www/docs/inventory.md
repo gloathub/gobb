@@ -10,11 +10,11 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| built-in-library | 38 | 0 | 1 | 37 | 0 |
-| built-in-namespace | 104 | 0 | 3 | 101 | 0 |
-| capability | 41 | 9 | 18 | 5 | 9 |
+| built-in-library | 38 | 0 | 3 | 35 | 0 |
+| built-in-namespace | 104 | 0 | 5 | 99 | 0 |
+| capability | 41 | 9 | 19 | 4 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
-| compatible-library | 98 | 0 | 0 | 98 | 0 |
+| compatible-library | 98 | 0 | 1 | 97 | 0 |
 | java-class | 583 | 35 | 1 | 524 | 23 |
 | project-config | 13 | 10 | 2 | 1 | 0 |
 | representative-program | 37 | 0 | 4 | 33 | 0 |
@@ -25,7 +25,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Item | Surface | State | Evidence |
 | --- | --- | --- | --- |
+| `built-in-library/babashka/babashka.curl` | built-in-library | **partial** | src/gobb/curl.clj<br>test/curl |
 | `built-in-library/babashka/fs` | built-in-library | **partial** | src/gobb/fs.clj<br>test/fs |
+| `built-in-library/org.babashka/http-client` | built-in-library | **partial** | src/gobb/http_client.clj<br>test/http-client |
 | `capability/browser-filesystem` | capability | **platform-limited** | www/docs/implementation.md |
 | `capability/browser-network` | capability | **platform-limited** | test/capabilities |
 | `capability/browser-repl` | capability | **partial** | test/gobb<br>www/docs/javascripts/repl.js |
@@ -49,6 +51,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `capability/native-openbsd-arm64` | capability | **partial** | util/release-dist |
 | `capability/native-repl` | capability | **partial** | test/gobb |
 | `capability/native-windows-amd64` | capability | **partial** | util/release-dist |
+| `capability/network-client` | capability | **partial** | test/curl<br>test/http-client<br>test/capabilities |
 | `capability/platform-contract` | capability | **supported** | test/capabilities |
 | `capability/process` | capability | **supported** | test/tasks<br>src/gobb/tasks.clj |
 | `capability/process-pipeline` | capability | **supported** | test/tasks |
@@ -131,7 +134,10 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `cli/-m` | cli | **supported** | :invocation/main |
 | `cli/-x` | cli | **supported** | :invocation/exec |
 | `cli/repl` | cli | **partial** | test/gobb |
+| `compatible-library/babashka/babashka.curl` | compatible-library | **partial** | src/gobb/curl.clj<br>test/curl |
+| `namespace/babashka.curl` | built-in-namespace | **partial** | src/gobb/curl.clj<br>test/curl |
 | `namespace/babashka.fs` | built-in-namespace | **partial** | src/gobb/fs.clj<br>test/fs |
+| `namespace/babashka.http-client` | built-in-namespace | **partial** | src/gobb/http_client.clj<br>test/http-client |
 | `namespace/babashka.process` | built-in-namespace | **partial** | src/gobb/process.clj<br>test/process |
 | `namespace/clojure.java.io` | built-in-namespace | **partial** | :loading/resource |
 | `project/aliases` | project-config | **supported** | test/projects |
@@ -168,10 +174,10 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 9 | 149 |
+| 9 | 144 |
 | 10 | 11 |
 | 11 | 2 |
-| 13 | 722 |
+| 13 | 721 |
 
 ## Authoritative inputs
 

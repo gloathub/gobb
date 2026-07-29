@@ -31,6 +31,13 @@ BABASHKA-FS-SOURCE := $(BABASHKA-SOURCE)/fs
 BABASHKA-PROCESS-REVISION := 16a84e0af0da51b8c84e289970f6b7cc35b35d18
 BABASHKA-PROCESS-STAMP := $(LOCAL-CACHE)/.babashka-process-$(BABASHKA-PROCESS-REVISION)
 BABASHKA-PROCESS-SOURCE := $(BABASHKA-SOURCE)/process
+BABASHKA-CURL-REVISION := e936acd40544eb637b6041c7e89454b21eb7ee34
+BABASHKA-CURL-STAMP := $(LOCAL-CACHE)/.babashka-curl-$(BABASHKA-CURL-REVISION)
+BABASHKA-CURL-SOURCE := $(BABASHKA-SOURCE)/babashka.curl
+BABASHKA-HTTP-CLIENT-TAG := v0.4.23
+BABASHKA-HTTP-CLIENT-REVISION := d56bc7f86903d09ff3faef1500ad36005dab037f
+BABASHKA-HTTP-CLIENT-SOURCE := $(LOCAL-CACHE)/http-client-0.4.23
+BABASHKA-HTTP-CLIENT-STAMP := $(LOCAL-CACHE)/.http-client-0.4.23
 SOURCE-STAGE := $(TOP)/.cache/source-stage
 SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
 REPL-SOURCE-STAGE := $(TOP)/.cache/repl-source-stage
@@ -104,6 +111,9 @@ MAKES-REALCLEAN := \
   $(BABASHKA-SOURCE-STAMP) \
   $(BABASHKA-FS-STAMP) \
   $(BABASHKA-PROCESS-STAMP) \
+  $(BABASHKA-CURL-STAMP) \
+  $(BABASHKA-HTTP-CLIENT-SOURCE) \
+  $(BABASHKA-HTTP-CLIENT-STAMP) \
 
 default:: build
 
@@ -163,19 +173,49 @@ $(BABASHKA-PROCESS-STAMP): $(BABASHKA-SOURCE-STAMP)
 	@$(ECHO)
 
 BABASHKA-PROCESS-DEP := $(BABASHKA-PROCESS-STAMP)
+
+$(BABASHKA-CURL-STAMP): $(BABASHKA-SOURCE-STAMP)
+	@$(ECHO) "* Downloading the pinned babashka.curl source"
+	$Q git -C '$(BABASHKA-SOURCE)' submodule update --init --depth=1 babashka.curl
+	$Q test "$$(git -C '$(BABASHKA-CURL-SOURCE)' rev-parse HEAD)" = \
+	  "$(BABASHKA-CURL-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+BABASHKA-CURL-DEP := $(BABASHKA-CURL-STAMP)
 else
 BABASHKA-SOURCE-DEP := $(BABASHKA-SOURCE)
 BABASHKA-FS-DEP := $(BABASHKA-FS-SOURCE)
 BABASHKA-PROCESS-DEP := $(BABASHKA-PROCESS-SOURCE)
+BABASHKA-CURL-DEP := $(BABASHKA-CURL-SOURCE)
 endif
+
+$(BABASHKA-HTTP-CLIENT-STAMP):
+	@$(ECHO) "* Downloading the pinned babashka.http-client source"
+	$Q $(RM) -r '$(BABASHKA-HTTP-CLIENT-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(BABASHKA-HTTP-CLIENT-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/babashka/http-client \
+	  '$(BABASHKA-HTTP-CLIENT-SOURCE)'
+	$Q test "$$(git -C '$(BABASHKA-HTTP-CLIENT-SOURCE)' rev-parse HEAD)" = \
+	  "$(BABASHKA-HTTP-CLIENT-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+BABASHKA-HTTP-CLIENT-DEP := $(BABASHKA-HTTP-CLIENT-STAMP)
 
 deps: \
   $(BABASHKA-SOURCE-DEP) \
   $(BABASHKA-FS-DEP) \
-  $(BABASHKA-PROCESS-DEP)
+  $(BABASHKA-PROCESS-DEP) \
+  $(BABASHKA-CURL-DEP) \
+  $(BABASHKA-HTTP-CLIENT-DEP)
 	$Q test -f '$(BABASHKA-SOURCE)/src/babashka/main.clj'
 	$Q test -f '$(BABASHKA-FS-SOURCE)/src/babashka/fs.cljc'
 	$Q test -f '$(BABASHKA-PROCESS-SOURCE)/src/babashka/process.cljc'
+	$Q test -f '$(BABASHKA-CURL-SOURCE)/src/babashka/curl.clj'
+	$Q test -f '$(BABASHKA-HTTP-CLIENT-SOURCE)/src/babashka/http_client.clj'
 ifndef BABASHKA_DIR
 	$Q test "$$(git -C '$(BABASHKA-SOURCE)' rev-parse HEAD)" = \
 	  "$(BABASHKA-SOURCE-REVISION)"
@@ -468,11 +508,17 @@ test: \
   $(RG) \
   $(BABASHKA-FS-DEP) \
   $(BABASHKA-PROCESS-DEP) \
+  $(BABASHKA-CURL-DEP) \
+  $(BABASHKA-HTTP-CLIENT-DEP) \
   smoke \
   capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/fs
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/process
+	$Q GOBB='$(GOBB)' BB='$(BB)' \
+	  GO="$$('$(GLOAT)' --which=go)" test/curl
+	$Q GOBB='$(GOBB)' BB='$(BB)' \
+	  GO="$$('$(GLOAT)' --which=go)" test/http-client
 	$Q GOBB='$(GOBB)' test/java-lang
 	$Q GOBB='$(GOBB)' GOBB_GLOAT='$(GLOAT)' \
 	  WASMTIME='$(WASMTIME)' NODE='$(NODE)' test/projects

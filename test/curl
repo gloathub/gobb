@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the Babashka executable}"
+: "${GO:?GO must name the Go executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+fixture=$root/test/fixtures/curl/core.clj
+server_source=$root/test/fixtures/curl/server.go
+tmp=$(mktemp -d)
+server_pid=
+cleanup() {
+  if [[ -n $server_pid ]]; then
+    kill "$server_pid" 2>/dev/null || true
+    wait "$server_pid" 2>/dev/null || true
+  fi
+  rm -rf "$tmp"
+}
+trap cleanup EXIT
+
+printf 'Gobb curl fixture\n' >"$tmp/body.txt"
+env -i \
+  HOME="$tmp" \
+  PATH=/usr/bin:/bin \
+  GOCACHE="$tmp/go-cache" \
+  GOPATH="$tmp/go-path" \
+  CGO_ENABLED=0 \
+  "$GO" build -o "$tmp/server" "$server_source"
+"$tmp/server" "$tmp/address" &
+server_pid=$!
+
+for _ in {1..100}; do
+  [[ -s $tmp/address ]] && break
+  sleep 0.01
+done
+
+if [[ ! -s $tmp/address ]]; then
+  echo "test/curl: local HTTP server did not start" >&2
+  exit 1
+fi
+
+base_url=$(<"$tmp/address")
+
+"$BB" "$fixture" "$tmp/body.txt" "$base_url" >"$tmp/bb.edn"
+"$GOBB" "$fixture" "$tmp/body.txt" "$base_url" >"$tmp/gobb.edn"
+
+equal=$(
+  "$BB" -e \
+    '(let [[expected actual] *command-line-args*]
+       (= (read-string (slurp expected))
+          (read-string (slurp actual))))' \
+    "$tmp/bb.edn" "$tmp/gobb.edn"
+)
+
+if [[ $equal != true ]]; then
+  diff -u "$tmp/bb.edn" "$tmp/gobb.edn" || true
+  echo "test/curl: Gobb babashka.curl behavior differs from BB" >&2
+  exit 1
+fi
+
+echo "Core babashka.curl compatibility tests passed"

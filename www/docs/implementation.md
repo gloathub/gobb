@@ -198,6 +198,21 @@ working directories, lifecycle callbacks, `sh`, `shell`, and the `$` macro.
 Direct JVM-style stream records, true process destruction, and replace-image
 `exec` remain partial.
 
+The first networking wave exposes the pinned `babashka.curl` API through the
+same native process adapter. It covers the common request methods, headers,
+query and form parameters, string and file bodies, byte responses, redirects,
+debug commands, and BB-compatible response and error maps. The differential
+suite uses both file URLs and a repository-local HTTP server, so it does not
+depend on a public test service. Live response streams are currently buffered;
+WASI has no socket substrate, and the browser target still needs a Fetch-based
+adapter.
+
+The same transport now backs the pinned core `babashka.http-client` surface:
+client defaults, all common methods, headers, query and form parameters,
+bodies, redirects, buffered async requests, and function clients are checked
+against BB using the local server. JVM-specific client constructors, complete
+interceptor customization, WebSocket support, and browser Fetch remain open.
+
 ## Repository boundaries
 
 Gobb selectively ports BB behavior rather than maintaining a wholesale fork.

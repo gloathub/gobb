@@ -268,6 +268,47 @@
    :evidence [{:kind :implementation :path "src/gobb/process.clj"}
               {:kind :test :path "test/process"
                :description "Differential core process behavior against pinned BB"}]}
+  "built-in-library/babashka/babashka.curl"
+  {:state :partial
+   :milestone 9
+   :rationale "The pinned babashka.curl request surface is implemented over the native curl process; buffered request and response modes work while live streaming and non-native targets remain limited"
+   :evidence [{:kind :implementation :path "src/gobb/curl.clj"}
+              {:kind :test :path "test/curl"
+               :description "Differential file and local HTTP behavior against pinned BB"}]}
+  "compatible-library/babashka/babashka.curl"
+  {:state :partial
+   :milestone 9
+   :rationale "Gobb bundles a native curl-backed compatibility namespace; live streams and non-native targets remain partial"
+   :evidence [{:kind :implementation :path "src/gobb/curl.clj"}
+              {:kind :test :path "test/curl"}]}
+  "namespace/babashka.curl"
+  {:state :partial
+   :milestone 9
+   :rationale "GET, HEAD, POST, PUT, PATCH, DELETE, headers, query and form parameters, body and byte modes, redirects, debug commands, and error dispositions are implemented; live streaming remains buffered"
+   :evidence [{:kind :implementation :path "src/gobb/curl.clj"}
+              {:kind :test :path "test/curl"
+               :description "Differential requests against file URLs and a local HTTP server"}]}
+  "built-in-library/org.babashka/http-client"
+  {:state :partial
+   :milestone 9
+   :rationale "The pinned core babashka.http-client API is adapted to Gobb's native curl transport; JVM client constructors, full interceptor customization, WebSocket, and browser adapters remain"
+   :evidence [{:kind :implementation :path "src/gobb/http_client.clj"}
+              {:kind :test :path "test/http-client"
+               :description "Differential core HTTP client behavior against pinned BB"}]}
+  "namespace/babashka.http-client"
+  {:state :partial
+   :milestone 9
+   :rationale "Core clients, methods, defaults, headers, parameters, bodies, redirects, asynchronous deref, and function clients are implemented; JVM-specific constructors and advanced transports remain"
+   :evidence [{:kind :implementation :path "src/gobb/http_client.clj"}
+              {:kind :test :path "test/http-client"
+               :description "Differential local HTTP behavior against pinned BB"}]}
+  "capability/network-client"
+  {:state :partial
+   :milestone 9
+   :rationale "The native target exposes babashka.curl and the core babashka.http-client API through the required curl binary; WASI has no sockets and browser networking requires a Fetch adapter"
+   :evidence [{:kind :test :path "test/curl"}
+              {:kind :test :path "test/http-client"}
+              {:kind :test :path "test/capabilities"}]}
   "capability/filesystem"
   {:state :partial
    :milestone 9
