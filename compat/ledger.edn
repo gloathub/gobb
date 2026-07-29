@@ -16,22 +16,24 @@
  :states
  {:intentional-difference 24,
   :not-applicable 5,
-  :partial 30,
-  :planned 888,
+  :partial 33,
+  :planned 885,
   :platform-limited 6,
   :supported 69},
  :categories
- [{:category :built-in-library, :count 38, :states {:planned 38}}
+ [{:category :built-in-library,
+   :count 38,
+   :states {:partial 1, :planned 37}}
   {:category :built-in-namespace,
    :count 104,
-   :states {:partial 1, :planned 103}}
+   :states {:partial 2, :planned 102}}
   {:category :capability,
    :count 41,
    :states
    {:intentional-difference 1,
     :not-applicable 2,
-    :partial 17,
-    :planned 6,
+    :partial 18,
+    :planned 5,
     :platform-limited 6,
     :supported 9}}
   {:category :cli,
@@ -67,7 +69,7 @@
    :states {:partial 13, :platform-limited 6, :supported 4}}
   {:milestone 7, :count 15, :states {:partial 5, :supported 10}}
   {:milestone 8, :count 16, :states {:partial 5, :supported 11}}
-  {:milestone 9, :count 153, :states {:planned 153}}
+  {:milestone 9, :count 153, :states {:partial 3, :planned 150}}
   {:milestone 10, :count 11, :states {:planned 11}}
   {:milestone 11, :count 2, :states {:planned 2}}
   {:milestone 13,
@@ -81,7 +83,7 @@
  [
 {:state :planned, :milestone 9, :id "built-in-library/babashka/babashka.core", :category :built-in-library, :name "babashka/babashka.core", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/babashka/babashka.curl", :category :built-in-library, :name "babashka/babashka.curl", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 9, :id "built-in-library/babashka/fs", :category :built-in-library, :name "babashka/fs", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :partial, :milestone 9, :id "built-in-library/babashka/fs", :category :built-in-library, :name "babashka/fs", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :rationale "The Go-backed core path and filesystem wave is implemented; glob walking, archives, attributes, permissions, and the temporary-directory macro remain", :evidence [{:kind :implementation, :path "src/gobb/fs.clj"} {:kind :test, :path "test/fs", :description "Differential core filesystem behavior against pinned BB"}]}
 {:state :planned, :milestone 9, :id "built-in-library/cheshire/cheshire", :category :built-in-library, :name "cheshire/cheshire", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/clj-commons/clj-yaml", :category :built-in-library, :name "clj-commons/clj-yaml", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/com.cognitect/transit-clj", :category :built-in-library, :name "com.cognitect/transit-clj", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
@@ -123,7 +125,7 @@
 {:state :planned, :milestone 9, :id "namespace/babashka.core", :category :built-in-namespace, :name "babashka.core", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/babashka.curl", :category :built-in-namespace, :name "babashka.curl", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/babashka.deps", :category :built-in-namespace, :name "babashka.deps", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 9, :id "namespace/babashka.fs", :category :built-in-namespace, :name "babashka.fs", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :partial, :milestone 9, :id "namespace/babashka.fs", :category :built-in-namespace, :name "babashka.fs", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "Core paths, predicates, file I/O, copies, moves, links, temporary files, and executable lookup are implemented through Go; advanced APIs remain", :evidence [{:kind :implementation, :path "src/gobb/fs.clj"} {:kind :test, :path "test/fs", :description "Differential core filesystem behavior against pinned BB"}]}
 {:state :planned, :milestone 9, :id "namespace/babashka.http-client", :category :built-in-namespace, :name "babashka.http-client", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/babashka.http-client.interceptors", :category :built-in-namespace, :name "babashka.http-client.interceptors", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/babashka.http-client.websocket", :category :built-in-namespace, :name "babashka.http-client.websocket", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
@@ -229,7 +231,7 @@
 {:state :supported, :milestone 5, :id "capability/clock", :name "Wall-clock adapter", :category :capability, :evidence [{:kind :test, :path "test/capabilities"}]}
 {:state :supported, :milestone 7, :id "capability/compiled-program", :name "gobb build compiled program", :category :capability, :evidence [{:kind :compat-fixture, :id :compiled/main} {:kind :test, :path "test/projects", :description "Dependency-bearing native, WASI, and browser-Wasm builds"}]}
 {:state :supported, :milestone 5, :id "capability/environment", :name "Environment-variable adapter", :category :capability, :evidence [{:kind :test, :path "test/capabilities"}]}
-{:state :planned, :milestone 9, :id "capability/filesystem", :name "Filesystem operations", :category :capability, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :partial, :milestone 9, :id "capability/filesystem", :name "Filesystem operations", :category :capability, :rationale "Native core filesystem operations work; the full babashka.fs surface and non-native platform limits remain", :evidence [{:kind :test, :path "test/fs"} {:kind :test, :path "test/capabilities"}]}
 {:state :intentional-difference, :milestone 1, :id "capability/gobb-reader-feature", :name "Additional :gobb reader feature", :category :capability, :rationale "Gobb adds :gobb while retaining the :bb and :clj reader features", :evidence [{:kind :compat-fixture, :id :reader/gobb-feature}]}
 {:state :planned, :milestone 10, :id "capability/http-server", :name "HTTP server integrations", :category :capability, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :not-applicable, :milestone 4, :id "capability/jvm-bytecode", :name "Arbitrary JVM bytecode", :category :capability, :rationale "Gobb deliberately runs Glojure code without a JVM", :evidence [{:kind :implementation, :path "www/docs/implementation.md"}]}

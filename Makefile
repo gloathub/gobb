@@ -25,6 +25,9 @@ BABASHKA-SOURCE-REVISION := 0fb349c414e717800be775ba9cb77c95a9eb700d
 BABASHKA-SOURCE-CACHE := $(LOCAL-CACHE)/babashka-src-$(BABASHKA-SOURCE-TAG)
 BABASHKA-SOURCE := $(or $(BABASHKA_DIR),$(BABASHKA-SOURCE-CACHE))
 BABASHKA-SOURCE-STAMP := $(LOCAL-CACHE)/.babashka-src-$(BABASHKA-SOURCE-TAG)
+BABASHKA-FS-REVISION := 3fdcbcb8de6af0c880a0082700a295c55ffd2ecd
+BABASHKA-FS-STAMP := $(LOCAL-CACHE)/.babashka-fs-$(BABASHKA-FS-REVISION)
+BABASHKA-FS-SOURCE := $(BABASHKA-SOURCE)/fs
 SOURCE-STAGE := $(TOP)/.cache/source-stage
 SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
 REPL-SOURCE-STAGE := $(TOP)/.cache/repl-source-stage
@@ -96,6 +99,7 @@ MAKES-CLEAN := \
 MAKES-REALCLEAN := \
   $(BABASHKA-SOURCE-CACHE) \
   $(BABASHKA-SOURCE-STAMP) \
+  $(BABASHKA-FS-STAMP) \
 
 default:: build
 
@@ -135,12 +139,24 @@ $(BABASHKA-SOURCE-STAMP):
 	$Q touch '$@'
 	@$(ECHO)
 BABASHKA-SOURCE-DEP := $(BABASHKA-SOURCE-STAMP)
+
+$(BABASHKA-FS-STAMP): $(BABASHKA-SOURCE-STAMP)
+	@$(ECHO) "* Downloading the pinned babashka.fs source"
+	$Q git -C '$(BABASHKA-SOURCE)' submodule update --init --depth=1 fs
+	$Q test "$$(git -C '$(BABASHKA-FS-SOURCE)' rev-parse HEAD)" = \
+	  "$(BABASHKA-FS-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+BABASHKA-FS-DEP := $(BABASHKA-FS-STAMP)
 else
 BABASHKA-SOURCE-DEP := $(BABASHKA-SOURCE)
+BABASHKA-FS-DEP := $(BABASHKA-FS-SOURCE)
 endif
 
-deps: $(BABASHKA-SOURCE-DEP)
+deps: $(BABASHKA-SOURCE-DEP) $(BABASHKA-FS-DEP)
 	$Q test -f '$(BABASHKA-SOURCE)/src/babashka/main.clj'
+	$Q test -f '$(BABASHKA-FS-SOURCE)/src/babashka/fs.cljc'
 ifndef BABASHKA_DIR
 	$Q test "$$(git -C '$(BABASHKA-SOURCE)' rev-parse HEAD)" = \
 	  "$(BABASHKA-SOURCE-REVISION)"
@@ -427,8 +443,9 @@ java-compat-test: \
 	  '$(JAVA-COMPAT-DIR)/browser.edn'
 	@$(ECHO)
 
-test: $(GOBB) $(BB) $(RG) smoke capability-test
+test: $(GOBB) $(BB) $(RG) $(BABASHKA-FS-DEP) smoke capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/fs
 	$Q GOBB='$(GOBB)' test/java-lang
 	$Q GOBB='$(GOBB)' GOBB_GLOAT='$(GLOAT)' \
 	  WASMTIME='$(WASMTIME)' NODE='$(NODE)' test/projects

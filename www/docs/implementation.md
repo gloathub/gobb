@@ -169,6 +169,21 @@ never pass through Java process classes. The platform capability layer rejects
 process creation predictably under WASI and browser-Wasm. See
 [Tasks and processes](tasks.md).
 
+## Bundled libraries
+
+Milestone 9 ports BB's bundled libraries in dependency-shaped waves. The first
+wave is a Gobb-owned `babashka.fs` adapter backed directly by Go's filesystem
+packages and Glojure's `Path` and `File` compatibility types. Gobb pins the
+upstream `babashka.fs` source revision as the behavioral reference without
+adding it as a Gobb Git submodule.
+
+The current slice covers core path construction and inspection, predicates,
+directory and file creation, byte and line I/O, copy, move, delete, links,
+temporary files, executable lookup, and XDG paths. A differential fixture runs
+the same operations under pinned BB and Gobb. Glob walking, archives,
+attributes, permissions, and `with-temp-dir` macro compatibility remain open
+and are recorded as partial in the generated inventory.
+
 ## Repository boundaries
 
 Gobb selectively ports BB behavior rather than maintaining a wholesale fork.

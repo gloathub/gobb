@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the Babashka executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+fixture=$root/test/fixtures/fs/core.clj
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+mkdir "$tmp/bb" "$tmp/gobb"
+
+"$BB" "$fixture" "$tmp/bb" >"$tmp/bb.edn"
+"$GOBB" "$fixture" "$tmp/gobb" >"$tmp/gobb.edn"
+
+if ! diff -u "$tmp/bb.edn" "$tmp/gobb.edn"; then
+  echo "test/fs: Gobb babashka.fs behavior differs from BB" >&2
+  exit 1
+fi
+
+echo "Core babashka.fs compatibility tests passed"

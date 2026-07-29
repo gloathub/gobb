@@ -10,9 +10,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| built-in-library | 38 | 0 | 0 | 38 | 0 |
-| built-in-namespace | 104 | 0 | 1 | 103 | 0 |
-| capability | 41 | 9 | 17 | 6 | 9 |
+| built-in-library | 38 | 0 | 1 | 37 | 0 |
+| built-in-namespace | 104 | 0 | 2 | 102 | 0 |
+| capability | 41 | 9 | 18 | 5 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
 | compatible-library | 98 | 0 | 0 | 98 | 0 |
 | java-class | 583 | 35 | 1 | 524 | 23 |
@@ -25,6 +25,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Item | Surface | State | Evidence |
 | --- | --- | --- | --- |
+| `built-in-library/babashka/fs` | built-in-library | **partial** | src/gobb/fs.clj<br>test/fs |
 | `capability/browser-filesystem` | capability | **platform-limited** | www/docs/implementation.md |
 | `capability/browser-network` | capability | **platform-limited** | test/capabilities |
 | `capability/browser-repl` | capability | **partial** | test/gobb<br>www/docs/javascripts/repl.js |
@@ -33,6 +34,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `capability/clock` | capability | **supported** | test/capabilities |
 | `capability/compiled-program` | capability | **supported** | :compiled/main<br>test/projects |
 | `capability/environment` | capability | **supported** | test/capabilities |
+| `capability/filesystem` | capability | **partial** | test/fs<br>test/capabilities |
 | `capability/gobb-reader-feature` | capability | **intentional-difference** | :reader/gobb-feature |
 | `capability/jvm-bytecode` | capability | **not-applicable** | www/docs/implementation.md |
 | `capability/native-freebsd-amd64` | capability | **partial** | util/release-dist |
@@ -129,6 +131,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `cli/-m` | cli | **supported** | :invocation/main |
 | `cli/-x` | cli | **supported** | :invocation/exec |
 | `cli/repl` | cli | **partial** | test/gobb |
+| `namespace/babashka.fs` | built-in-namespace | **partial** | src/gobb/fs.clj<br>test/fs |
 | `namespace/clojure.java.io` | built-in-namespace | **partial** | :loading/resource |
 | `project/aliases` | project-config | **supported** | test/projects |
 | `project/bb-edn-discovery` | project-config | **supported** | test/projects |
@@ -164,7 +167,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 9 | 153 |
+| 9 | 150 |
 | 10 | 11 |
 | 11 | 2 |
 | 13 | 722 |

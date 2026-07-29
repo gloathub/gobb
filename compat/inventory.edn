@@ -247,6 +247,26 @@
    :milestone 8
    :rationale "The native process substrate is implemented; the unchanged example awaits its bundled filesystem namespace"
    :evidence [{:kind :test :path "test/tasks"}]}
+  "built-in-library/babashka/fs"
+  {:state :partial
+   :milestone 9
+   :rationale "The Go-backed core path and filesystem wave is implemented; glob walking, archives, attributes, permissions, and the temporary-directory macro remain"
+   :evidence [{:kind :implementation :path "src/gobb/fs.clj"}
+              {:kind :test :path "test/fs"
+               :description "Differential core filesystem behavior against pinned BB"}]}
+  "namespace/babashka.fs"
+  {:state :partial
+   :milestone 9
+   :rationale "Core paths, predicates, file I/O, copies, moves, links, temporary files, and executable lookup are implemented through Go; advanced APIs remain"
+   :evidence [{:kind :implementation :path "src/gobb/fs.clj"}
+              {:kind :test :path "test/fs"
+               :description "Differential core filesystem behavior against pinned BB"}]}
+  "capability/filesystem"
+  {:state :partial
+   :milestone 9
+   :rationale "Native core filesystem operations work; the full babashka.fs surface and non-native platform limits remain"
+   :evidence [{:kind :test :path "test/fs"}
+              {:kind :test :path "test/capabilities"}]}
   "namespace/clojure.java.io" {:state :partial
                               :milestone 3
                               :rationale "Classpath resource lookup is implemented; the complete JVM API is not"

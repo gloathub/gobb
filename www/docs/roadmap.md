@@ -370,7 +370,15 @@ examples.
       Bring over BB's bundled libraries in tested dependency-shaped waves.
     </p>
     <ul class="task-list">
-      <li>Port <code>babashka.fs</code> and its filesystem dependency wave</li>
+      <li class="task-progress">
+        Port <code>babashka.fs</code> and its filesystem dependency wave
+        <ul>
+          <li class="task-done">Pin and verify the upstream <code>babashka.fs</code> source revision</li>
+          <li class="task-done">Implement Go-backed core paths, predicates, file I/O, copies, moves, links, and temporary files</li>
+          <li class="task-done">Differentially test the core filesystem wave against pinned BB</li>
+          <li>Complete glob walking, archives, attributes, permissions, and temporary-directory macro compatibility</li>
+        </ul>
+      </li>
       <li>Port the public <code>babashka.process</code> API onto the native process adapter</li>
       <li>Port curl, HTTP client, and portable networking helpers</li>
       <li>Fill out <code>clojure.java.io</code> compatibility used by bundled libraries</li>

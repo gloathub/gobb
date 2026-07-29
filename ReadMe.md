@@ -135,7 +135,9 @@ Gobb has completed its repository foundation and started native execution:
 - [x] BB-compatible Glojure execution shell
 - [x] Generated BB surface inventory and compatibility backlog
 - [x] Tested native, WASI, and browser-Wasm capability contract
-- [ ] Project dependencies, tasks, pods, and bundled libraries
+- [x] Project dependencies and BB-compatible task/process execution
+- [ ] Bundled libraries (Go-backed `babashka.fs` core is in progress)
+- [ ] Pods and interactive services
 - [ ] Production `gobb build` command
 
 Follow the [live roadmap](https://gobb.site/roadmap/) for current progress.
