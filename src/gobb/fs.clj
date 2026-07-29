@@ -107,7 +107,8 @@
                            (path-string other))]
     (when error
       (fail-path! :relativize other error))
-    (path-object result)))
+    (path-object
+     (if (= "." result) "" result))))
 
 (defn root [value]
   (let [value (path-string value)
@@ -201,6 +202,99 @@
            (not (zero? (bit-and mode 73)))))
     (catch Exception _ false)))
 
+(def permission-names
+  ["OWNER_READ"
+   "OWNER_WRITE"
+   "OWNER_EXECUTE"
+   "GROUP_READ"
+   "GROUP_WRITE"
+   "GROUP_EXECUTE"
+   "OTHERS_READ"
+   "OTHERS_WRITE"
+   "OTHERS_EXECUTE"])
+
+(def permission-bits
+  [0400 0200 0100 0040 0020 0010 0004 0002 0001])
+
+(defn str->posix [value]
+  (when-not (and (= 9 (count value))
+                 (every?
+                  true?
+                  (map-indexed
+                   (fn [index character]
+                     (or (= \- character)
+                         (= character
+                            (nth "rwxrwxrwx" index))))
+                   value)))
+    (throw
+     (ex-info
+      (str "Invalid mode: " value)
+      {:gobb/fs :str->posix
+       :mode value})))
+  (into
+   #{}
+   (keep-indexed
+    (fn [index character]
+      (when-not (= \- character)
+        (symbol (nth permission-names index))))
+    value)))
+
+(defn posix->str [permissions]
+  (let [permissions (set (map str permissions))]
+    (apply
+     str
+     (map-indexed
+      (fn [index character]
+        (if (contains? permissions
+                       (nth permission-names index))
+          character
+          \-))
+      "rwxrwxrwx"))))
+
+(defn permission-mode [permissions]
+  (let [permissions
+        (if (string? permissions)
+          (str->posix permissions)
+          permissions)
+        permissions (set (map str permissions))]
+    (reduce
+     bit-or
+     0
+     (keep-indexed
+      (fn [index permission]
+        (when (contains? permissions permission)
+          (nth permission-bits index)))
+      permission-names))))
+
+(defn set-posix-file-permissions [value permissions]
+  (capabilities/require! :filesystem :write)
+  (let [error
+        (os.Chmod (path-string value)
+                  (permission-mode permissions))]
+    (when error
+      (fail-path! :set-posix-file-permissions value error))
+    (path value)))
+
+(defn posix-file-permissions
+  ([value]
+   (posix-file-permissions value nil))
+  ([value options]
+   (let [mode
+         (int
+          (.Mode
+           (if (:nofollow-links options)
+             (lstat value)
+             (stat value))))]
+     (into
+      #{}
+      (keep-indexed
+       (fn [index permission]
+         (when-not
+          (zero? (bit-and mode
+                          (nth permission-bits index)))
+           (symbol permission)))
+       permission-names)))))
+
 (defn size [value]
   (.Size (stat value)))
 
@@ -212,7 +306,11 @@
    (create-dir directory nil))
   ([directory options]
    (capabilities/require! :filesystem :write)
-   (let [mode (or (:mode options) 0777)
+   (let [mode (or (:mode options)
+                  (when-let [permissions
+                             (:posix-file-permissions options)]
+                    (permission-mode permissions))
+                  0777)
          error (os.Mkdir (path-string directory) mode)]
      (when error
        (fail-path! :create-dir directory error))
@@ -223,7 +321,11 @@
    (create-dirs directory nil))
   ([directory options]
    (capabilities/require! :filesystem :write)
-   (let [mode (or (:mode options) 0777)
+   (let [mode (or (:mode options)
+                  (when-let [permissions
+                             (:posix-file-permissions options)]
+                    (permission-mode permissions))
+                  0777)
          error (os.MkdirAll (path-string directory) mode)]
      (when error
        (fail-path! :create-dirs directory error))
@@ -237,7 +339,11 @@
    (let [[stream error]
          (os.OpenFile (path-string value)
                       (bit-or os.O_CREATE os.O_EXCL os.O_WRONLY)
-                      (or (:mode options) 0666))]
+                      (or (:mode options)
+                          (when-let [permissions
+                                     (:posix-file-permissions options)]
+                            (permission-mode permissions))
+                          0666))]
      (when error
        (fail-path! :create-file value error))
      (.Close stream)
@@ -256,6 +362,8 @@
          (os.MkdirTemp (path-string directory) prefix)]
      (when error
        (fail-path! :create-temp-dir directory error))
+     (when-let [permissions (:posix-file-permissions options)]
+       (set-posix-file-permissions result permissions))
      (path-object result))))
 
 (defn create-temp-file
@@ -275,6 +383,8 @@
        (fail-path! :create-temp-file directory error))
      (let [result (.Name stream)]
        (.Close stream)
+       (when-let [permissions (:posix-file-permissions options)]
+         (set-posix-file-permissions result permissions))
        (path-object result)))))
 
 (defmacro with-temp-dir
@@ -313,6 +423,188 @@
 
 (defn list-dirs [directories glob-or-accept]
   (mapcat #(list-dir % glob-or-accept) directories))
+
+(def visitor-results
+  #{:continue :skip-subtree :skip-siblings :terminate})
+
+(defn visitor-result [result]
+  (let [result (or result :continue)]
+    (when-not (contains? visitor-results result)
+      (throw
+       (ex-info
+        (str "Invalid file visitor result: " result)
+        {:gobb/fs :walk-file-tree
+         :result result})))
+    result))
+
+(defn walk-file-tree
+  ([value]
+   (walk-file-tree value nil))
+  ([value options]
+   (let [root (path value)
+         follow-links (:follow-links options)
+         max-depth (or (:max-depth options) 2147483647)
+         pre-visit-dir (or (:pre-visit-dir options)
+                           (fn [_ _] :continue))
+         post-visit-dir (or (:post-visit-dir options)
+                            (fn [_ _] :continue))
+         visit-file (or (:visit-file options)
+                        (fn [_ _] :continue))
+         visit-file-failed
+         (or (:visit-file-failed options)
+             (fn [_ _] :continue))]
+     (letfn [(visit [candidate depth]
+               (try
+                 (let [link? (sym-link? candidate)
+                       directory (and (or follow-links (not link?))
+                                      (directory? candidate))
+                       info (if (and link? (not follow-links))
+                              (lstat candidate)
+                              (stat candidate))]
+                   (if directory
+                     (let [before
+                           (visitor-result
+                            (pre-visit-dir candidate info))]
+                       (case before
+                         :terminate :terminate
+                         :skip-siblings :skip-siblings
+                         :skip-subtree
+                         (visitor-result
+                          (post-visit-dir candidate nil))
+                         (let [children-result
+                               (if (< depth max-depth)
+                                 (loop [children
+                                        (seq (list-dir candidate))]
+                                   (if-let [child (first children)]
+                                     (let [result
+                                           (visit child (inc depth))]
+                                       (case result
+                                         :terminate :terminate
+                                         :skip-siblings :continue
+                                         (recur (next children))))
+                                     :continue))
+                                 :continue)]
+                           (if (= :terminate children-result)
+                             :terminate
+                             (visitor-result
+                              (post-visit-dir candidate nil))))))
+                     (visitor-result (visit-file candidate info))))
+                 (catch Exception error
+                   (visitor-result
+                    (visit-file-failed candidate error)))))]
+       (visit root 0)
+       root))))
+
+(defn path-parts [value]
+  (vec
+   (remove empty?
+           (strings.Split
+            (strings.ReplaceAll (str value) "\\" "/")
+            "/"))))
+
+(defn glob-segment? [pattern candidate]
+  (let [[matched error]
+        (path:filepath.Match pattern candidate)]
+    (and (nil? error) matched)))
+
+(defn glob-parts? [patterns candidates]
+  (cond
+    (empty? patterns) (empty? candidates)
+    (= "**" (first patterns))
+    (if (next patterns)
+      (and (seq candidates)
+           (or (glob-parts? patterns (rest candidates))
+               (glob-parts? (rest patterns)
+                            (rest candidates))))
+      true)
+    (empty? candidates) false
+    (glob-segment? (first patterns) (first candidates))
+    (glob-parts? (rest patterns) (rest candidates))
+    :else false))
+
+(defn path-hidden? [relative]
+  (some #(strings.HasPrefix % ".")
+        (path-parts relative)))
+
+(defn match
+  ([root-dir pattern]
+   (match root-dir pattern nil))
+  ([root-dir pattern options]
+   (let [root-dir (path root-dir)
+         recursive (:recursive options false)
+         hidden (:hidden options false)
+         max-depth (if recursive
+                     (or (:max-depth options) 2147483647)
+                     1)
+         [kind pattern]
+         (cond
+           (strings.HasPrefix pattern "glob:")
+           [:glob (subs pattern 5)]
+           (strings.HasPrefix pattern "regex:")
+           [:regex (subs pattern 6)]
+         :else [:glob pattern])
+         regex
+         (when (= :regex kind)
+           (let [[compiled error] (regexp.Compile pattern)]
+             (when error
+               (throw
+                (ex-info
+                 (str "Invalid regex pattern: " pattern)
+                 {:gobb/fs :match
+                  :pattern pattern})))
+             compiled))
+         matches (atom [])]
+     (walk-file-tree
+      root-dir
+      {:max-depth max-depth
+       :follow-links (:follow-links options)
+       :pre-visit-dir
+       (fn [candidate _]
+         (if (= (str candidate) (str root-dir))
+           :continue
+           (let [relative (str (relativize root-dir candidate))]
+             (if (and (not hidden) (path-hidden? relative))
+               :skip-subtree
+               (do
+                 (when
+                  (if (= :regex kind)
+                    (.MatchString regex relative)
+                    (glob-parts? (path-parts pattern)
+                                 (path-parts relative)))
+                   (swap! matches conj candidate))
+                 (if recursive :continue :skip-subtree))))))
+       :visit-file
+       (fn [candidate _]
+         (let [relative (str (relativize root-dir candidate))]
+           (when
+            (and (or hidden (not (path-hidden? relative)))
+                 (if (= :regex kind)
+                   (.MatchString regex relative)
+                   (glob-parts? (path-parts pattern)
+                                (path-parts relative))))
+             (swap! matches conj candidate)))
+         :continue)})
+     @matches)))
+
+(defn glob
+  ([root-dir pattern]
+   (glob root-dir pattern nil))
+  ([root-dir pattern options]
+   (let [recursive
+         (:recursive
+          options
+          (or (strings.Contains pattern "**")
+              (strings.Contains
+               (strings.ReplaceAll pattern "\\" "/")
+               "/")))
+         hidden
+         (:hidden options
+                  (strings.HasPrefix pattern "."))]
+     (match root-dir
+            (str "glob:" pattern)
+            (assoc options
+                   :recursive recursive
+                   :hidden hidden)))))
 
 (defn read-all-bytes [value]
   (capabilities/read-bytes (path-string value)))
@@ -486,6 +778,245 @@
     (when error
       (fail-path! :read-link link error))
     (path-object target)))
+
+(defn copy-stream! [input output operation value]
+  (let [[written error] (io.Copy output input)]
+    (when error
+      (fail-path! operation value error))
+    written))
+
+(defn gzip
+  ([source-file]
+   (gzip source-file {}))
+  ([source-file options]
+   (let [destination-directory
+         (or (:dir options)
+             (parent source-file)
+             "")
+         destination-name
+         (str (or (:out-file options)
+                  (str (file-name source-file) ".gz")))
+         output-file
+         (path destination-directory destination-name)]
+     (when-let [directory (parent output-file)]
+       (create-dirs directory))
+     (let [[input input-error]
+           (os.Open (path-string source-file))]
+       (when input-error
+         (fail-path! :gzip source-file input-error))
+       (let [[output output-error]
+             (os.Create (path-string output-file))]
+         (when output-error
+           (.Close input)
+           (fail-path! :gzip output-file output-error))
+         (let [compressor (compress:gzip.NewWriter output)]
+           (copy-stream! input compressor :gzip source-file)
+           (let [close-error (.Close compressor)]
+             (.Close input)
+             (.Close output)
+             (when close-error
+               (fail-path! :gzip output-file close-error))))))
+     (str output-file))))
+
+(defn gunzip
+  ([gz-file]
+   (gunzip gz-file nil))
+  ([gz-file target-dir]
+   (gunzip gz-file target-dir {}))
+  ([gz-file target-dir options]
+   (let [destination-directory
+         (or target-dir (parent gz-file) "")
+         destination-name
+         (strings.TrimSuffix (file-name gz-file) ".gz")
+         output-file
+         (path destination-directory destination-name)]
+     (when (not-empty (str destination-directory))
+       (create-dirs destination-directory))
+     (when (and (exists? output-file)
+                (not (:replace-existing options)))
+       (throw
+        (ex-info
+         (str "Target already exists: " output-file)
+         {:gobb/fs :gunzip
+          :path (str output-file)})))
+     (let [[input input-error]
+           (os.Open (path-string gz-file))]
+       (when input-error
+         (fail-path! :gunzip gz-file input-error))
+       (let [[decompressor gzip-error]
+             (compress:gzip.NewReader input)]
+         (when gzip-error
+           (.Close input)
+           (fail-path! :gunzip gz-file gzip-error))
+         (let [[output output-error]
+               (os.Create (path-string output-file))]
+           (when output-error
+             (.Close decompressor)
+             (.Close input)
+             (fail-path! :gunzip output-file output-error))
+           (let [written
+                 (copy-stream! decompressor output
+                               :gunzip gz-file)]
+             (.Close output)
+             (.Close decompressor)
+             (.Close input)
+             written)))))))
+
+(defn tree-entries [value]
+  (let [entries (atom [])]
+    (if (directory? value {:nofollow-links true})
+      (walk-file-tree
+       value
+       {:pre-visit-dir
+        (fn [candidate _]
+          (swap! entries conj candidate)
+          :continue)
+        :visit-file
+        (fn [candidate _]
+          (swap! entries conj candidate)
+          :continue)})
+      (swap! entries conj (path value)))
+    @entries))
+
+(defn zip-entry-name [candidate options]
+  (let [directory (directory? candidate)
+        candidate
+        (if-let [root (:root options)]
+          (str (relativize root candidate))
+          (str candidate))
+        candidate
+        (if-let [path-fn (:path-fn options)]
+          (path-fn candidate)
+          candidate)
+        candidate
+        (when candidate
+          (strings.ReplaceAll candidate "\\" "/"))]
+    (when (and candidate (not (empty? candidate)))
+      (if (and directory
+               (not (strings.HasSuffix candidate "/")))
+        (str candidate "/")
+        candidate))))
+
+(defn zip
+  ([zip-file path-or-paths]
+   (zip zip-file path-or-paths nil))
+  ([zip-file path-or-paths options]
+   (let [entries
+         (if (or (string? path-or-paths)
+                 (instance? File path-or-paths)
+                 (instance? Path path-or-paths))
+           [path-or-paths]
+           path-or-paths)]
+     (assert (every? relative? entries)
+             "All entries must be relative")
+     (let [[output output-error]
+           (os.Create (path-string zip-file))]
+       (when output-error
+         (fail-path! :zip zip-file output-error))
+       (let [archive (archive:zip.NewWriter output)
+             archive-path
+             (str (normalize (absolutize zip-file)))]
+         (doseq [entry entries
+                 candidate (tree-entries entry)]
+           (when-not
+            (= archive-path
+               (str (normalize (absolutize candidate))))
+             (when-let [entry-name
+                        (zip-entry-name candidate options)]
+               (let [[destination create-error]
+                     (.Create archive entry-name)]
+                 (when create-error
+                   (.Close archive)
+                   (.Close output)
+                   (fail-path! :zip zip-file create-error))
+                 (when-not (directory? candidate)
+                   (let [[input input-error]
+                         (os.Open (path-string candidate))]
+                     (when input-error
+                       (.Close archive)
+                       (.Close output)
+                       (fail-path! :zip candidate input-error))
+                     (copy-stream! input destination
+                                   :zip candidate)
+                     (.Close input)))))))
+         (let [close-error (.Close archive)]
+           (.Close output)
+           (when close-error
+             (fail-path! :zip zip-file close-error)))))
+     nil)))
+
+(defn safe-unzip-path [target-dir entry-name]
+  (let [target (normalize (absolutize target-dir))
+        output (normalize (absolutize (path target entry-name)))
+        relative (str (relativize target output))]
+    (when (or (absolute? entry-name)
+              (= ".." relative)
+              (strings.HasPrefix relative
+                                 (str ".." file-separator)))
+      (throw
+       (ex-info
+        (str "Zip entry escapes target directory: " entry-name)
+        {:gobb/fs :unzip
+         :entry entry-name})))
+    output))
+
+(defn host-field [value field]
+  (let [[result found]
+        (github.com:glojurelang:glojure:pkg:lang.FieldOrMethod
+         value field)]
+    (when-not found
+      (throw
+       (ex-info
+        (str "Missing Go field " field)
+        {:gobb/fs :host-field
+         :field field})))
+    result))
+
+(defn unzip
+  ([zip-file]
+   (unzip zip-file "."))
+  ([zip-file target-dir]
+   (unzip zip-file target-dir nil))
+  ([zip-file target-dir options]
+   (create-dirs target-dir)
+   (let [[archive archive-error]
+         (archive:zip.OpenReader (path-string zip-file))]
+     (when archive-error
+       (fail-path! :unzip zip-file archive-error))
+     (doseq [entry (host-field archive "File")]
+       (let [entry-name (host-field entry "Name")
+             output-file (safe-unzip-path target-dir entry-name)]
+         (if (strings.HasSuffix entry-name "/")
+           (create-dirs output-file)
+           (when (or (nil? (:extract-fn options))
+                     ((:extract-fn options)
+                      {:entry entry :name entry-name}))
+             (when-let [directory (parent output-file)]
+               (create-dirs directory))
+             (when (and (exists? output-file)
+                        (not (:replace-existing options)))
+               (.Close archive)
+               (throw
+                (ex-info
+                 (str "Target already exists: " output-file)
+                 {:gobb/fs :unzip
+                  :path (str output-file)})))
+             (let [[input input-error] (.Open entry)]
+               (when input-error
+                 (.Close archive)
+                 (fail-path! :unzip entry-name input-error))
+               (let [[output output-error]
+                     (os.Create (path-string output-file))]
+                 (when output-error
+                   (.Close input)
+                   (.Close archive)
+                   (fail-path! :unzip output-file output-error))
+                 (copy-stream! input output
+                               :unzip entry-name)
+                 (.Close output)
+                 (.Close input)))))))
+     (.Close archive)
+     nil)))
 
 (defn split-ext
   ([value]

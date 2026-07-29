@@ -178,11 +178,25 @@ upstream `babashka.fs` source revision as the behavioral reference without
 adding it as a Gobb Git submodule.
 
 The current slice covers core path construction and inspection, predicates,
-directory and file creation, byte and line I/O, copy, move, delete, links,
-temporary files, executable lookup, and XDG paths. A differential fixture runs
-the same operations under pinned BB and Gobb. Glob walking, archives,
-attributes, permissions, and `with-temp-dir` macro compatibility remain open
-and are recorded as partial in the generated inventory.
+directory and file creation, recursive visitors and glob matching, byte and
+line I/O, copy, move, delete, links, temporary files and scopes, executable
+lookup, XDG paths, POSIX permissions, and zip, gzip, and extraction.
+Differential fixtures run the same operations under pinned BB and Gobb. JVM
+`FileTime`-style attributes remain open and are recorded as partial in the
+generated inventory.
+
+Gobb evaluates source one top-level form at a time. This is important for BB
+compatibility: an earlier `require`, `ns`, or `defmacro` must affect analysis
+of the forms that follow it. It also lets bundled macros such as
+`babashka.fs/with-temp-dir` work in ordinary scripts.
+
+The next library wave exposes `babashka.process` over the same Go
+`os/exec` substrate used by tasks. Its current differential contract covers
+tokenization, asynchronous future-backed results, process builders, captured
+pipelines, string and byte capture, file redirection, environment changes,
+working directories, lifecycle callbacks, `sh`, `shell`, and the `$` macro.
+Direct JVM-style stream records, true process destruction, and replace-image
+`exec` remain partial.
 
 ## Repository boundaries
 

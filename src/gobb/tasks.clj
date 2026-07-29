@@ -142,9 +142,28 @@
              (go/make (go/slice-of go/string) 0)
              entries))))
 
-(defn buffer-string [buffer]
+(defn buffer-value [buffer mode]
   (when buffer
-    (.String buffer)))
+    (if (= :bytes mode)
+      (.Bytes buffer)
+      (.String buffer))))
+
+(defn open-output-file [value append?]
+  (let [flags (bit-or os.O_CREATE
+                      os.O_WRONLY
+                      (if append?
+                        os.O_APPEND
+                        os.O_TRUNC))
+        [stream error]
+        (os.OpenFile (str value) flags 0666)]
+    (when error
+      (throw
+       (ex-info
+        (str "Could not open process output " value
+             ": " (fmt.Sprint error))
+        {:gobb/process :redirect
+         :path (str value)})))
+    stream))
 
 (defn process-exit-code [command error]
   (if (nil? error)
@@ -157,8 +176,8 @@
 (defn process-result [options command argv out-buffer err-buffer error]
   {:cmd argv
    :exit (process-exit-code command error)
-   :out (buffer-string out-buffer)
-   :err (buffer-string err-buffer)})
+   :out (buffer-value out-buffer (:out options))
+   :err (buffer-value err-buffer (:err options))})
 
 (defn continue? [option result]
   (cond
@@ -185,31 +204,66 @@
                   options)
         argv (command-arguments arguments)
         command (apply os:exec.Command argv)
-        out-buffer (when (= :string (:out options))
+        out-buffer (when (contains? #{:string :bytes}
+                                    (:out options))
                      (new bytes.Buffer))
-        err-buffer (when (= :string (:err options))
+        err-buffer (when (contains? #{:string :bytes}
+                                    (:err options))
                      (new bytes.Buffer))
-        input (:in options)]
+        out-file
+        (when (contains? #{:write :append} (:out options))
+          (open-output-file (:out-file options)
+                            (= :append (:out options))))
+        err-file
+        (when (contains? #{:write :append} (:err options))
+          (open-output-file (:err-file options)
+                            (= :append (:err options))))
+        input (:in options)
+        input-file
+        (when (or (instance? File input)
+                  (instance? Path input))
+          (let [[stream error] (os.Open (str input))]
+            (when error
+              (throw
+               (ex-info
+                (str "Could not open process input " input
+                     ": " (fmt.Sprint error))
+                {:gobb/process :redirect
+                 :path (str input)})))
+            stream))
+        stdout
+        (cond
+          out-buffer out-buffer
+          out-file out-file
+          (= :inherit (:out options)) os.Stdout
+          (= :discard (:out options)) io.Discard
+          :else os.Stdout)
+        stderr
+        (cond
+          (= :out (:err options)) stdout
+          err-buffer err-buffer
+          err-file err-file
+          (= :inherit (:err options)) os.Stderr
+          (= :discard (:err options)) io.Discard
+          :else os.Stderr)]
     (when-let [directory (:dir options)]
       (set! (.Dir command) (str directory)))
     (set! (.Env command) (environment-entries options))
     (set! (.Stdin command)
           (cond
+            input-file input-file
             (= :inherit input) os.Stdin
             (string? input) (strings.NewReader input)
             input input
             :else nil))
-    (set! (.Stdout command)
-          (or out-buffer
-              (when-not (= :string (:out options))
-                os.Stdout)))
-    (set! (.Stderr command)
-          (or err-buffer
-              (when-not (= :string (:err options))
-                os.Stderr)))
+    (set! (.Stdout command) stdout)
+    (set! (.Stderr command) stderr)
     (let [error (.Run command)
           result (process-result options command argv
                                  out-buffer err-buffer error)]
+      (when input-file (.Close input-file))
+      (when out-file (.Close out-file))
+      (when err-file (.Close err-file))
       (if (continue? (:continue options) result)
         result
         (if-let [error-fn (:error-fn options)]

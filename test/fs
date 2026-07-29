@@ -7,6 +7,7 @@ set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
 fixture=$root/test/fixtures/fs/core.clj
+archive_fixture=$root/test/fixtures/fs/archive.clj
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
@@ -17,6 +18,20 @@ mkdir "$tmp/bb" "$tmp/gobb"
 
 if ! diff -u "$tmp/bb.edn" "$tmp/gobb.edn"; then
   echo "test/fs: Gobb babashka.fs behavior differs from BB" >&2
+  exit 1
+fi
+
+(
+  cd "$tmp/bb"
+  "$BB" "$archive_fixture"
+) >"$tmp/bb-archive.edn"
+(
+  cd "$tmp/gobb"
+  "$GOBB" "$archive_fixture"
+) >"$tmp/gobb-archive.edn"
+
+if ! diff -u "$tmp/bb-archive.edn" "$tmp/gobb-archive.edn"; then
+  echo "test/fs: Gobb archive behavior differs from BB" >&2
   exit 1
 fi
 

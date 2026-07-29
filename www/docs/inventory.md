@@ -11,7 +11,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | built-in-library | 38 | 0 | 1 | 37 | 0 |
-| built-in-namespace | 104 | 0 | 2 | 102 | 0 |
+| built-in-namespace | 104 | 0 | 3 | 101 | 0 |
 | capability | 41 | 9 | 18 | 5 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
 | compatible-library | 98 | 0 | 0 | 98 | 0 |
@@ -132,6 +132,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `cli/-x` | cli | **supported** | :invocation/exec |
 | `cli/repl` | cli | **partial** | test/gobb |
 | `namespace/babashka.fs` | built-in-namespace | **partial** | src/gobb/fs.clj<br>test/fs |
+| `namespace/babashka.process` | built-in-namespace | **partial** | src/gobb/process.clj<br>test/process |
 | `namespace/clojure.java.io` | built-in-namespace | **partial** | :loading/resource |
 | `project/aliases` | project-config | **supported** | test/projects |
 | `project/bb-edn-discovery` | project-config | **supported** | test/projects |
@@ -167,7 +168,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 9 | 150 |
+| 9 | 149 |
 | 10 | 11 |
 | 11 | 2 |
 | 13 | 722 |

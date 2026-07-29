@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the Babashka executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+fixture=$root/test/fixtures/process/core.clj
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+mkdir "$tmp/work"
+
+"$BB" "$fixture" "$tmp/work" >"$tmp/bb.edn"
+"$GOBB" "$fixture" "$tmp/work" >"$tmp/gobb.edn"
+
+equal=$(
+  "$BB" -e \
+    '(let [[expected actual] *command-line-args*]
+       (= (read-string (slurp expected))
+          (read-string (slurp actual))))' \
+    "$tmp/bb.edn" "$tmp/gobb.edn"
+)
+
+if [[ $equal != true ]]; then
+  diff -u "$tmp/bb.edn" "$tmp/gobb.edn" || true
+  echo "test/process: Gobb babashka.process behavior differs from BB" >&2
+  exit 1
+fi
+
+for runtime in "$BB" "$GOBB"; do
+  if "$runtime" -e \
+    '(require (quote [babashka.process :as process]))
+     (process/check
+      (process/process
+       {:out :string :err :string}
+       "sh" "-c" "printf failure >&2; exit 7"))' \
+    >"$tmp/check.out" 2>"$tmp/check.err"; then
+    echo "test/process: babashka.process/check accepted a failed process" >&2
+    exit 1
+  fi
+done
+
+echo "Core babashka.process compatibility tests passed"

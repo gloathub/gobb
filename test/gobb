@@ -67,6 +67,12 @@ check "build help" \
 check "definitions persist between forms" "42" \
   "$GOBB" -e '(def x 41) (inc x)'
 
+check "top-level macros affect following forms" "42" \
+  "$GOBB" -e \
+  '(defmacro with-value [[binding value] & body]
+     `(let [~binding ~value] ~@body))
+   (with-value [answer 42] answer)'
+
 require_expression="(require '[gobb.fixture.math-ops :as math]) (math/answer 40)"
 check "explicit classpath require" "42" \
   "$GOBB" --classpath test/fixtures/classpath -e "$require_expression"

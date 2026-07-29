@@ -376,10 +376,22 @@ examples.
           <li class="task-done">Pin and verify the upstream <code>babashka.fs</code> source revision</li>
           <li class="task-done">Implement Go-backed core paths, predicates, file I/O, copies, moves, links, and temporary files</li>
           <li class="task-done">Differentially test the core filesystem wave against pinned BB</li>
-          <li>Complete glob walking, archives, attributes, permissions, and temporary-directory macro compatibility</li>
+          <li class="task-done">Implement recursive visitors, glob and regex matching, and temporary-directory macro compatibility</li>
+          <li class="task-done">Implement zip, unzip, gzip, and gunzip through Go's archive packages</li>
+          <li class="task-done">Implement POSIX permission conversion, inspection, mutation, and creation options</li>
+          <li>Complete JVM <code>FileTime</code>-style attributes</li>
         </ul>
       </li>
-      <li>Port the public <code>babashka.process</code> API onto the native process adapter</li>
+      <li class="task-progress">
+        Port the public <code>babashka.process</code> API onto the native process adapter
+        <ul>
+          <li class="task-done">Pin and verify the upstream <code>babashka.process</code> source revision</li>
+          <li class="task-done">Implement tokenization, process, builder, pipeline, <code>sh</code>, <code>shell</code>, and <code>$</code> entry points</li>
+          <li class="task-done">Differentially test results, environment, working directory, failures, and pipelines against pinned BB</li>
+          <li class="task-done">Implement string and byte capture, file redirects, pre-start, exit, and shutdown callbacks</li>
+          <li>Complete direct stream records, true process destruction, and replace-image <code>exec</code></li>
+        </ul>
+      </li>
       <li>Port curl, HTTP client, and portable networking helpers</li>
       <li>Fill out <code>clojure.java.io</code> compatibility used by bundled libraries</li>
       <li>Bring over common data libraries for JSON, CSV, YAML, and Transit</li>

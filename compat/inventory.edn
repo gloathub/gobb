@@ -250,17 +250,24 @@
   "built-in-library/babashka/fs"
   {:state :partial
    :milestone 9
-   :rationale "The Go-backed core path and filesystem wave is implemented; glob walking, archives, attributes, permissions, and the temporary-directory macro remain"
+   :rationale "The Go-backed core path, traversal, archive, POSIX permission, and filesystem wave is implemented; JVM FileTime-style attributes remain"
    :evidence [{:kind :implementation :path "src/gobb/fs.clj"}
               {:kind :test :path "test/fs"
                :description "Differential core filesystem behavior against pinned BB"}]}
   "namespace/babashka.fs"
   {:state :partial
    :milestone 9
-   :rationale "Core paths, predicates, file I/O, copies, moves, links, temporary files, and executable lookup are implemented through Go; advanced APIs remain"
+   :rationale "Core paths, predicates, traversal, glob matching, file I/O, copies, moves, links, archives, POSIX permissions, temporary scopes, and executable lookup are implemented through Go; JVM FileTime-style attributes remain"
    :evidence [{:kind :implementation :path "src/gobb/fs.clj"}
               {:kind :test :path "test/fs"
                :description "Differential core filesystem behavior against pinned BB"}]}
+  "namespace/babashka.process"
+  {:state :partial
+   :milestone 9
+   :rationale "Tokenization, process and builder entry points, future-backed derefable results, captured pipelines, sh, shell, check, environment, string and byte capture, file redirection, working directories, and lifecycle callbacks are backed by Go; direct stream records, true process destruction, and replace-image exec remain"
+   :evidence [{:kind :implementation :path "src/gobb/process.clj"}
+              {:kind :test :path "test/process"
+               :description "Differential core process behavior against pinned BB"}]}
   "capability/filesystem"
   {:state :partial
    :milestone 9

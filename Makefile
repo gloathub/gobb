@@ -28,6 +28,9 @@ BABASHKA-SOURCE-STAMP := $(LOCAL-CACHE)/.babashka-src-$(BABASHKA-SOURCE-TAG)
 BABASHKA-FS-REVISION := 3fdcbcb8de6af0c880a0082700a295c55ffd2ecd
 BABASHKA-FS-STAMP := $(LOCAL-CACHE)/.babashka-fs-$(BABASHKA-FS-REVISION)
 BABASHKA-FS-SOURCE := $(BABASHKA-SOURCE)/fs
+BABASHKA-PROCESS-REVISION := 16a84e0af0da51b8c84e289970f6b7cc35b35d18
+BABASHKA-PROCESS-STAMP := $(LOCAL-CACHE)/.babashka-process-$(BABASHKA-PROCESS-REVISION)
+BABASHKA-PROCESS-SOURCE := $(BABASHKA-SOURCE)/process
 SOURCE-STAGE := $(TOP)/.cache/source-stage
 SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
 REPL-SOURCE-STAGE := $(TOP)/.cache/repl-source-stage
@@ -100,6 +103,7 @@ MAKES-REALCLEAN := \
   $(BABASHKA-SOURCE-CACHE) \
   $(BABASHKA-SOURCE-STAMP) \
   $(BABASHKA-FS-STAMP) \
+  $(BABASHKA-PROCESS-STAMP) \
 
 default:: build
 
@@ -149,14 +153,29 @@ $(BABASHKA-FS-STAMP): $(BABASHKA-SOURCE-STAMP)
 	@$(ECHO)
 
 BABASHKA-FS-DEP := $(BABASHKA-FS-STAMP)
+
+$(BABASHKA-PROCESS-STAMP): $(BABASHKA-SOURCE-STAMP)
+	@$(ECHO) "* Downloading the pinned babashka.process source"
+	$Q git -C '$(BABASHKA-SOURCE)' submodule update --init --depth=1 process
+	$Q test "$$(git -C '$(BABASHKA-PROCESS-SOURCE)' rev-parse HEAD)" = \
+	  "$(BABASHKA-PROCESS-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+BABASHKA-PROCESS-DEP := $(BABASHKA-PROCESS-STAMP)
 else
 BABASHKA-SOURCE-DEP := $(BABASHKA-SOURCE)
 BABASHKA-FS-DEP := $(BABASHKA-FS-SOURCE)
+BABASHKA-PROCESS-DEP := $(BABASHKA-PROCESS-SOURCE)
 endif
 
-deps: $(BABASHKA-SOURCE-DEP) $(BABASHKA-FS-DEP)
+deps: \
+  $(BABASHKA-SOURCE-DEP) \
+  $(BABASHKA-FS-DEP) \
+  $(BABASHKA-PROCESS-DEP)
 	$Q test -f '$(BABASHKA-SOURCE)/src/babashka/main.clj'
 	$Q test -f '$(BABASHKA-FS-SOURCE)/src/babashka/fs.cljc'
+	$Q test -f '$(BABASHKA-PROCESS-SOURCE)/src/babashka/process.cljc'
 ifndef BABASHKA_DIR
 	$Q test "$$(git -C '$(BABASHKA-SOURCE)' rev-parse HEAD)" = \
 	  "$(BABASHKA-SOURCE-REVISION)"
@@ -443,9 +462,17 @@ java-compat-test: \
 	  '$(JAVA-COMPAT-DIR)/browser.edn'
 	@$(ECHO)
 
-test: $(GOBB) $(BB) $(RG) $(BABASHKA-FS-DEP) smoke capability-test
+test: \
+  $(GOBB) \
+  $(BB) \
+  $(RG) \
+  $(BABASHKA-FS-DEP) \
+  $(BABASHKA-PROCESS-DEP) \
+  smoke \
+  capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/fs
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/process
 	$Q GOBB='$(GOBB)' test/java-lang
 	$Q GOBB='$(GOBB)' GOBB_GLOAT='$(GLOAT)' \
 	  WASMTIME='$(WASMTIME)' NODE='$(NODE)' test/projects

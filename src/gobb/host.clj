@@ -462,15 +462,19 @@
                 print-result? false}}]
   (set-command-line-args! args)
   (reset! current-source file)
-  ;; A single enclosing do lets the runtime reader accept any number of forms
-  ;; while keeping them in the same Glojure environment.
   (let [source (-> source
                    rewrite-reader-features
                    rewrite-tagged-literals)
         read-and-evaluate
         (fn []
-          (let [form (read-string (str "(do\n" source "\n)"))
-                result (eval form)]
+          ;; Read all top-level forms as data, then evaluate them one at a
+          ;; time. This lets an earlier require, ns, or defmacro affect the
+          ;; analysis of every form that follows it.
+          (let [forms (read-string (str "[\n" source "\n]"))
+                result
+                (reduce (fn [_ form] (eval form))
+                        nil
+                        forms)]
             (when (and print-result? (some? result))
               (prn result))
             result))]
