@@ -195,8 +195,8 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 10 | 11 |
-| 11 | 2 |
+| 11 | 11 |
+| 12 | 2 |
 | 13 | 844 |
 
 ## Authoritative inputs

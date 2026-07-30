@@ -137,7 +137,7 @@
                       :milestone 3
                       :evidence [{:kind :compat-fixture :id :loading/preloads}]}
   "project/pods" {:state :planned
-                  :milestone 10
+                  :milestone 11
                   :rationale "Pod loading belongs to the interactive services milestone"}
   "project/min-bb-version" {:state :supported
                             :milestone 7
@@ -731,10 +731,10 @@
  :capabilities
  [{:id "capability/native-repl" :name "Native terminal REPL"}
   {:id "capability/browser-repl" :name "Browser-Wasm REPL"}
-  {:id "capability/socket-repl" :name "Socket REPL" :milestone 10}
-  {:id "capability/nrepl-server" :name "nREPL server" :milestone 10}
-  {:id "capability/pods" :name "Pod loading and invocation" :milestone 10}
-  {:id "capability/http-server" :name "HTTP server integrations" :milestone 10}
+  {:id "capability/socket-repl" :name "Socket REPL" :milestone 11}
+  {:id "capability/nrepl-server" :name "nREPL server" :milestone 11}
+  {:id "capability/pods" :name "Pod loading and invocation" :milestone 11}
+  {:id "capability/http-server" :name "HTTP server integrations" :milestone 11}
   {:id "capability/runtime-require" :name "Runtime namespace loading"}
   {:id "capability/compiled-program" :name "gobb build compiled program"}
   {:id "capability/process" :name "Subprocess execution" :milestone 8}
@@ -775,18 +775,18 @@
  [{:pattern "(bb_edn|deps|print_deps)" :area :projects :milestone 7}
   {:pattern "tasks" :area :tasks :milestone 8}
   {:pattern "(nrepl|socket_repl|server|pod)" :area :interactive-services
-   :milestone 10}
+   :milestone 11}
   {:pattern "(classes|interop|proxy|reify|java_)" :area :java-compatibility
    :milestone 13}
   {:pattern "(io_test|file_var|classpath)" :area :filesystem
    :milestone 13}
   {:pattern "(shutdown_hook|interrupt|kill_child)" :area :platform
    :milestone 13}
-  {:pattern "(uberjar|uberscript)" :area :build :milestone 11}]
+  {:pattern "(uberjar|uberscript)" :area :build :milestone 12}]
 
  :program-routes
  [{:pattern "(process|pst|which|fzf)" :area :process :milestone 8}
   {:pattern "(http|download|digitalocean|torrent)" :area :network
    :milestone 13}
   {:pattern "(ls_jar|tree|notes)" :area :filesystem :milestone 13}
-  {:pattern "(server|portal)" :area :interactive-services :milestone 10}]}
+  {:pattern "(server|portal)" :area :interactive-services :milestone 11}]}

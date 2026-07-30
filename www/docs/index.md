@@ -32,8 +32,8 @@ hide:
 
 <div class="status-strip">
   <span class="status-pulse"></span>
-  <strong>Current phase:</strong> Java compatibility
-  <span class="status-note">The native, WASI, and browser-Wasm capability contract is tested.</span>
+  <strong>Current phase:</strong> Interactive services
+  <span class="status-note">The live browser-Wasm REPL and generated compatibility reports are published.</span>
 </div>
 
 ## Install
@@ -120,10 +120,11 @@ missing symbol or an obscure host failure.
 <div class="callout">
   <div>
     <p class="callout-label">Project status</p>
-    <h2>The architecture and roadmap are defined.</h2>
+    <h2>Core BB workflows are running.</h2>
     <p>
-      Runtime execution, compatibility work, and cross-platform artifacts are
-      the next engineering milestones.
+      Runtime execution, projects, tasks, bundled-library waves, native and
+      Wasm artifacts, and the live browser REPL are implemented and tested.
+      Interactive services are next.
     </p>
   </div>
   <a class="text-link" href="roadmap/">View current progress →</a>

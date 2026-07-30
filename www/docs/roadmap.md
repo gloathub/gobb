@@ -12,7 +12,7 @@ description: Current Gobb implementation progress and upcoming milestones
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">10 / 14</p>
+    <p class="summary-value">11 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 71%"></span>
+  <span style="width: 79%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -443,23 +443,40 @@ examples.
   </div>
 </div>
 
+## Completed website and live Gobb
+
+<div class="milestone milestone-done">
+  <div class="milestone-marker">10</div>
+  <div>
+    <span class="status-badge status-done">Complete</span>
+    <h3>Website and live Gobb</h3>
+    <p>
+      Publish the tested project state and a real browser-Wasm Gobb experience.
+    </p>
+    <ul class="task-list">
+      <li class="task-done">Serve the MkDocs site at <code>https://gobb.site/</code></li>
+      <li class="task-done">Generate compatibility, inventory, Java, and platform reports from tested ledgers</li>
+      <li class="task-done">Compile Babashka's reusable REPL loop to browser Wasm with Gloat</li>
+      <li class="task-done">Provide a responsive terminal-style browser REPL</li>
+      <li class="task-done">Replay and share complete REPL state through copyable URLs</li>
+      <li class="task-done">Publish branded, cache-busted social cards</li>
+      <li class="task-done">Keep <code>make serve</code>, <code>make site</code>, and <code>make publish</code> reproducible</li>
+    </ul>
+  </div>
+</div>
+
 ## Planned milestones
 
 <div class="roadmap-grid">
   <article class="roadmap-card">
-    <span>10</span>
+    <span>11</span>
     <h3>Interactive services</h3>
     <p>Extend the basic terminal/browser REPLs with editing, nREPL, socket REPL, pods, and servers.</p>
   </article>
   <article class="roadmap-card">
-    <span>11</span>
+    <span>12</span>
     <h3>Production build command</h3>
     <p>Finalize deterministic native and Wasm builds through Gloat.</p>
-  </article>
-  <article class="roadmap-card">
-    <span>12</span>
-    <h3>Website and live Gobb</h3>
-    <p>Keep compatibility reports current and add a browser-Wasm playground.</p>
   </article>
   <article class="roadmap-card">
     <span>13</span>
