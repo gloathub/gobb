@@ -213,6 +213,23 @@ bodies, redirects, buffered async requests, and function clients are checked
 against BB using the local server. JVM-specific client constructors, complete
 interceptor customization, WebSocket support, and browser Fetch remain open.
 
+The bundled-library substrate also includes a Go-backed `clojure.java.io`
+surface. Files, relative paths, parent creation, byte streams, readers,
+writers, copying, classpath resources, and deletion are differentially checked
+against BB. True `java.net.URL` objects, character-set conversion, and the
+complete JVM protocol-extension surface remain partial.
+
+The first data-library slice pins `clojure.data.csv` 1.0.0 and provides its
+public `read-csv` and `write-csv` API over Go's `encoding/csv`. Differential
+fixtures cover strings and readers, custom separators, standard CSV quoting,
+and LF and CRLF output. Alternate quote characters, custom quote predicates,
+and lazy incremental reads remain partial.
+
+Core JSON support pins Cheshire 6.2.0 and maps its string, stream, sequence,
+key-conversion, array-coercion, and generation APIs onto Go's `encoding/json`.
+Factories, custom encoders, Smile, and strict duplicate-key detection remain
+open and are kept partial in the inventory.
+
 ## Repository boundaries
 
 Gobb selectively ports BB behavior rather than maintaining a wholesale fork.

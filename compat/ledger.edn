@@ -16,17 +16,17 @@
  :states
  {:intentional-difference 24,
   :not-applicable 5,
-  :partial 40,
-  :planned 878,
+  :partial 44,
+  :planned 874,
   :platform-limited 6,
   :supported 69},
  :categories
  [{:category :built-in-library,
    :count 38,
-   :states {:partial 3, :planned 35}}
+   :states {:partial 5, :planned 33}}
   {:category :built-in-namespace,
    :count 104,
-   :states {:partial 5, :planned 99}}
+   :states {:partial 7, :planned 97}}
   {:category :capability,
    :count 41,
    :states
@@ -64,14 +64,14 @@
   {:milestone 1,
    :count 10,
    :states {:intentional-difference 1, :partial 5, :supported 4}}
-  {:milestone 3, :count 6, :states {:partial 1, :supported 5}}
+  {:milestone 3, :count 5, :states {:supported 5}}
   {:milestone 4, :count 5, :states {:not-applicable 5}}
   {:milestone 5,
    :count 23,
    :states {:partial 13, :platform-limited 6, :supported 4}}
   {:milestone 7, :count 15, :states {:partial 5, :supported 10}}
   {:milestone 8, :count 16, :states {:partial 5, :supported 11}}
-  {:milestone 9, :count 154, :states {:partial 10, :planned 144}}
+  {:milestone 9, :count 155, :states {:partial 15, :planned 140}}
   {:milestone 10, :count 11, :states {:planned 11}}
   {:milestone 11, :count 2, :states {:planned 2}}
   {:milestone 13,
@@ -86,7 +86,7 @@
 {:state :planned, :milestone 9, :id "built-in-library/babashka/babashka.core", :category :built-in-library, :name "babashka/babashka.core", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :partial, :milestone 9, :id "built-in-library/babashka/babashka.curl", :category :built-in-library, :name "babashka/babashka.curl", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :rationale "The pinned babashka.curl request surface is implemented over the native curl process; buffered request and response modes work while live streaming and non-native targets remain limited", :evidence [{:kind :implementation, :path "src/gobb/curl.clj"} {:kind :test, :path "test/curl", :description "Differential file and local HTTP behavior against pinned BB"}]}
 {:state :partial, :milestone 9, :id "built-in-library/babashka/fs", :category :built-in-library, :name "babashka/fs", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :rationale "The Go-backed core path, traversal, archive, POSIX permission, and filesystem wave is implemented; JVM FileTime-style attributes remain", :evidence [{:kind :implementation, :path "src/gobb/fs.clj"} {:kind :test, :path "test/fs", :description "Differential core filesystem behavior against pinned BB"}]}
-{:state :planned, :milestone 9, :id "built-in-library/cheshire/cheshire", :category :built-in-library, :name "cheshire/cheshire", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :partial, :milestone 9, :id "built-in-library/cheshire/cheshire", :category :built-in-library, :name "cheshire/cheshire", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :rationale "The pinned Cheshire 6.2.0 core parse, generate, stream, key conversion, array coercion, pretty, and parsed-seq behavior is implemented over Go's encoding/json; factories, custom encoders, Smile, and strict duplicate detection remain", :evidence [{:kind :implementation, :path "src/cheshire/core.clj"} {:kind :upstream-source, :path "https://github.com/dakrone/cheshire", :description "Pinned tag 6.2.0 at revision 2143a93711400d9078980aabd630963a8182fe23"} {:kind :test, :path "test/cheshire", :description "Differential core Cheshire behavior against pinned BB"}]}
 {:state :planned, :milestone 9, :id "built-in-library/clj-commons/clj-yaml", :category :built-in-library, :name "clj-commons/clj-yaml", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/com.cognitect/transit-clj", :category :built-in-library, :name "com.cognitect/transit-clj", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/com.taoensso/timbre", :category :built-in-library, :name "com.taoensso/timbre", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
@@ -105,7 +105,7 @@
 {:state :planned, :milestone 9, :id "built-in-library/org.clojure/core.async", :category :built-in-library, :name "org.clojure/core.async", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/org.clojure/core.match", :category :built-in-library, :name "org.clojure/core.match", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/org.clojure/core.rrb-vector", :category :built-in-library, :name "org.clojure/core.rrb-vector", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 9, :id "built-in-library/org.clojure/data.csv", :category :built-in-library, :name "org.clojure/data.csv", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :partial, :milestone 9, :id "built-in-library/org.clojure/data.csv", :category :built-in-library, :name "org.clojure/data.csv", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :rationale "The pinned data.csv 1.0.0 public read and write API is implemented over Go's encoding/csv; alternate quote characters and custom quote predicates remain", :evidence [{:kind :implementation, :path "src/clojure/data/csv.clj"} {:kind :upstream-source, :path "https://github.com/clojure/data.csv", :description "Pinned tag data.csv-1.0.0 at revision 72561ee39463afd83acb8b328579e1c54ff68ecc"} {:kind :test, :path "test/data-csv", :description "Differential CSV reading and writing against pinned BB"}]}
 {:state :planned, :milestone 9, :id "built-in-library/org.clojure/data.priority-map", :category :built-in-library, :name "org.clojure/data.priority-map", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/org.clojure/data.xml", :category :built-in-library, :name "org.clojure/data.xml", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "built-in-library/org.clojure/test.check", :category :built-in-library, :name "org.clojure/test.check", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
@@ -140,7 +140,7 @@
 {:state :planned, :milestone 9, :id "namespace/babashka.terminal", :category :built-in-namespace, :name "babashka.terminal", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/babashka.wait", :category :built-in-namespace, :name "babashka.wait", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/bencode.core", :category :built-in-namespace, :name "bencode.core", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 9, :id "namespace/cheshire.core", :category :built-in-namespace, :name "cheshire.core", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :partial, :milestone 9, :id "namespace/cheshire.core", :category :built-in-namespace, :name "cheshire.core", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "Core JSON string and stream parsing and generation work; advanced factory, encoder, Smile, and strict parsing behavior remains", :evidence [{:kind :implementation, :path "src/cheshire/core.clj"} {:kind :test, :path "test/cheshire", :description "Differential core Cheshire behavior against pinned BB"}]}
 {:state :planned, :milestone 9, :id "namespace/cheshire.factory", :category :built-in-namespace, :name "cheshire.factory", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/cheshire.generate", :category :built-in-namespace, :name "cheshire.generate", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clj-yaml.core", :category :built-in-namespace, :name "clj-yaml.core", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
@@ -152,7 +152,7 @@
 {:state :planned, :milestone 9, :id "namespace/clojure.core.rrb-vector", :category :built-in-namespace, :name "clojure.core.rrb-vector", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.core.server", :category :built-in-namespace, :name "clojure.core.server", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.data", :category :built-in-namespace, :name "clojure.data", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 9, :id "namespace/clojure.data.csv", :category :built-in-namespace, :name "clojure.data.csv", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :partial, :milestone 9, :id "namespace/clojure.data.csv", :category :built-in-namespace, :name "clojure.data.csv", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "Strings and readers, separators, standard quoting, LF and CRLF output are supported; alternate quote characters, custom quote predicates, and lazy incremental reads remain", :evidence [{:kind :implementation, :path "src/clojure/data/csv.clj"} {:kind :test, :path "test/data-csv", :description "Differential core clojure.data.csv behavior against pinned BB"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.data.priority-map", :category :built-in-namespace, :name "clojure.data.priority-map", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.data.xml", :category :built-in-namespace, :name "clojure.data.xml", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.data.xml.event", :category :built-in-namespace, :name "clojure.data.xml.event", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
@@ -161,7 +161,7 @@
 {:state :planned, :milestone 9, :id "namespace/clojure.datafy", :category :built-in-namespace, :name "clojure.datafy", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.instant", :category :built-in-namespace, :name "clojure.instant", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.java.browse", :category :built-in-namespace, :name "clojure.java.browse", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :partial, :milestone 3, :id "namespace/clojure.java.io", :category :built-in-namespace, :name "clojure.java.io", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "Classpath resource lookup is implemented; the complete JVM API is not", :evidence [{:kind :compat-fixture, :id :loading/resource}]}
+{:state :partial, :milestone 9, :id "namespace/clojure.java.io", :category :built-in-namespace, :name "clojure.java.io", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "Files, relative paths, parent creation, input and output streams, readers, writers, copying, resources, and deletion are Go-backed; true URL objects, character encodings, and the complete JVM protocol extension surface remain", :evidence [{:kind :implementation, :path "src/clojure/java/io.clj"} {:kind :test, :path "test/java-io", :description "Differential core clojure.java.io behavior against pinned BB"} {:kind :compat-fixture, :id :loading/resource}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.java.javadoc", :category :built-in-namespace, :name "clojure.java.javadoc", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.java.process", :category :built-in-namespace, :name "clojure.java.process", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 9, :id "namespace/clojure.java.shell", :category :built-in-namespace, :name "clojure.java.shell", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}

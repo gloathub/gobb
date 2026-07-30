@@ -8,17 +8,17 @@ Gobb (pronounced "Joby"; rhymes with "Moby") is the
 [Glojure](https://github.com/glojurelang/glojure) runtime; without SCI,
 GraalVM, or a JVM.
 
-The project aims to make as much existing BB code and behavior work as
-possible while adding first-class native and WebAssembly compilation:
+Gloat AOT compiles the Babashka Clojure source code to Go source code which
+then compiles to a native `gobb` binary for up to 25 different platform
+architectures including WebAssembly binaries for both server and browser.
 
-```text
-gobb build script.clj -o app --platform linux/amd64
-```
+Gobb currently releases prebuilt binaries for 15 platforms.
+Gobb's runtime speed should be as fast or faster than `bb` compiled with
+GraalVM's `native-image` compiler.
 
 > [!IMPORTANT]
 > Gobb is an early architecture proof, not yet a general BB replacement.
-> The first native executable evaluates expressions, files, and stdin through
-> Glojure and is compiled by Gloat.
+
 
 ## Install
 

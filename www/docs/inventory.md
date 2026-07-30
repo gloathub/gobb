@@ -10,8 +10,8 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| built-in-library | 38 | 0 | 3 | 35 | 0 |
-| built-in-namespace | 104 | 0 | 5 | 99 | 0 |
+| built-in-library | 38 | 0 | 5 | 33 | 0 |
+| built-in-namespace | 104 | 0 | 7 | 97 | 0 |
 | capability | 41 | 9 | 19 | 4 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
 | compatible-library | 98 | 0 | 1 | 97 | 0 |
@@ -27,7 +27,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | --- | --- | --- | --- |
 | `built-in-library/babashka/babashka.curl` | built-in-library | **partial** | src/gobb/curl.clj<br>test/curl |
 | `built-in-library/babashka/fs` | built-in-library | **partial** | src/gobb/fs.clj<br>test/fs |
+| `built-in-library/cheshire/cheshire` | built-in-library | **partial** | src/cheshire/core.clj<br>https://github.com/dakrone/cheshire<br>test/cheshire |
 | `built-in-library/org.babashka/http-client` | built-in-library | **partial** | src/gobb/http_client.clj<br>test/http-client |
+| `built-in-library/org.clojure/data.csv` | built-in-library | **partial** | src/clojure/data/csv.clj<br>https://github.com/clojure/data.csv<br>test/data-csv |
 | `capability/browser-filesystem` | capability | **platform-limited** | www/docs/implementation.md |
 | `capability/browser-network` | capability | **platform-limited** | test/capabilities |
 | `capability/browser-repl` | capability | **partial** | test/gobb<br>www/docs/javascripts/repl.js |
@@ -139,7 +141,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `namespace/babashka.fs` | built-in-namespace | **partial** | src/gobb/fs.clj<br>test/fs |
 | `namespace/babashka.http-client` | built-in-namespace | **partial** | src/gobb/http_client.clj<br>test/http-client |
 | `namespace/babashka.process` | built-in-namespace | **partial** | src/gobb/process.clj<br>test/process |
-| `namespace/clojure.java.io` | built-in-namespace | **partial** | :loading/resource |
+| `namespace/cheshire.core` | built-in-namespace | **partial** | src/cheshire/core.clj<br>test/cheshire |
+| `namespace/clojure.data.csv` | built-in-namespace | **partial** | src/clojure/data/csv.clj<br>test/data-csv |
+| `namespace/clojure.java.io` | built-in-namespace | **partial** | src/clojure/java/io.clj<br>test/java-io<br>:loading/resource |
 | `project/aliases` | project-config | **supported** | test/projects |
 | `project/bb-edn-discovery` | project-config | **supported** | test/projects |
 | `project/classpath-cache` | project-config | **supported** | test/projects |
@@ -174,7 +178,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 9 | 144 |
+| 9 | 140 |
 | 10 | 11 |
 | 11 | 2 |
 | 13 | 721 |

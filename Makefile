@@ -38,6 +38,14 @@ BABASHKA-HTTP-CLIENT-TAG := v0.4.23
 BABASHKA-HTTP-CLIENT-REVISION := d56bc7f86903d09ff3faef1500ad36005dab037f
 BABASHKA-HTTP-CLIENT-SOURCE := $(LOCAL-CACHE)/http-client-0.4.23
 BABASHKA-HTTP-CLIENT-STAMP := $(LOCAL-CACHE)/.http-client-0.4.23
+CLOJURE-DATA-CSV-TAG := data.csv-1.0.0
+CLOJURE-DATA-CSV-REVISION := 72561ee39463afd83acb8b328579e1c54ff68ecc
+CLOJURE-DATA-CSV-SOURCE := $(LOCAL-CACHE)/data.csv-1.0.0
+CLOJURE-DATA-CSV-STAMP := $(LOCAL-CACHE)/.data.csv-1.0.0
+CHESHIRE-TAG := 6.2.0
+CHESHIRE-REVISION := 2143a93711400d9078980aabd630963a8182fe23
+CHESHIRE-SOURCE := $(LOCAL-CACHE)/cheshire-6.2.0
+CHESHIRE-STAMP := $(LOCAL-CACHE)/.cheshire-6.2.0
 SOURCE-STAGE := $(TOP)/.cache/source-stage
 SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
 REPL-SOURCE-STAGE := $(TOP)/.cache/repl-source-stage
@@ -46,7 +54,7 @@ SOURCE-MANIFEST := $(TOP)/src/babashka-source.edn
 STAGE-SOURCES := $(TOP)/util/stage-sources
 VERSION-FILE := $(TOP)/VERSION
 GOBB-SOURCES := $(shell \
-  find '$(TOP)/src/gobb' -type f -name '*.clj' 2>/dev/null)
+  find '$(TOP)/src' -type f -name '*.clj' 2>/dev/null)
 BABASHKA-SOURCES := $(shell \
   find '$(BABASHKA-SOURCE)/src' -type f -name '*.clj' 2>/dev/null)
 GOBB := $(TOP)/bin/gobb
@@ -114,6 +122,10 @@ MAKES-REALCLEAN := \
   $(BABASHKA-CURL-STAMP) \
   $(BABASHKA-HTTP-CLIENT-SOURCE) \
   $(BABASHKA-HTTP-CLIENT-STAMP) \
+  $(CLOJURE-DATA-CSV-SOURCE) \
+  $(CLOJURE-DATA-CSV-STAMP) \
+  $(CHESHIRE-SOURCE) \
+  $(CHESHIRE-STAMP) \
 
 default:: build
 
@@ -205,17 +217,51 @@ $(BABASHKA-HTTP-CLIENT-STAMP):
 
 BABASHKA-HTTP-CLIENT-DEP := $(BABASHKA-HTTP-CLIENT-STAMP)
 
+$(CLOJURE-DATA-CSV-STAMP):
+	@$(ECHO) "* Downloading the pinned clojure.data.csv source"
+	$Q $(RM) -r '$(CLOJURE-DATA-CSV-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(CLOJURE-DATA-CSV-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/clojure/data.csv \
+	  '$(CLOJURE-DATA-CSV-SOURCE)'
+	$Q test "$$(git -C '$(CLOJURE-DATA-CSV-SOURCE)' rev-parse HEAD)" = \
+	  "$(CLOJURE-DATA-CSV-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+CLOJURE-DATA-CSV-DEP := $(CLOJURE-DATA-CSV-STAMP)
+
+$(CHESHIRE-STAMP):
+	@$(ECHO) "* Downloading the pinned Cheshire source"
+	$Q $(RM) -r '$(CHESHIRE-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(CHESHIRE-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/dakrone/cheshire \
+	  '$(CHESHIRE-SOURCE)'
+	$Q test "$$(git -C '$(CHESHIRE-SOURCE)' rev-parse HEAD)" = \
+	  "$(CHESHIRE-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+CHESHIRE-DEP := $(CHESHIRE-STAMP)
+
 deps: \
   $(BABASHKA-SOURCE-DEP) \
   $(BABASHKA-FS-DEP) \
   $(BABASHKA-PROCESS-DEP) \
   $(BABASHKA-CURL-DEP) \
-  $(BABASHKA-HTTP-CLIENT-DEP)
+  $(BABASHKA-HTTP-CLIENT-DEP) \
+  $(CLOJURE-DATA-CSV-DEP) \
+  $(CHESHIRE-DEP)
 	$Q test -f '$(BABASHKA-SOURCE)/src/babashka/main.clj'
 	$Q test -f '$(BABASHKA-FS-SOURCE)/src/babashka/fs.cljc'
 	$Q test -f '$(BABASHKA-PROCESS-SOURCE)/src/babashka/process.cljc'
 	$Q test -f '$(BABASHKA-CURL-SOURCE)/src/babashka/curl.clj'
 	$Q test -f '$(BABASHKA-HTTP-CLIENT-SOURCE)/src/babashka/http_client.clj'
+	$Q test -f '$(CLOJURE-DATA-CSV-SOURCE)/src/main/clojure/clojure/data/csv.clj'
+	$Q test -f '$(CHESHIRE-SOURCE)/src/cheshire/core.clj'
 ifndef BABASHKA_DIR
 	$Q test "$$(git -C '$(BABASHKA-SOURCE)' rev-parse HEAD)" = \
 	  "$(BABASHKA-SOURCE-REVISION)"
@@ -510,10 +556,15 @@ test: \
   $(BABASHKA-PROCESS-DEP) \
   $(BABASHKA-CURL-DEP) \
   $(BABASHKA-HTTP-CLIENT-DEP) \
+  $(CLOJURE-DATA-CSV-DEP) \
+  $(CHESHIRE-DEP) \
   smoke \
   capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/fs
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/java-io
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/data-csv
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/cheshire
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/process
 	$Q GOBB='$(GOBB)' BB='$(BB)' \
 	  GO="$$('$(GLOAT)' --which=go)" test/curl

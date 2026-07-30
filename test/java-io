@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the Babashka executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+fixture=$root/test/fixtures/java_io/core.clj
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+mkdir "$tmp/bb" "$tmp/gobb"
+
+"$BB" -cp "$root/test/fixtures" \
+  "$fixture" "$tmp/bb" >"$tmp/bb.edn"
+"$GOBB" -cp "$root/test/fixtures" \
+  "$fixture" "$tmp/gobb" >"$tmp/gobb.edn"
+
+if ! diff -u "$tmp/bb.edn" "$tmp/gobb.edn"; then
+  echo "test/java-io: Gobb clojure.java.io behavior differs from BB" >&2
+  exit 1
+fi
+
+echo "Core clojure.java.io compatibility tests passed"

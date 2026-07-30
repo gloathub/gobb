@@ -315,11 +315,48 @@
    :rationale "Native core filesystem operations work; the full babashka.fs surface and non-native platform limits remain"
    :evidence [{:kind :test :path "test/fs"}
               {:kind :test :path "test/capabilities"}]}
-  "namespace/clojure.java.io" {:state :partial
-                              :milestone 3
-                              :rationale "Classpath resource lookup is implemented; the complete JVM API is not"
-                              :evidence [{:kind :compat-fixture
-                                          :id :loading/resource}]}
+  "namespace/clojure.java.io"
+  {:state :partial
+   :milestone 9
+   :rationale "Files, relative paths, parent creation, input and output streams, readers, writers, copying, resources, and deletion are Go-backed; true URL objects, character encodings, and the complete JVM protocol extension surface remain"
+   :evidence [{:kind :implementation :path "src/clojure/java/io.clj"}
+              {:kind :test :path "test/java-io"
+               :description "Differential core clojure.java.io behavior against pinned BB"}
+              {:kind :compat-fixture :id :loading/resource}]}
+  "built-in-library/org.clojure/data.csv"
+  {:state :partial
+   :milestone 9
+   :rationale "The pinned data.csv 1.0.0 public read and write API is implemented over Go's encoding/csv; alternate quote characters and custom quote predicates remain"
+   :evidence [{:kind :implementation :path "src/clojure/data/csv.clj"}
+              {:kind :upstream-source
+               :path "https://github.com/clojure/data.csv"
+               :description "Pinned tag data.csv-1.0.0 at revision 72561ee39463afd83acb8b328579e1c54ff68ecc"}
+              {:kind :test :path "test/data-csv"
+               :description "Differential CSV reading and writing against pinned BB"}]}
+  "namespace/clojure.data.csv"
+  {:state :partial
+   :milestone 9
+   :rationale "Strings and readers, separators, standard quoting, LF and CRLF output are supported; alternate quote characters, custom quote predicates, and lazy incremental reads remain"
+   :evidence [{:kind :implementation :path "src/clojure/data/csv.clj"}
+              {:kind :test :path "test/data-csv"
+               :description "Differential core clojure.data.csv behavior against pinned BB"}]}
+  "built-in-library/cheshire/cheshire"
+  {:state :partial
+   :milestone 9
+   :rationale "The pinned Cheshire 6.2.0 core parse, generate, stream, key conversion, array coercion, pretty, and parsed-seq behavior is implemented over Go's encoding/json; factories, custom encoders, Smile, and strict duplicate detection remain"
+   :evidence [{:kind :implementation :path "src/cheshire/core.clj"}
+              {:kind :upstream-source
+               :path "https://github.com/dakrone/cheshire"
+               :description "Pinned tag 6.2.0 at revision 2143a93711400d9078980aabd630963a8182fe23"}
+              {:kind :test :path "test/cheshire"
+               :description "Differential core Cheshire behavior against pinned BB"}]}
+  "namespace/cheshire.core"
+  {:state :partial
+   :milestone 9
+   :rationale "Core JSON string and stream parsing and generation work; advanced factory, encoder, Smile, and strict parsing behavior remains"
+   :evidence [{:kind :implementation :path "src/cheshire/core.clj"}
+              {:kind :test :path "test/cheshire"
+               :description "Differential core Cheshire behavior against pinned BB"}]}
   "class/java.lang.System" {:state :partial
                            :milestone 3
                            :rationale "Properties, environment, time, and controlled exit are implemented"

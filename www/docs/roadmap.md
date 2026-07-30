@@ -402,8 +402,27 @@ examples.
           <li>Complete live streaming, custom interceptors, WebSocket, JVM client constructors, and browser Fetch adapters</li>
         </ul>
       </li>
-      <li>Fill out <code>clojure.java.io</code> compatibility used by bundled libraries</li>
-      <li>Bring over common data libraries for JSON, CSV, YAML, and Transit</li>
+      <li class="task-progress">
+        Fill out <code>clojure.java.io</code> compatibility used by bundled libraries
+        <ul>
+          <li class="task-done">Implement Go-backed files, streams, readers, writers, copying, resources, parents, and deletion</li>
+          <li class="task-done">Differentially test the core public surface against pinned BB</li>
+          <li class="task-done">Track all Gobb-owned source namespaces as Make rebuild inputs</li>
+          <li>Complete true URL objects, character encodings, and JVM protocol-extension edge cases</li>
+        </ul>
+      </li>
+      <li class="task-progress">
+        Bring over common data libraries for JSON, CSV, YAML, and Transit
+        <ul>
+          <li class="task-done">Pin <code>clojure.data.csv</code> 1.0.0 as the behavioral source reference</li>
+          <li class="task-done">Implement and differentially test core CSV reading, writing, separators, quoting, and newlines</li>
+          <li>Complete alternate CSV quote characters, custom quote predicates, and lazy reads</li>
+          <li class="task-done">Pin Cheshire 6.2.0 and implement its core JSON parsing, generation, stream, and sequence APIs</li>
+          <li>Complete Cheshire factories, custom encoders, Smile, and strict duplicate-key detection</li>
+          <li>Implement and differentially test YAML support</li>
+          <li>Implement and differentially test Transit support</li>
+        </ul>
+      </li>
       <li>Port CLI, template, logging, and source-rewriting libraries in dependency order</li>
       <li>Run each library's focused tests under interpreted and compiled Gobb</li>
       <li>Record native, WASI, and browser limitations in the generated inventory</li>
