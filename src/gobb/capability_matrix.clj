@@ -124,10 +124,7 @@
   :label "Interactive terminal",
   :operations [:repl :line-editing],
   :targets
-  {:native
-   {:status :limited,
-    :rationale
-    "The REPL works; line editing and persistent history remain"},
+  {:native {:status :available},
    :wasi
    {:status :limited,
     :rationale

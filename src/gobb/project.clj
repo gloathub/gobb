@@ -641,6 +641,9 @@
   (select-keys @resolved-config
                [:paths :deps :aliases :mvn/repos]))
 
+(defn configured-pods []
+  (:pods @resolved-config))
+
 (def source-extensions #{".clj" ".cljc" ".glj"})
 
 (defn stage-tree! [source destination relative]

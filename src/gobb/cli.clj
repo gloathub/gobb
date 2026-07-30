@@ -1,13 +1,15 @@
 (ns gobb.cli
   (:require [babashka.impl.exceptions]
+            [babashka.pods :as pods]
             [gobb.host :as host]
             [gobb.project :as project]
             [gobb.repl :as repl]
+            [gobb.servers :as servers]
             [gobb.version]
             [babashka.tasks :as tasks]))
 
 (def usage
-  "Usage: gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -m NS|VAR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -x VAR [ARGS...]\n       gobb [PROJECT-OPTS] [-cp PATH|--classpath PATH] --repl\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb [PROJECT-OPTS] run [--parallel] [--prn] TASK [ARGS...]\n       gobb [PROJECT-OPTS] tasks\n       gobb [PROJECT-OPTS] build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb\n\nPROJECT-OPTS:\n  --config FILE       Use an explicit bb.edn or deps.edn\n  --deps-root DIR     Resolve relative project paths from DIR\n  -Sdeps EDN          Merge dependency EDN after project configuration\n  -A ALIASES          Apply comma- or colon-separated aliases")
+  "Usage: gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -e EXPR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -m NS|VAR [ARGS...]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] -x VAR [ARGS...]\n       gobb [PROJECT-OPTS] [-cp PATH|--classpath PATH] --repl\n       gobb [PROJECT-OPTS] --socket-repl [[HOST:]PORT]\n       gobb [PROJECT-OPTS] --nrepl-server [[HOST:]PORT]\n       gobb [PROJECT-OPTS] [--init FILE] [-cp PATH|--classpath PATH] FILE [ARGS...]\n       gobb [PROJECT-OPTS] run [--parallel] [--prn] TASK [ARGS...]\n       gobb [PROJECT-OPTS] tasks\n       gobb [PROJECT-OPTS] build INPUT -o OUTPUT [--platform OS/ARCH]\n       SOURCE | gobb\n\nPROJECT-OPTS:\n  --config FILE       Use an explicit bb.edn or deps.edn\n  --deps-root DIR     Resolve relative project paths from DIR\n  -Sdeps EDN          Merge dependency EDN after project configuration\n  -A ALIASES          Apply comma- or colon-separated aliases")
 
 (def build-usage
   "Usage: gobb build INPUT -o OUTPUT [--platform OS/ARCH]")
@@ -202,6 +204,9 @@
       :file absolute-file})))
 
 (defn stdin-terminal? []
+  (github.com:glojurelang:glojure:pkg:repl.IsTerminal))
+
+(defn stdin-character-device? []
   (let [[info error] (.Stat os.Stdin)]
     (when error
       (fail! (str "cannot inspect standard input: " error)))
@@ -289,6 +294,39 @@
   (host/set-file! host/repl-source-path)
   (repl/start read-native-form))
 
+(defn start-enhanced-repl []
+  (host/set-command-line-args! ())
+  (host/set-file! host/repl-source-path)
+  (println (str "Gobb v" gobb.version/version))
+  (println (str "Babashka v" gobb.version/babashka-version))
+  (println "Type :repl/help for help")
+  (let [previous (os.Getenv "GLJ_REPL_NO_BANNER")
+        configured-history (os.Getenv "GOBB_HISTORY_FILE")
+        [home home-error] (os.UserHomeDir)
+        history-file
+        (if-not (empty? configured-history)
+          configured-history
+          (if home-error
+            ".gobb_history"
+            (path:filepath.Join home ".gobb_history")))
+        history-option
+        (github.com:glojurelang:glojure:pkg:repl.WithHistoryFile
+         history-file "jline")]
+    (os.Setenv "GLJ_REPL_NO_BANNER" "all")
+    (try
+      (github.com:glojurelang:glojure:pkg:repl.Start history-option)
+      (finally
+        (if (empty? previous)
+          (os.Unsetenv "GLJ_REPL_NO_BANNER")
+          (os.Setenv "GLJ_REPL_NO_BANNER" previous))))))
+
+(defn server-address [arguments default-port]
+  (let [candidate (second arguments)]
+    (if (and candidate
+             (not (.startsWith (str candidate) "-")))
+      candidate
+      (str default-port))))
+
 (defn run-task-command [arguments]
   (loop [arguments arguments
          options {:parallel false
@@ -322,19 +360,38 @@
            (parse-global-options argv)
            paths (project/configure! options)]
        (configure-classpath! paths)
+       (pods/load-configured-pods! (project/configured-pods))
        (host/run-preloads!)
        (host/run-init! init)
        (cond
          (empty? argv)
-         (if (stdin-terminal?)
+         (cond
+           (stdin-terminal?)
+           (start-enhanced-repl)
+
+           (stdin-character-device?)
            (start-repl)
+
+           :else
            (host/evaluate-source
             (slurp *in*)
             {:file host/no-source-path
              :print-result? true}))
 
          (= "--repl" (first argv))
-         (start-repl)
+         (if (stdin-terminal?)
+           (start-enhanced-repl)
+           (start-repl))
+
+         (contains? #{"--socket-repl" "socket-repl"}
+                    (first argv))
+         (servers/serve! :socket-repl
+                         (server-address argv 1666))
+
+         (contains? #{"--nrepl-server" "nrepl-server"}
+                    (first argv))
+         (servers/serve! :nrepl
+                         (server-address argv 1667))
 
          (= "build" (first argv))
          (build-program (rest argv))

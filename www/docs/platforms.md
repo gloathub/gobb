@@ -18,7 +18,7 @@ A **limited** capability exists but remains constrained by its host or sandbox. 
 | Subprocesses | **available** | **unavailable**<br><small>WASI preview 1 has no process creation API</small> | **unavailable**<br><small>Browsers cannot spawn host processes</small> |
 | Signals | **available** | **unavailable**<br><small>WASI preview 1 does not expose POSIX signal handling</small> | **unavailable**<br><small>Browser events are not operating-system signals</small> |
 | Networking | **available** | **unavailable**<br><small>The current WASI target has no socket proposal enabled</small> | **limited**<br><small>Fetch and WebSocket are possible; raw TCP, UDP, and listeners are not</small> |
-| Interactive terminal | **limited**<br><small>The REPL works; line editing and persistent history remain</small> | **limited**<br><small>Interactive behavior depends entirely on the WASI host</small> | **limited**<br><small>The website supplies a terminal-like REPL UI</small> |
+| Interactive terminal | **available** | **limited**<br><small>Interactive behavior depends entirely on the WASI host</small> | **limited**<br><small>The website supplies a terminal-like REPL UI</small> |
 | Arbitrary JVM bytecode | **unavailable**<br><small>Gobb deliberately runs without a JVM</small> | **unavailable**<br><small>Gobb deliberately runs without a JVM</small> | **unavailable**<br><small>Gobb deliberately runs without a JVM</small> |
 
 ## Structured failures

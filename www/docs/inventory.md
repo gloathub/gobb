@@ -11,12 +11,12 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | built-in-library | 38 | 0 | 11 | 27 | 0 |
-| built-in-namespace | 104 | 2 | 16 | 86 | 0 |
-| capability | 41 | 9 | 19 | 4 | 9 |
-| cli | 36 | 6 | 1 | 26 | 3 |
+| built-in-namespace | 104 | 3 | 19 | 82 | 0 |
+| capability | 41 | 12 | 20 | 0 | 9 |
+| cli | 36 | 8 | 1 | 24 | 3 |
 | compatible-library | 98 | 0 | 1 | 97 | 0 |
 | java-class | 583 | 35 | 1 | 524 | 23 |
-| project-config | 13 | 10 | 2 | 1 | 0 |
+| project-config | 13 | 10 | 3 | 0 | 0 |
 | representative-program | 37 | 0 | 4 | 33 | 0 |
 | task-config | 9 | 9 | 0 | 0 | 0 |
 | upstream-test | 63 | 0 | 4 | 59 | 0 |
@@ -46,6 +46,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `capability/environment` | capability | **supported** | test/capabilities |
 | `capability/filesystem` | capability | **partial** | test/fs<br>test/capabilities |
 | `capability/gobb-reader-feature` | capability | **intentional-difference** | :reader/gobb-feature |
+| `capability/http-server` | capability | **partial** | test/interactive-services |
 | `capability/jvm-bytecode` | capability | **not-applicable** | www/docs/implementation.md |
 | `capability/native-freebsd-amd64` | capability | **partial** | util/release-dist |
 | `capability/native-freebsd-arm64` | capability | **partial** | util/release-dist |
@@ -57,16 +58,19 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `capability/native-netbsd-arm64` | capability | **partial** | util/release-dist |
 | `capability/native-openbsd-amd64` | capability | **partial** | util/release-dist |
 | `capability/native-openbsd-arm64` | capability | **partial** | util/release-dist |
-| `capability/native-repl` | capability | **partial** | test/gobb |
+| `capability/native-repl` | capability | **supported** | test/gobb<br>src/gobb/cli.clj |
 | `capability/native-windows-amd64` | capability | **partial** | util/release-dist |
 | `capability/network-client` | capability | **partial** | test/curl<br>test/http-client<br>test/capabilities |
+| `capability/nrepl-server` | capability | **supported** | test/interactive-services |
 | `capability/platform-contract` | capability | **supported** | test/capabilities |
+| `capability/pods` | capability | **partial** | test/interactive-services |
 | `capability/process` | capability | **supported** | test/tasks<br>src/gobb/tasks.clj |
 | `capability/process-pipeline` | capability | **supported** | test/tasks |
 | `capability/random` | capability | **supported** | test/capabilities |
 | `capability/runtime-require` | capability | **supported** | :loading/require |
 | `capability/sci-runtime` | capability | **not-applicable** | test/gobb |
 | `capability/signals` | capability | **partial** | test/gobb |
+| `capability/socket-repl` | capability | **supported** | test/interactive-services |
 | `capability/standard-streams` | capability | **partial** | test/capabilities |
 | `capability/wasi-filesystem` | capability | **platform-limited** | test/capabilities |
 | `capability/wasi-network` | capability | **platform-limited** | test/capabilities |
@@ -141,15 +145,20 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `cli/-f` | cli | **supported** | test/gobb |
 | `cli/-m` | cli | **supported** | :invocation/main |
 | `cli/-x` | cli | **supported** | :invocation/exec |
+| `cli/nrepl-server` | cli | **supported** | test/interactive-services |
 | `cli/repl` | cli | **partial** | test/gobb |
+| `cli/socket-repl` | cli | **supported** | test/interactive-services |
 | `compatible-library/babashka/babashka.curl` | compatible-library | **partial** | src/gobb/curl.clj<br>test/curl |
 | `namespace/babashka.cli` | built-in-namespace | **partial** | util/stage-sources<br>test/babashka-cli |
 | `namespace/babashka.curl` | built-in-namespace | **partial** | src/gobb/curl.clj<br>test/curl |
 | `namespace/babashka.fs` | built-in-namespace | **partial** | src/gobb/fs.clj<br>test/fs |
 | `namespace/babashka.http-client` | built-in-namespace | **partial** | src/gobb/http_client.clj<br>test/http-client |
+| `namespace/babashka.nrepl.server` | built-in-namespace | **supported** | src/babashka/nrepl/server.clj<br>test/interactive-services |
+| `namespace/babashka.pods` | built-in-namespace | **partial** | src/babashka/pods.clj<br>test/interactive-services |
 | `namespace/babashka.process` | built-in-namespace | **partial** | src/gobb/process.clj<br>test/process |
 | `namespace/cheshire.core` | built-in-namespace | **partial** | src/cheshire/core.clj<br>test/cheshire |
 | `namespace/clj-yaml.core` | built-in-namespace | **partial** | src/clj_yaml/core.clj<br>test/clj-yaml |
+| `namespace/clojure.core.server` | built-in-namespace | **partial** | src/clojure/core/server.clj<br>test/interactive-services |
 | `namespace/clojure.data.csv` | built-in-namespace | **partial** | src/clojure/data/csv.clj<br>test/data-csv |
 | `namespace/clojure.java.io` | built-in-namespace | **partial** | src/clojure/java/io.clj<br>test/java-io<br>:loading/resource |
 | `namespace/clojure.tools.logging` | built-in-namespace | **partial** | src/clojure/tools/logging.clj<br>test/logging |
@@ -159,6 +168,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `namespace/cognitect.transit` | built-in-namespace | **partial** | src/cognitect/transit.clj<br>test/transit |
 | `namespace/hiccup.core` | built-in-namespace | **partial** | src/hiccup/core.clj<br>test/hiccup |
 | `namespace/hiccup2.core` | built-in-namespace | **partial** | src/hiccup2/core.clj<br>test/hiccup |
+| `namespace/org.httpkit.server` | built-in-namespace | **partial** | src/org/httpkit/server.clj<br>test/interactive-services |
 | `namespace/taoensso.timbre` | built-in-namespace | **partial** | src/taoensso/timbre.clj<br>test/logging |
 | `namespace/taoensso.timbre.appenders.core` | built-in-namespace | **partial** | src/taoensso/timbre/appenders/core.clj<br>test/logging |
 | `project/aliases` | project-config | **supported** | test/projects |
@@ -171,6 +181,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `project/min-bb-version` | project-config | **supported** | test/projects |
 | `project/mvn-coordinates` | project-config | **partial** | test/projects<br>src/gobb/project.clj |
 | `project/paths` | project-config | **supported** | test/projects |
+| `project/pods` | project-config | **partial** | test/interactive-services |
 | `project/preloads` | project-config | **supported** | :loading/preloads |
 | `project/print-deps` | project-config | **partial** | test/projects |
 | `representative-program/examples/fzf.clj` | representative-program | **partial** | test/tasks |
@@ -195,9 +206,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 11 | 11 |
+| 11 | 6 |
 | 12 | 2 |
-| 13 | 844 |
+| 13 | 838 |
 
 ## Authoritative inputs
 

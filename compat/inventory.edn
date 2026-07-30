@@ -54,7 +54,54 @@
   :representative-program {:state :planned :milestone 13}}
 
  :overrides
- {"cli/-D<property>=<value>" {:state :not-applicable
+ {"cli/nrepl-server" {:state :supported
+                       :milestone 11
+                       :evidence [{:kind :test :path "test/interactive-services"}]}
+  "cli/socket-repl" {:state :supported
+                      :milestone 11
+                      :evidence [{:kind :test :path "test/interactive-services"}]}
+  "namespace/babashka.nrepl.server"
+  {:state :supported
+   :milestone 11
+   :evidence [{:kind :implementation :path "src/babashka/nrepl/server.clj"}
+              {:kind :test :path "test/interactive-services"}]}
+  "namespace/babashka.pods"
+  {:state :partial
+   :milestone 11
+   :rationale "Local EDN subprocess pods, dynamic namespace installation, invocation, unload, and bb.edn :path coordinates work; registry downloads, socket transport, JSON, Transit, async handlers, and deferred namespaces remain"
+   :evidence [{:kind :implementation :path "src/babashka/pods.clj"}
+              {:kind :test :path "test/interactive-services"}]}
+  "namespace/clojure.core.server"
+  {:state :partial
+   :milestone 11
+   :rationale "Named TCP socket REPL servers can be started and stopped; arbitrary accept functions and JVM socket options remain"
+   :evidence [{:kind :implementation :path "src/clojure/core/server.clj"}
+              {:kind :test :path "test/interactive-services"}]}
+  "namespace/org.httpkit.server"
+  {:state :partial
+   :milestone 11
+   :rationale "Core Ring HTTP status, headers, request maps, response bodies, server metadata, and shutdown work; WebSockets, channels, and advanced http-kit options remain"
+   :evidence [{:kind :implementation :path "src/org/httpkit/server.clj"}
+              {:kind :test :path "test/interactive-services"}]}
+  "capability/http-server"
+  {:state :partial
+   :milestone 11
+   :rationale "Native Ring HTTP serving works through org.httpkit.server; WebSockets and Wasm listeners are unavailable"
+   :evidence [{:kind :test :path "test/interactive-services"}]}
+  "capability/nrepl-server"
+  {:state :supported
+   :milestone 11
+   :evidence [{:kind :test :path "test/interactive-services"}]}
+  "capability/pods"
+  {:state :partial
+   :milestone 11
+   :rationale "Native local EDN pods work end to end; registry and alternate payload transports remain"
+   :evidence [{:kind :test :path "test/interactive-services"}]}
+  "capability/socket-repl"
+  {:state :supported
+   :milestone 11
+   :evidence [{:kind :test :path "test/interactive-services"}]}
+  "cli/-D<property>=<value>" {:state :not-applicable
                               :milestone 4
                               :rationale "Gobb has no Substrate VM system-property option layer"
                               :evidence [{:kind :implementation
@@ -136,9 +183,10 @@
   "project/preloads" {:state :supported
                       :milestone 3
                       :evidence [{:kind :compat-fixture :id :loading/preloads}]}
-  "project/pods" {:state :planned
+  "project/pods" {:state :partial
                   :milestone 11
-                  :rationale "Pod loading belongs to the interactive services milestone"}
+                  :rationale "Local :path EDN pods load from bb.edn; registry coordinates and alternate pod transports remain"
+                  :evidence [{:kind :test :path "test/interactive-services"}]}
   "project/min-bb-version" {:state :supported
                             :milestone 7
                             :evidence [{:kind :test :path "test/projects"
@@ -513,10 +561,12 @@
                            :rationale "Properties, environment, time, and controlled exit are implemented"
                            :evidence [{:kind :test :path "test/gobb"
                                       :description "System properties, environment, time, and exit"}]}
-  "capability/native-repl" {:state :partial
-                            :milestone 1
-                            :rationale "Core loop works; terminal editing and persistent history remain"
-                            :evidence [{:kind :test :path "test/gobb"}]}
+  "capability/native-repl" {:state :supported
+                            :milestone 11
+                            :evidence [{:kind :test :path "test/gobb"}
+                                       {:kind :implementation
+                                        :path "src/gobb/cli.clj"
+                                        :description "Glojure readline editing, completion, highlighting, and persistent JLine-format history"}]}
   "capability/browser-repl" {:state :partial
                              :milestone 1
                              :rationale "Browser-Wasm evaluation and shared history work; browser files do not"

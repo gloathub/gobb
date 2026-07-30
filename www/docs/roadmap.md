@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Interactive services</p>
+    <p class="summary-value">Production build command</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">11 / 14</p>
+    <p class="summary-value">12 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 79%"></span>
+  <span style="width: 86%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -315,20 +315,19 @@ also removes the downloaded Babashka source checkout.
   GraalVM substitutions, or libraries that have not been ported.
 - Project-derived classpaths work, but Maven bytecode-only libraries remain
   unavailable and advanced POM/BOM edge cases are not yet tools.deps-complete.
-- Bundled filesystem/network libraries, pods, and network REPL services remain
-  unimplemented. Native task subprocesses work; WASI and browser targets
-  intentionally reject process creation.
-- The native and browser REPLs are focused proofs. Terminal line editing and
-  command history, nREPL, socket REPL, browser filesystem loading, and the rest
-  of BB's interactive surface remain.
+- Local EDN pods work, including `bb.edn` `:path` coordinates. Registry
+  downloads, socket transport, JSON and Transit payloads, async handlers, and
+  deferred pod namespaces remain.
+- Native terminal editing, nREPL, and socket REPL are implemented. WASI and
+  browser targets still cannot open raw network listeners.
+- Core Ring HTTP serving works through `org.httpkit.server`; WebSockets,
+  channels, and advanced http-kit options remain.
 - The current source reader wraps input in one `do` form. Shebang handling and
   exact BB reader edge cases remain for a later CLI-compatibility pass.
 
 ## Next concrete slice
 
-Port BB's bundled libraries in dependency-shaped waves, starting with
-filesystem and process namespaces that unlock the largest number of upstream
-examples.
+Finalize deterministic native and Wasm program builds through Gloat.
 
 ## Completed tasks and commands
 
@@ -465,14 +464,35 @@ examples.
   </div>
 </div>
 
+## Completed interactive services
+
+<div class="milestone milestone-done">
+  <div class="milestone-marker">11</div>
+  <div>
+    <span class="status-badge status-done">Complete</span>
+    <h3>Interactive services</h3>
+    <p>
+      Extend Gobb from basic evaluation loops into native interactive and
+      network services while keeping host limitations explicit.
+    </p>
+    <ul class="task-list">
+      <li class="task-done">Use Glojure's readline terminal with editing, completion, highlighting, and persistent <code>~/.gobb_history</code></li>
+      <li class="task-done">Implement <code>--socket-repl</code> and <code>socket-repl</code> with BB-compatible defaults</li>
+      <li class="task-done">Implement <code>--nrepl-server</code> and <code>nrepl-server</code> with bencoded evaluation responses</li>
+      <li class="task-done">Expose programmatic <code>babashka.nrepl.server</code> start and stop operations</li>
+      <li class="task-done">Expose named <code>clojure.core.server</code> socket REPL lifecycle operations</li>
+      <li class="task-done">Load, invoke, and unload local EDN subprocess pods</li>
+      <li class="task-done">Load local <code>:path</code> pods declared in <code>bb.edn</code></li>
+      <li class="task-done">Serve Ring handlers through the core <code>org.httpkit.server</code> API</li>
+      <li class="task-done">Test socket REPL, nREPL, pod, project-pod, and HTTP behavior against real native processes</li>
+      <li class="task-done">Record registry pods, alternate payload formats, WebSockets, and non-native listeners as explicit compatibility limits</li>
+    </ul>
+  </div>
+</div>
+
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>11</span>
-    <h3>Interactive services</h3>
-    <p>Extend the basic terminal/browser REPLs with editing, nREPL, socket REPL, pods, and servers.</p>
-  </article>
   <article class="roadmap-card">
     <span>12</span>
     <h3>Production build command</h3>

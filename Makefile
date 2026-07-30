@@ -799,6 +799,8 @@ test: \
 	$Q GOBB='$(GOBB)' GOBB_GLOAT='$(GLOAT)' \
 	  WASMTIME='$(WASMTIME)' NODE='$(NODE)' test/projects
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/tasks
+	$Q GOBB='$(GOBB)' \
+	  GO="$$('$(GLOAT)' --which=go)" test/interactive-services
 
 compat: _compat
 

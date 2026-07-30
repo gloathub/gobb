@@ -137,7 +137,7 @@ Gobb has completed its repository foundation and started native execution:
 - [x] Tested native, WASI, and browser-Wasm capability contract
 - [x] Project dependencies and BB-compatible task/process execution
 - [ ] Bundled libraries (Go-backed `babashka.fs` core is in progress)
-- [ ] Pods and interactive services
+- [x] Native terminal editing, nREPL, socket REPL, local EDN pods, and Ring HTTP serving
 - [ ] Production `gobb build` command
 
 Follow the [live roadmap](https://gobb.site/roadmap/) for current progress.
@@ -160,6 +160,18 @@ Babashka v1.12.218
 Type :repl/help for help
 user=>
 ```
+
+Start BB-compatible network REPL services:
+
+```bash
+gobb --socket-repl 1666
+gobb --nrepl-server 1667
+```
+
+Local EDN pods can be loaded with `babashka.pods/load-pod` or declared with a
+`:path` coordinate under `:pods` in `bb.edn`. Core Ring HTTP handlers run
+through `org.httpkit.server/run-server`. Registry pod downloads, JSON/Transit
+pod payloads, and WebSockets remain explicit compatibility gaps.
 
 The Makefile downloads and verifies the pinned Babashka source checkout in the
 ignored local cache.

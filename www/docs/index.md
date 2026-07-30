@@ -32,8 +32,8 @@ hide:
 
 <div class="status-strip">
   <span class="status-pulse"></span>
-  <strong>Current phase:</strong> Interactive services
-  <span class="status-note">The live browser-Wasm REPL and generated compatibility reports are published.</span>
+  <strong>Current phase:</strong> Production build command
+  <span class="status-note">Native REPL services, local EDN pods, and Ring HTTP serving are implemented.</span>
 </div>
 
 ## Install
@@ -124,7 +124,7 @@ missing symbol or an obscure host failure.
     <p>
       Runtime execution, projects, tasks, bundled-library waves, native and
       Wasm artifacts, and the live browser REPL are implemented and tested.
-      Interactive services are next.
+      Production build hardening is next.
     </p>
   </div>
   <a class="text-link" href="roadmap/">View current progress →</a>

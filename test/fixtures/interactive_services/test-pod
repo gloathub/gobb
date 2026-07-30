@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+IFS= read -r -N 30 _
+printf 'd6:format3:edn10:namespacesld4:name8:pod.test4:varsld4:name3:addeeee3:opsd8:shutdowndeee'
+
+IFS= read -r -N 56 _
+printf 'd5:value2:42e'
+
+IFS= read -r -N 56 _
+printf 'd5:value2:42e'
+
+IFS= read -r -N 30 _
+printf 'de'

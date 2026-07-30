@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${GOBB:?}"
+: "${GO:?}"
+
+root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+tmp=$(mktemp -d)
+server_pid=
+
+cleanup() {
+  if [[ -n $server_pid ]]; then
+    kill "$server_pid" 2>/dev/null || true
+    wait "$server_pid" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+env -i \
+  HOME="$tmp" \
+  PATH=/usr/bin:/bin \
+  GOCACHE="$tmp/go-cache" \
+  GOPATH="$tmp/go-path" \
+  CGO_ENABLED=0 \
+  "$GO" build -o "$tmp/client" \
+  "$root/test/fixtures/interactive_services/client.go"
+
+start_server() {
+  local option=$1
+  local marker=$2
+  : > "$tmp/server.log"
+  "$GOBB" "$option" 0 2> "$tmp/server.log" &
+  server_pid=$!
+  for _ in $(seq 1 100); do
+    if grep -q "$marker" "$tmp/server.log"; then
+      return
+    fi
+    sleep 0.05
+  done
+  echo "test/interactive-services: $option did not start" >&2
+  cat "$tmp/server.log" >&2
+  exit 1
+}
+
+stop_server() {
+  kill "$server_pid" 2>/dev/null || true
+  wait "$server_pid" 2>/dev/null || true
+  server_pid=
+}
+
+start_server --socket-repl 'socket REPL started'
+socket_port=$(awk -F: '/socket REPL started/{print $NF}' "$tmp/server.log")
+"$tmp/client" socket "127.0.0.1:$socket_port"
+stop_server
+
+start_server --nrepl-server 'Started nREPL server'
+nrepl_port=$(awk -F: '/Started nREPL server/{print $NF}' "$tmp/server.log")
+"$tmp/client" nrepl "127.0.0.1:$nrepl_port"
+stop_server
+
+"$GOBB" -e '
+  (require (quote [babashka.nrepl.server :as nrepl]))
+  (require (quote [clojure.core.server :as socket]))
+  (let [n (nrepl/start-server! {:port 0})
+        s (socket/start-server {:name "test" :port 0})]
+    (assert (pos? (.Port n)))
+    (assert (pos? (.Port s)))
+    (nrepl/stop-server! n)
+    (socket/stop-server "test")
+    (println :server-apis-ok))' |
+  grep -qx ':server-apis-ok'
+
+"$GOBB" -e '
+  (require (quote [org.httpkit.server :as http]))
+  (let [stop
+        (http/run-server
+         (fn [request]
+            {:status 201
+            :headers {"x-gobb" "yes"}
+            :body (str (:request-method request)
+                       " " (:uri request)
+                       " " (:scheme request)
+                       " " (pos? (:server-port request)))})
+         {:ip "127.0.0.1" :port 0})]
+    (println (:local-port (meta stop)))
+    (flush)
+    @(promise))' > "$tmp/http.port" &
+server_pid=$!
+for _ in $(seq 1 100); do
+  [[ -s $tmp/http.port ]] && break
+  sleep 0.05
+done
+http_port=$(head -1 "$tmp/http.port")
+http_response=$(curl -sS -i "http://127.0.0.1:$http_port/hello")
+grep -q 'HTTP/1.1 201' <<< "$http_response"
+grep -qi '^X-Gobb: yes' <<< "$http_response"
+grep -q ':get /hello :http true' <<< "$http_response"
+stop_server
+
+pod=$root/test/fixtures/interactive_services/test-pod
+"$GOBB" -e "
+  (require (quote [babashka.pods :as pods]))
+  (let [pod (pods/load-pod \"$pod\")
+        add (ns-resolve (quote pod.test) (quote add))]
+    (when-not (= 42 (add 20 22))
+      (throw (ex-info \"proxy pod invocation failed\" {})))
+    (when-not (= 42 (pods/invoke pod (quote pod.test/add) [20 22]))
+      (throw (ex-info \"direct pod invocation failed\" {})))
+    (pods/unload-pod pod)
+    (println :pod-ok))" |
+  grep -qx ':pod-ok'
+
+mkdir -p "$tmp/project"
+printf '{:pods {pod/test {:path "%s"}}}\n' "$pod" \
+  > "$tmp/project/bb.edn"
+(
+  cd "$tmp/project"
+  "$GOBB" -e '
+    (let [add (ns-resolve (quote pod.test) (quote add))]
+      (when-not (= 42 (add 20 22))
+        (throw (ex-info "configured pod invocation failed" {})))
+      (println :configured-pod-ok))'
+) | grep -qx ':configured-pod-ok'
+
+echo "Interactive service tests passed"
