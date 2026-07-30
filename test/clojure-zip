@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -eu
+
+gobb=${GOBB:?}
+bb=${BB:?}
+fixture=$(dirname "$0")/fixtures/clojure_zip/core.clj
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+"$bb" "$fixture" >"$tmp/bb.out"
+"$gobb" "$fixture" >"$tmp/gobb.out"
+diff -u "$tmp/bb.out" "$tmp/gobb.out"
+echo "clojure.zip differential test passed"

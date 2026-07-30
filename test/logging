@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -eu
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the Babashka executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+fixture="$root/test/fixtures/logging/core.clj"
+
+expected=$("$BB" "$fixture" 2>&1)
+actual=$("$GOBB" "$fixture" 2>&1)
+
+for output in "$expected" "$actual"; do
+  [[ "$output" == *"tools 42"* ]]
+  [[ "$output" == *"timbre 43"* ]]
+done
+
+expected_result=$(printf '%s\n' "$expected" | tail -n 1)
+actual_result=$(printf '%s\n' "$actual" | tail -n 1)
+
+if [[ "$actual_result" != "$expected_result" ]]; then
+  diff -u <(printf '%s\n' "$expected_result") \
+          <(printf '%s\n' "$actual_result")
+  exit 1
+fi
+
+printf '%s\n' 'Core logging compatibility tests passed'

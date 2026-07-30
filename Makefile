@@ -46,6 +46,41 @@ CHESHIRE-TAG := 6.2.0
 CHESHIRE-REVISION := 2143a93711400d9078980aabd630963a8182fe23
 CHESHIRE-SOURCE := $(LOCAL-CACHE)/cheshire-6.2.0
 CHESHIRE-STAMP := $(LOCAL-CACHE)/.cheshire-6.2.0
+CLJ-YAML-TAG := v1.0.29
+CLJ-YAML-REVISION := 57c817a20910003583b0b0dde16a76ee101fd7e7
+CLJ-YAML-SOURCE := $(LOCAL-CACHE)/clj-yaml-1.0.29
+CLJ-YAML-STAMP := $(LOCAL-CACHE)/.clj-yaml-1.0.29
+TRANSIT-CLJ-TAG := v1.1.357
+TRANSIT-CLJ-REVISION := 89144172fb10568df433d0255058f947ac70ab53
+TRANSIT-CLJ-SOURCE := $(LOCAL-CACHE)/transit-clj-1.1.357
+TRANSIT-CLJ-STAMP := $(LOCAL-CACHE)/.transit-clj-1.1.357
+BABASHKA-CLI-TAG := v0.8.67
+BABASHKA-CLI-REVISION := 4ca06937cd9d50917ad7112855815960365cb474
+BABASHKA-CLI-SOURCE := $(LOCAL-CACHE)/babashka-cli-0.8.67
+BABASHKA-CLI-SOURCE-ROOT := $(BABASHKA-CLI-SOURCE)/src
+BABASHKA-CLI-STAMP := $(LOCAL-CACHE)/.babashka-cli-0.8.67
+HICCUP-TAG := 2.0.0-RC1
+HICCUP-REVISION := 327d5408af94b4ef9560c39ab0afcfe5afe3c9a5
+HICCUP-SOURCE := $(LOCAL-CACHE)/hiccup-2.0.0-RC1
+HICCUP-STAMP := $(LOCAL-CACHE)/.hiccup-2.0.0-RC1
+TOOLS-LOGGING-TAG := v1.3.0
+TOOLS-LOGGING-REVISION := be30369b2fcf5403ae75cebbc9e645046525f437
+TOOLS-LOGGING-SOURCE := $(LOCAL-CACHE)/tools.logging-1.3.0
+TOOLS-LOGGING-STAMP := $(LOCAL-CACHE)/.tools.logging-1.3.0
+TIMBRE-TAG := v6.8.0
+TIMBRE-REVISION := cd00a1175147d447812be02d33e3d6e054864b9b
+TIMBRE-SOURCE := $(LOCAL-CACHE)/timbre-6.8.0
+TIMBRE-STAMP := $(LOCAL-CACHE)/.timbre-6.8.0
+CLOJURE-SOURCE-TAG := clojure-1.12.4
+CLOJURE-SOURCE-REVISION := b4ea0f824b2eea039dfc06b796ed601e35cbeab6
+CLOJURE-SOURCE := $(LOCAL-CACHE)/clojure-1.12.4
+CLOJURE-ZIP-SOURCE := $(CLOJURE-SOURCE)/src/clj/clojure/zip.clj
+CLOJURE-SOURCE-STAMP := $(LOCAL-CACHE)/.clojure-1.12.4
+REWRITE-CLJ-TAG := v1.2.54
+REWRITE-CLJ-REVISION := b2436aa4ee60b406407420dbf15e61bf13a8c18d
+REWRITE-CLJ-SOURCE := $(LOCAL-CACHE)/rewrite-clj-1.2.54
+REWRITE-CLJ-SOURCE-ROOT := $(REWRITE-CLJ-SOURCE)/src
+REWRITE-CLJ-STAMP := $(LOCAL-CACHE)/.rewrite-clj-1.2.54
 SOURCE-STAGE := $(TOP)/.cache/source-stage
 SOURCE-STAGE-STAMP := $(SOURCE-STAGE)/.stamp
 REPL-SOURCE-STAGE := $(TOP)/.cache/repl-source-stage
@@ -55,6 +90,9 @@ STAGE-SOURCES := $(TOP)/util/stage-sources
 VERSION-FILE := $(TOP)/VERSION
 GOBB-SOURCES := $(shell \
   find '$(TOP)/src' -type f -name '*.clj' 2>/dev/null)
+BABASHKA-CLI-SOURCES := $(shell \
+  find '$(BABASHKA-CLI-SOURCE-ROOT)' -type f \
+    \( -name '*.clj' -o -name '*.cljc' \) 2>/dev/null)
 BABASHKA-SOURCES := $(shell \
   find '$(BABASHKA-SOURCE)/src' -type f -name '*.clj' 2>/dev/null)
 GOBB := $(TOP)/bin/gobb
@@ -126,6 +164,22 @@ MAKES-REALCLEAN := \
   $(CLOJURE-DATA-CSV-STAMP) \
   $(CHESHIRE-SOURCE) \
   $(CHESHIRE-STAMP) \
+  $(CLJ-YAML-SOURCE) \
+  $(CLJ-YAML-STAMP) \
+  $(TRANSIT-CLJ-SOURCE) \
+  $(TRANSIT-CLJ-STAMP) \
+  $(BABASHKA-CLI-SOURCE) \
+  $(BABASHKA-CLI-STAMP) \
+  $(HICCUP-SOURCE) \
+  $(HICCUP-STAMP) \
+  $(TOOLS-LOGGING-SOURCE) \
+  $(TOOLS-LOGGING-STAMP) \
+  $(TIMBRE-SOURCE) \
+  $(TIMBRE-STAMP) \
+  $(CLOJURE-SOURCE) \
+  $(CLOJURE-SOURCE-STAMP) \
+  $(REWRITE-CLJ-SOURCE) \
+  $(REWRITE-CLJ-STAMP) \
 
 default:: build
 
@@ -247,6 +301,126 @@ $(CHESHIRE-STAMP):
 
 CHESHIRE-DEP := $(CHESHIRE-STAMP)
 
+$(CLJ-YAML-STAMP):
+	@$(ECHO) "* Downloading the pinned clj-yaml source"
+	$Q $(RM) -r '$(CLJ-YAML-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(CLJ-YAML-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/clj-commons/clj-yaml \
+	  '$(CLJ-YAML-SOURCE)'
+	$Q test "$$(git -C '$(CLJ-YAML-SOURCE)' rev-parse HEAD)" = \
+	  "$(CLJ-YAML-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+CLJ-YAML-DEP := $(CLJ-YAML-STAMP)
+
+$(TRANSIT-CLJ-STAMP):
+	@$(ECHO) "* Downloading the pinned transit-clj source"
+	$Q $(RM) -r '$(TRANSIT-CLJ-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(TRANSIT-CLJ-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/cognitect/transit-clj \
+	  '$(TRANSIT-CLJ-SOURCE)'
+	$Q test "$$(git -C '$(TRANSIT-CLJ-SOURCE)' rev-parse HEAD)" = \
+	  "$(TRANSIT-CLJ-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+TRANSIT-CLJ-DEP := $(TRANSIT-CLJ-STAMP)
+
+$(BABASHKA-CLI-STAMP):
+	@$(ECHO) "* Downloading the pinned babashka.cli source"
+	$Q $(RM) -r '$(BABASHKA-CLI-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(BABASHKA-CLI-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/babashka/cli \
+	  '$(BABASHKA-CLI-SOURCE)'
+	$Q test "$$(git -C '$(BABASHKA-CLI-SOURCE)' rev-parse HEAD)" = \
+	  "$(BABASHKA-CLI-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+BABASHKA-CLI-DEP := $(BABASHKA-CLI-STAMP)
+
+$(HICCUP-STAMP):
+	@$(ECHO) "* Downloading the pinned Hiccup source"
+	$Q $(RM) -r '$(HICCUP-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(HICCUP-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/weavejester/hiccup \
+	  '$(HICCUP-SOURCE)'
+	$Q test "$$(git -C '$(HICCUP-SOURCE)' rev-parse HEAD)" = \
+	  "$(HICCUP-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+HICCUP-DEP := $(HICCUP-STAMP)
+
+$(TOOLS-LOGGING-STAMP):
+	@$(ECHO) "* Downloading the pinned tools.logging source"
+	$Q $(RM) -r '$(TOOLS-LOGGING-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(TOOLS-LOGGING-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/clojure/tools.logging \
+	  '$(TOOLS-LOGGING-SOURCE)'
+	$Q test "$$(git -C '$(TOOLS-LOGGING-SOURCE)' rev-parse HEAD)" = \
+	  "$(TOOLS-LOGGING-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+TOOLS-LOGGING-DEP := $(TOOLS-LOGGING-STAMP)
+
+$(TIMBRE-STAMP):
+	@$(ECHO) "* Downloading the pinned Timbre source"
+	$Q $(RM) -r '$(TIMBRE-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(TIMBRE-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/taoensso/timbre \
+	  '$(TIMBRE-SOURCE)'
+	$Q test "$$(git -C '$(TIMBRE-SOURCE)' rev-parse HEAD)" = \
+	  "$(TIMBRE-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+TIMBRE-DEP := $(TIMBRE-STAMP)
+
+$(CLOJURE-SOURCE-STAMP):
+	@$(ECHO) "* Downloading the pinned Clojure source"
+	$Q $(RM) -r '$(CLOJURE-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(CLOJURE-SOURCE-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/clojure/clojure \
+	  '$(CLOJURE-SOURCE)'
+	$Q test "$$(git -C '$(CLOJURE-SOURCE)' rev-parse HEAD)" = \
+	  "$(CLOJURE-SOURCE-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+CLOJURE-SOURCE-DEP := $(CLOJURE-SOURCE-STAMP)
+
+$(REWRITE-CLJ-STAMP):
+	@$(ECHO) "* Downloading the pinned rewrite-clj source"
+	$Q $(RM) -r '$(REWRITE-CLJ-SOURCE)'
+	$Q git clone$(if $Q, -q) --depth=1 \
+	  --branch '$(REWRITE-CLJ-TAG)' \
+	  --config advice.detachedHead=false \
+	  https://github.com/clj-commons/rewrite-clj \
+	  '$(REWRITE-CLJ-SOURCE)'
+	$Q test "$$(git -C '$(REWRITE-CLJ-SOURCE)' rev-parse HEAD)" = \
+	  "$(REWRITE-CLJ-REVISION)"
+	$Q touch '$@'
+	@$(ECHO)
+
+REWRITE-CLJ-DEP := $(REWRITE-CLJ-STAMP)
+
 deps: \
   $(BABASHKA-SOURCE-DEP) \
   $(BABASHKA-FS-DEP) \
@@ -254,7 +428,15 @@ deps: \
   $(BABASHKA-CURL-DEP) \
   $(BABASHKA-HTTP-CLIENT-DEP) \
   $(CLOJURE-DATA-CSV-DEP) \
-  $(CHESHIRE-DEP)
+  $(CHESHIRE-DEP) \
+  $(CLJ-YAML-DEP) \
+  $(TRANSIT-CLJ-DEP) \
+  $(BABASHKA-CLI-DEP) \
+  $(HICCUP-DEP) \
+  $(TOOLS-LOGGING-DEP) \
+  $(TIMBRE-DEP) \
+  $(CLOJURE-SOURCE-DEP) \
+  $(REWRITE-CLJ-DEP)
 	$Q test -f '$(BABASHKA-SOURCE)/src/babashka/main.clj'
 	$Q test -f '$(BABASHKA-FS-SOURCE)/src/babashka/fs.cljc'
 	$Q test -f '$(BABASHKA-PROCESS-SOURCE)/src/babashka/process.cljc'
@@ -262,6 +444,14 @@ deps: \
 	$Q test -f '$(BABASHKA-HTTP-CLIENT-SOURCE)/src/babashka/http_client.clj'
 	$Q test -f '$(CLOJURE-DATA-CSV-SOURCE)/src/main/clojure/clojure/data/csv.clj'
 	$Q test -f '$(CHESHIRE-SOURCE)/src/cheshire/core.clj'
+	$Q test -f '$(CLJ-YAML-SOURCE)/src/clojure/clj_yaml/core.clj'
+	$Q test -f '$(TRANSIT-CLJ-SOURCE)/src/main/clojure/cognitect/transit.clj'
+	$Q test -f '$(BABASHKA-CLI-SOURCE-ROOT)/babashka/cli.cljc'
+	$Q test -f '$(HICCUP-SOURCE)/src/hiccup/core.clj'
+	$Q test -f '$(TOOLS-LOGGING-SOURCE)/src/main/clojure/clojure/tools/logging.clj'
+	$Q test -d '$(TIMBRE-SOURCE)/src'
+	$Q test -f '$(CLOJURE-ZIP-SOURCE)'
+	$Q test -f '$(REWRITE-CLJ-SOURCE-ROOT)/rewrite_clj/zip.cljc'
 ifndef BABASHKA_DIR
 	$Q test "$$(git -C '$(BABASHKA-SOURCE)' rev-parse HEAD)" = \
 	  "$(BABASHKA-SOURCE-REVISION)"
@@ -272,8 +462,16 @@ $(SOURCE-STAGE-STAMP): \
   $(BABASHKA-SOURCES) \
   $(BB) \
   $(GOBB-SOURCES) \
+  $(BABASHKA-CLI-DEP) \
+  $(HICCUP-DEP) \
+  $(TOOLS-LOGGING-DEP) \
+  $(TIMBRE-DEP) \
+  $(CLOJURE-SOURCE-DEP) \
+  $(BABASHKA-CLI-SOURCES) \
+  $(CLOJURE-ZIP-SOURCE) \
   $(SOURCE-MANIFEST) \
   $(STAGE-SOURCES) \
+  $(TOP)/Makefile \
   $(VERSION-FILE)
 	@$(ECHO) "* Staging Gobb and selected Babashka sources"
 	$Q $(BB) '$(STAGE-SOURCES)' \
@@ -281,7 +479,10 @@ $(SOURCE-STAGE-STAMP): \
 	  '$(BABASHKA-SOURCE)' \
 	  '$(TOP)/src' \
 	  '$(SOURCE-STAGE)' \
-	  '$(VERSION-FILE)'
+	  '$(VERSION-FILE)' \
+	  'gobb.cli' \
+	  '$(BABASHKA-CLI-SOURCE-ROOT)' \
+	  '$(CLOJURE-ZIP-SOURCE)'
 	$Q touch '$@'
 	@$(ECHO)
 
@@ -292,8 +493,13 @@ $(REPL-SOURCE-STAGE-STAMP): \
   $(BABASHKA-SOURCES) \
   $(BB) \
   $(GOBB-SOURCES) \
+  $(BABASHKA-CLI-DEP) \
+  $(CLOJURE-SOURCE-DEP) \
+  $(BABASHKA-CLI-SOURCES) \
+  $(CLOJURE-ZIP-SOURCE) \
   $(SOURCE-MANIFEST) \
   $(STAGE-SOURCES) \
+  $(TOP)/Makefile \
   $(VERSION-FILE)
 	@$(ECHO) "* Staging the Gobb browser REPL"
 	$Q $(BB) '$(STAGE-SOURCES)' \
@@ -302,7 +508,9 @@ $(REPL-SOURCE-STAGE-STAMP): \
 	  '$(TOP)/src' \
 	  '$(REPL-SOURCE-STAGE)' \
 	  '$(VERSION-FILE)' \
-	  'gobb.web-repl'
+	  'gobb.web-repl' \
+	  '$(BABASHKA-CLI-SOURCE-ROOT)' \
+	  '$(CLOJURE-ZIP-SOURCE)'
 	$Q touch '$@'
 	@$(ECHO)
 
@@ -311,9 +519,14 @@ $(CAPABILITY-STAGE-STAMP): \
   $(BABASHKA-SOURCES) \
   $(BB) \
   $(GOBB-SOURCES) \
+  $(BABASHKA-CLI-DEP) \
+  $(CLOJURE-SOURCE-DEP) \
+  $(BABASHKA-CLI-SOURCES) \
+  $(CLOJURE-ZIP-SOURCE) \
   $(CAPABILITY-SOURCE) \
   $(SOURCE-MANIFEST) \
   $(STAGE-SOURCES) \
+  $(TOP)/Makefile \
   $(VERSION-FILE)
 	@$(ECHO) "* Staging the cross-target capability probe"
 	$Q $(BB) '$(STAGE-SOURCES)' \
@@ -322,7 +535,9 @@ $(CAPABILITY-STAGE-STAMP): \
 	  '$(TOP)/src' \
 	  '$(CAPABILITY-STAGE)' \
 	  '$(VERSION-FILE)' \
-	  'gobb.capability-probe'
+	  'gobb.capability-probe' \
+	  '$(BABASHKA-CLI-SOURCE-ROOT)' \
+	  '$(CLOJURE-ZIP-SOURCE)'
 	$Q touch '$@'
 	@$(ECHO)
 
@@ -558,6 +773,10 @@ test: \
   $(BABASHKA-HTTP-CLIENT-DEP) \
   $(CLOJURE-DATA-CSV-DEP) \
   $(CHESHIRE-DEP) \
+  $(CLJ-YAML-DEP) \
+  $(TRANSIT-CLJ-DEP) \
+  $(BABASHKA-CLI-DEP) \
+  $(CLOJURE-SOURCE-DEP) \
   smoke \
   capability-test
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/gobb
@@ -565,6 +784,12 @@ test: \
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/java-io
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/data-csv
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/cheshire
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/clj-yaml
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/transit
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/babashka-cli
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/hiccup
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/logging
+	$Q GOBB='$(GOBB)' BB='$(BB)' test/clojure-zip
 	$Q GOBB='$(GOBB)' BB='$(BB)' test/process
 	$Q GOBB='$(GOBB)' BB='$(BB)' \
 	  GO="$$('$(GLOAT)' --which=go)" test/curl

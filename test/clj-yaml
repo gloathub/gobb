@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -eu
+
+: "${GOBB:?GOBB must name the Gobb executable}"
+: "${BB:?BB must name the Babashka executable}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+fixture="$root/test/fixtures/clj_yaml/core.clj"
+
+expected=$("$BB" "$fixture")
+actual=$("$GOBB" "$fixture")
+
+if [[ "$actual" != "$expected" ]]; then
+  diff -u <(printf '%s\n' "$expected") <(printf '%s\n' "$actual")
+  exit 1
+fi
+
+printf '%s\n' 'Core clj-yaml compatibility tests passed'

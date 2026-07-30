@@ -45,8 +45,8 @@
  {:cli {:state :planned :milestone 13}
   :project-config {:state :planned :milestone 7}
   :task-config {:state :planned :milestone 8}
-  :built-in-namespace {:state :planned :milestone 9}
-  :built-in-library {:state :planned :milestone 9}
+  :built-in-namespace {:state :planned :milestone 13}
+  :built-in-library {:state :planned :milestone 13}
   :compatible-library {:state :planned :milestone 13}
   :java-class {:state :planned :milestone 13}
   :capability {:state :planned :milestone 5}
@@ -357,6 +357,157 @@
    :evidence [{:kind :implementation :path "src/cheshire/core.clj"}
               {:kind :test :path "test/cheshire"
                :description "Differential core Cheshire behavior against pinned BB"}]}
+  "built-in-library/clj-commons/clj-yaml"
+  {:state :partial
+   :milestone 9
+   :rationale "The pinned clj-yaml 1.0.29 high-level parse and generate API is implemented over Go yaml.v3; SnakeYAML objects, marked nodes, unsafe Java tags, and exact ordered collection types remain"
+   :evidence [{:kind :implementation :path "src/clj_yaml/core.clj"}
+              {:kind :upstream-source
+               :path "https://github.com/clj-commons/clj-yaml"
+               :description "Pinned tag v1.0.29 at revision 57c817a20910003583b0b0dde16a76ee101fd7e7"}
+              {:kind :test :path "test/clj-yaml"
+               :description "Differential core YAML behavior against pinned BB"}]}
+  "namespace/clj-yaml.core"
+  {:state :partial
+   :milestone 9
+   :rationale "String and stream parsing, keyword and custom keys, multiple documents, generation, and indentation work; JVM-specific low-level and marked-node APIs remain"
+   :evidence [{:kind :implementation :path "src/clj_yaml/core.clj"}
+              {:kind :test :path "test/clj-yaml"
+               :description "Differential core clj-yaml behavior against pinned BB"}]}
+  "built-in-library/com.cognitect/transit-clj"
+  {:state :partial
+   :milestone 9
+   :rationale "Core JSON Transit streams support scalars, maps, vectors, lists, sets, keywords, and symbols; cache compaction, custom handlers, dates, UUIDs, binary formats, and complete tagged values remain"
+   :evidence [{:kind :implementation :path "src/cognitect/transit.clj"}
+              {:kind :upstream-source
+               :path "https://github.com/cognitect/transit-clj"
+               :description "Pinned tag v1.1.357 at revision 89144172fb10568df433d0255058f947ac70ab53"}
+              {:kind :test :path "test/transit"
+               :description "Differential core Transit JSON behavior against pinned BB"}]}
+  "namespace/cognitect.transit"
+  {:state :partial
+   :milestone 9
+   :rationale "Core JSON reader, writer, read, and write work for common Clojure values; advanced handlers, cache compaction, and non-JSON formats remain"
+   :evidence [{:kind :implementation :path "src/cognitect/transit.clj"}
+              {:kind :test :path "test/transit"
+               :description "Differential core Transit JSON behavior against pinned BB"}]}
+  "built-in-library/org.babashka/cli"
+  {:state :partial
+   :milestone 9
+   :rationale "The pinned babashka.cli 0.8.67 Clojure source is normalized from cljc and compiled directly; core option parsing, coercion, aliases, collection, and command behavior is differentially tested while exec dispatch remains less exercised"
+   :evidence [{:kind :upstream-source
+               :path "https://github.com/babashka/cli"
+               :description "Pinned tag v0.8.67 at revision 4ca06937cd9d50917ad7112855815960365cb474"}
+              {:kind :implementation :path "util/stage-sources"}
+              {:kind :test :path "test/babashka-cli"
+               :description "Differential core babashka.cli behavior against pinned BB"}]}
+  "namespace/babashka.cli"
+  {:state :partial
+   :milestone 9
+   :rationale "Pinned upstream parsing, coercion, alias, collection, and command functions are compiled into Gobb; the complete exec dispatch surface remains to be exercised"
+   :evidence [{:kind :implementation :path "util/stage-sources"}
+              {:kind :test :path "test/babashka-cli"
+               :description "Differential core babashka.cli behavior against pinned BB"}]}
+  "namespace/clojure.edn"
+  {:state :supported
+   :milestone 9
+   :evidence [{:kind :implementation :path "src/clojure/edn.clj"}
+              {:kind :test :path "test/babashka-cli"
+               :description "EDN coercion exercised through pinned babashka.cli source"}]}
+  "built-in-library/hiccup/hiccup"
+  {:state :partial
+   :milestone 9
+   :rationale "The pinned Hiccup 2.0.0-RC1 core HTML and Hiccup2 rendering contract is implemented natively; page, form, element, middleware, URI, and complete compile-time optimization APIs remain"
+   :evidence [{:kind :implementation :path "src/hiccup/render.clj"}
+              {:kind :implementation :path "src/hiccup/core.clj"}
+              {:kind :implementation :path "src/hiccup2/core.clj"}
+              {:kind :upstream-source
+               :path "https://github.com/weavejester/hiccup"
+               :description "Pinned tag 2.0.0-RC1 at revision 327d5408af94b4ef9560c39ab0afcfe5afe3c9a5"}
+              {:kind :test :path "test/hiccup"
+               :description "Differential core Hiccup rendering against pinned BB"}]}
+  "namespace/hiccup.core"
+  {:state :partial
+   :milestone 9
+   :rationale "Legacy html and escaping behavior work; the remaining helper namespaces and compiler optimizations remain"
+   :evidence [{:kind :implementation :path "src/hiccup/core.clj"}
+              {:kind :test :path "test/hiccup"}]}
+  "namespace/hiccup2.core"
+  {:state :partial
+   :milestone 9
+   :rationale "Escaped HTML and raw content work for common element trees; complete upstream compiler and option behavior remains"
+   :evidence [{:kind :implementation :path "src/hiccup2/core.clj"}
+              {:kind :test :path "test/hiccup"}]}
+  "built-in-library/org.clojure/tools.logging"
+  {:state :partial
+   :milestone 9
+   :rationale "The common tools.logging macros, logger lookup, level filtering, formatted messages, throwable output, and spy behavior use Gobb's native logger; JVM logging-facade discovery and backend-specific factories do not apply"
+   :evidence [{:kind :implementation :path "src/clojure/tools/logging.clj"}
+              {:kind :implementation :path "src/clojure/tools/logging/impl.clj"}
+              {:kind :upstream-source
+               :path "https://github.com/clojure/tools.logging"
+               :description "Pinned tag v1.3.0 at revision be30369b2fcf5403ae75cebbc9e645046525f437"}
+              {:kind :test :path "test/logging"
+               :description "Differential common logging output and return values against pinned BB"}]}
+  "namespace/clojure.tools.logging"
+  {:state :partial
+   :milestone 9
+   :rationale "Common level, formatted-message, enabled, and spy macros are available over Gobb's native logger; JVM facade discovery remains unavailable"
+   :evidence [{:kind :implementation :path "src/clojure/tools/logging.clj"}
+              {:kind :test :path "test/logging"}]}
+  "namespace/clojure.tools.logging.impl"
+  {:state :partial
+   :milestone 9
+   :rationale "Gobb supplies its native logger factory, level checks, and writer; JVM backend factory implementations are not present"
+   :evidence [{:kind :implementation :path "src/clojure/tools/logging/impl.clj"}
+              {:kind :test :path "test/logging"}]}
+  "namespace/clojure.tools.logging.readable"
+  {:state :supported
+   :milestone 9
+   :evidence [{:kind :implementation :path "src/clojure/tools/logging/readable.clj"}
+              {:kind :test :path "test/logging"}]}
+  "built-in-library/com.taoensso/timbre"
+  {:state :partial
+   :milestone 9
+   :rationale "Common Timbre levels, formatting, configuration bindings, filtering, spy, and println appender behavior use Gobb's native logger; the complete Timbre middleware, appender, rate-limit, and profiling surface remains"
+   :evidence [{:kind :implementation :path "src/taoensso/timbre.clj"}
+              {:kind :implementation :path "src/taoensso/timbre/appenders/core.clj"}
+              {:kind :upstream-source
+               :path "https://github.com/taoensso/timbre"
+               :description "Pinned tag v6.8.0 at revision cd00a1175147d447812be02d33e3d6e054864b9b"}
+              {:kind :test :path "test/logging"
+               :description "Differential common logging output and return values against pinned BB"}]}
+  "namespace/taoensso.timbre"
+  {:state :partial
+   :milestone 9
+   :rationale "Common level macros, formatting, configuration bindings, filtering, and spy work; advanced middleware, appenders, rate limiting, and profiling remain"
+   :evidence [{:kind :implementation :path "src/taoensso/timbre.clj"}
+              {:kind :test :path "test/logging"}]}
+  "namespace/taoensso.timbre.appenders.core"
+  {:state :partial
+   :milestone 9
+   :rationale "The common println appender is available; the complete upstream appender surface remains"
+   :evidence [{:kind :implementation :path "src/taoensso/timbre/appenders/core.clj"}
+              {:kind :test :path "test/logging"}]}
+  "namespace/clojure.zip"
+  {:state :supported
+   :milestone 9
+   :evidence [{:kind :upstream-source
+               :path "https://github.com/clojure/clojure"
+               :description "Pinned Clojure 1.12.4 source at revision b4ea0f824b2eea039dfc06b796ed601e35cbeab6"}
+              {:kind :implementation :path "util/stage-sources"
+               :description "Preserves zipper function metadata while normalizing the pinned source"}
+              {:kind :test :path "test/clojure-zip"
+               :description "Differential zipper traversal and editing against pinned BB"}]}
+  "built-in-library/rewrite-clj/rewrite-clj"
+  {:state :planned
+   :milestone 13
+   :rationale "Pinned rewrite-clj 1.2.54 source stages successfully, but Glojure 0.7.3 AOT cannot yet serialize the lang.ArityFn roots loaded by rewrite-clj's protocol namespace"
+   :evidence [{:kind :upstream-source
+               :path "https://github.com/clj-commons/rewrite-clj"
+               :description "Pinned tag v1.2.54 at revision b2436aa4ee60b406407420dbf15e61bf13a8c18d"}
+              {:kind :implementation :path "util/stage-sources"
+               :description "External clj and cljc source staging and diagnostic adaptations"}]}
   "class/java.lang.System" {:state :partial
                            :milestone 3
                            :rationale "Properties, environment, time, and controlled exit are implemented"
@@ -628,7 +779,7 @@
   {:pattern "(classes|interop|proxy|reify|java_)" :area :java-compatibility
    :milestone 13}
   {:pattern "(io_test|file_var|classpath)" :area :filesystem
-   :milestone 9}
+   :milestone 13}
   {:pattern "(shutdown_hook|interrupt|kill_child)" :area :platform
    :milestone 13}
   {:pattern "(uberjar|uberscript)" :area :build :milestone 11}]
@@ -637,5 +788,5 @@
  [{:pattern "(process|pst|which|fzf)" :area :process :milestone 8}
   {:pattern "(http|download|digitalocean|torrent)" :area :network
    :milestone 13}
-  {:pattern "(ls_jar|tree|notes)" :area :filesystem :milestone 9}
+  {:pattern "(ls_jar|tree|notes)" :area :filesystem :milestone 13}
   {:pattern "(server|portal)" :area :interactive-services :milestone 10}]}

@@ -10,8 +10,8 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| built-in-library | 38 | 0 | 5 | 33 | 0 |
-| built-in-namespace | 104 | 0 | 7 | 97 | 0 |
+| built-in-library | 38 | 0 | 11 | 27 | 0 |
+| built-in-namespace | 104 | 2 | 16 | 86 | 0 |
 | capability | 41 | 9 | 19 | 4 | 9 |
 | cli | 36 | 6 | 1 | 26 | 3 |
 | compatible-library | 98 | 0 | 1 | 97 | 0 |
@@ -28,8 +28,14 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `built-in-library/babashka/babashka.curl` | built-in-library | **partial** | src/gobb/curl.clj<br>test/curl |
 | `built-in-library/babashka/fs` | built-in-library | **partial** | src/gobb/fs.clj<br>test/fs |
 | `built-in-library/cheshire/cheshire` | built-in-library | **partial** | src/cheshire/core.clj<br>https://github.com/dakrone/cheshire<br>test/cheshire |
+| `built-in-library/clj-commons/clj-yaml` | built-in-library | **partial** | src/clj_yaml/core.clj<br>https://github.com/clj-commons/clj-yaml<br>test/clj-yaml |
+| `built-in-library/com.cognitect/transit-clj` | built-in-library | **partial** | src/cognitect/transit.clj<br>https://github.com/cognitect/transit-clj<br>test/transit |
+| `built-in-library/com.taoensso/timbre` | built-in-library | **partial** | src/taoensso/timbre.clj<br>src/taoensso/timbre/appenders/core.clj<br>https://github.com/taoensso/timbre<br>test/logging |
+| `built-in-library/hiccup/hiccup` | built-in-library | **partial** | src/hiccup/render.clj<br>src/hiccup/core.clj<br>src/hiccup2/core.clj<br>https://github.com/weavejester/hiccup<br>test/hiccup |
+| `built-in-library/org.babashka/cli` | built-in-library | **partial** | https://github.com/babashka/cli<br>util/stage-sources<br>test/babashka-cli |
 | `built-in-library/org.babashka/http-client` | built-in-library | **partial** | src/gobb/http_client.clj<br>test/http-client |
 | `built-in-library/org.clojure/data.csv` | built-in-library | **partial** | src/clojure/data/csv.clj<br>https://github.com/clojure/data.csv<br>test/data-csv |
+| `built-in-library/org.clojure/tools.logging` | built-in-library | **partial** | src/clojure/tools/logging.clj<br>src/clojure/tools/logging/impl.clj<br>https://github.com/clojure/tools.logging<br>test/logging |
 | `capability/browser-filesystem` | capability | **platform-limited** | www/docs/implementation.md |
 | `capability/browser-network` | capability | **platform-limited** | test/capabilities |
 | `capability/browser-repl` | capability | **partial** | test/gobb<br>www/docs/javascripts/repl.js |
@@ -137,13 +143,24 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `cli/-x` | cli | **supported** | :invocation/exec |
 | `cli/repl` | cli | **partial** | test/gobb |
 | `compatible-library/babashka/babashka.curl` | compatible-library | **partial** | src/gobb/curl.clj<br>test/curl |
+| `namespace/babashka.cli` | built-in-namespace | **partial** | util/stage-sources<br>test/babashka-cli |
 | `namespace/babashka.curl` | built-in-namespace | **partial** | src/gobb/curl.clj<br>test/curl |
 | `namespace/babashka.fs` | built-in-namespace | **partial** | src/gobb/fs.clj<br>test/fs |
 | `namespace/babashka.http-client` | built-in-namespace | **partial** | src/gobb/http_client.clj<br>test/http-client |
 | `namespace/babashka.process` | built-in-namespace | **partial** | src/gobb/process.clj<br>test/process |
 | `namespace/cheshire.core` | built-in-namespace | **partial** | src/cheshire/core.clj<br>test/cheshire |
+| `namespace/clj-yaml.core` | built-in-namespace | **partial** | src/clj_yaml/core.clj<br>test/clj-yaml |
 | `namespace/clojure.data.csv` | built-in-namespace | **partial** | src/clojure/data/csv.clj<br>test/data-csv |
 | `namespace/clojure.java.io` | built-in-namespace | **partial** | src/clojure/java/io.clj<br>test/java-io<br>:loading/resource |
+| `namespace/clojure.tools.logging` | built-in-namespace | **partial** | src/clojure/tools/logging.clj<br>test/logging |
+| `namespace/clojure.tools.logging.impl` | built-in-namespace | **partial** | src/clojure/tools/logging/impl.clj<br>test/logging |
+| `namespace/clojure.tools.logging.readable` | built-in-namespace | **supported** | src/clojure/tools/logging/readable.clj<br>test/logging |
+| `namespace/clojure.zip` | built-in-namespace | **supported** | https://github.com/clojure/clojure<br>util/stage-sources<br>test/clojure-zip |
+| `namespace/cognitect.transit` | built-in-namespace | **partial** | src/cognitect/transit.clj<br>test/transit |
+| `namespace/hiccup.core` | built-in-namespace | **partial** | src/hiccup/core.clj<br>test/hiccup |
+| `namespace/hiccup2.core` | built-in-namespace | **partial** | src/hiccup2/core.clj<br>test/hiccup |
+| `namespace/taoensso.timbre` | built-in-namespace | **partial** | src/taoensso/timbre.clj<br>test/logging |
+| `namespace/taoensso.timbre.appenders.core` | built-in-namespace | **partial** | src/taoensso/timbre/appenders/core.clj<br>test/logging |
 | `project/aliases` | project-config | **supported** | test/projects |
 | `project/bb-edn-discovery` | project-config | **supported** | test/projects |
 | `project/classpath-cache` | project-config | **supported** | test/projects |
@@ -178,10 +195,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 
 | Milestone | Planned items |
 | ---: | ---: |
-| 9 | 140 |
 | 10 | 11 |
 | 11 | 2 |
-| 13 | 721 |
+| 13 | 844 |
 
 ## Authoritative inputs
 

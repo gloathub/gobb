@@ -16,7 +16,10 @@
   (with-open [reader (java.io.PushbackReader.
                       (io/reader (str file)))]
     (loop []
-      (let [form (read {:eof ::eof} reader)]
+      (let [form (read {:eof ::eof
+                        :read-cond :allow
+                        :features #{:clj}}
+                       reader)]
         (cond
           (= ::eof form) nil
           (and (seq? form) (= 'ns (first form))) (second form)
@@ -56,10 +59,103 @@
   (with-open [reader (java.io.PushbackReader.
                       (io/reader (str source)))]
     (loop [forms []]
-      (let [form (read {:eof ::eof} reader)]
+      (let [form (read {:eof ::eof
+                        :read-cond :allow
+                        :features #{:clj}}
+                       reader)]
         (if (= ::eof form)
           forms
           (recur (conj forms form)))))))
+
+(defn source-files [source-root]
+  (if (fs/regular-file? source-root)
+    [source-root]
+    (sort
+     (concat
+      (fs/glob source-root "**/*.clj")
+      (fs/glob source-root "**/*.cljc")))))
+
+(defn adapt-external-form [form]
+  (walk/postwalk
+   (fn [node]
+     (cond
+       (and (seq? node)
+            (= 'defn (first node))
+            (= 'zipper (second node))
+            (contains? (meta (last node)) :zip/branch?))
+       (concat
+        (butlast node)
+        '((with-meta
+            [root nil]
+            {:zip/branch? branch?
+             :zip/children children
+             :zip/make-node make-node})))
+
+       (= node 'java.io.PushbackReader.)
+       'clojure.lang.LineNumberingPushbackReader.
+
+       (= node 'babashka.cli.internal)
+       'babashka.cli-internal
+
+       (and (seq? node)
+            (= 'defn- (first node))
+            (= 'parse-number (second node)))
+       '(defn- parse-number [value]
+          (let [parsed (edn/read-string value)]
+            (if (number? parsed)
+              parsed
+              (throw-unexpected value))))
+
+       (and (seq? node)
+            (= 'reduce (first node))
+            (<= 3 (count node)))
+       (concat (butlast node)
+               [(list 'vec (last node))])
+
+       (and (seq? node)
+            (= 'into (first node))
+            (<= 3 (count node)))
+       (concat (butlast node)
+               [(list 'or (last node) [])])
+
+       :else node))
+   form))
+
+(defn external-namespace [namespace]
+  (case namespace
+    babashka.cli.internal 'babashka.cli-internal
+    namespace))
+
+(defn stage-external! [providers stage-dir entry-namespace source-root]
+  (when-not (or (fs/directory? source-root)
+                (fs/regular-file? source-root))
+    (die "external source root not found: " source-root))
+  (reduce
+   (fn [count source]
+     (let [source-namespace (namespace-in source)
+           namespace (external-namespace source-namespace)]
+       (when-not source-namespace
+         (die "cannot find namespace in " source))
+       (when-let [previous (get @providers namespace)]
+         (die "duplicate namespace " namespace
+              "  first: " previous
+              "  again: " source))
+       (swap! providers assoc namespace (str source))
+       (let [target (fs/path stage-dir
+                             (if (= namespace entry-namespace)
+                               "main.clj"
+                               (flat-name namespace)))]
+         (spit
+          (str target)
+          (str ";; Generated from pinned external Clojure source.\n"
+               ";; Original source: " source "\n\n"
+               (str/join "\n\n"
+                         (map (comp pr-str adapt-external-form)
+                              (read-forms source)))
+               "\n")))
+       (inc count)))
+   0
+   (source-files source-root)))
 
 (defn definition-name [form]
   (when (and (seq? form)
@@ -121,13 +217,12 @@
                "\n"))))
 
 (let [[manifest-file babashka-dir gobb-src-dir stage-dir version-file
-       entry-namespace-arg & extra]
+       entry-namespace-arg & external-roots]
       *command-line-args*]
-  (when (or extra
-            (some nil? [manifest-file babashka-dir gobb-src-dir
-                        stage-dir version-file]))
+  (when (some nil? [manifest-file babashka-dir gobb-src-dir
+                    stage-dir version-file])
     (die (str "usage: stage-sources MANIFEST BABASHKA-DIR GOBB-SRC-DIR "
-              "STAGE-DIR VERSION-FILE [ENTRY-NAMESPACE]")))
+              "STAGE-DIR VERSION-FILE [ENTRY-NAMESPACE [EXTERNAL-ROOT...]]")))
   (let [manifest (edn/read-string (slurp manifest-file))
         entry-namespace (symbol (or entry-namespace-arg "gobb.cli"))
         source-root (fs/path babashka-dir
@@ -149,7 +244,8 @@
                           (= :adapted (:disposition data)))
                         ledger)
         gobb-files (sort (fs/glob gobb-src-dir "**/*.clj"))
-        providers (atom {})]
+        providers (atom {})
+        external-count (atom 0)]
     (when-not (fs/directory? source-root)
       (die "Babashka source root not found: " source-root))
     (when (seq unknown)
@@ -177,6 +273,10 @@
         (when-not namespace
           (die "cannot find namespace in " source))
         (stage-file! providers stage-dir entry-namespace namespace source)))
+    (doseq [external-root external-roots]
+      (swap! external-count +
+             (stage-external! providers stage-dir entry-namespace
+                              (fs/path external-root))))
     (let [version (str/trim (slurp version-file))
           babashka-version (str/replace
                             (get-in manifest [:babashka :tag])
@@ -202,4 +302,5 @@
                   :namespaces ledger})))
     (println "Staged" (count @providers) "namespaces;"
              (+ (count selected) (count adapted)) "from Babashka and"
-             (count gobb-files) "from Gobb")))
+             (count gobb-files) "from Gobb and"
+             @external-count "from pinned external sources")))

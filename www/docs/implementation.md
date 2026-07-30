@@ -230,6 +230,40 @@ key-conversion, array-coercion, and generation APIs onto Go's `encoding/json`.
 Factories, custom encoders, Smile, and strict duplicate-key detection remain
 open and are kept partial in the inventory.
 
+YAML support pins clj-yaml 1.0.29 and maps its high-level string and stream
+parsing and generation APIs onto Go's YAML v3 package. Transit JSON streams
+cover common Clojure scalars and collections with the pinned transit-clj
+1.1.357 contract. SnakeYAML-specific objects, marked or unsafe Java nodes,
+Transit cache compaction, custom handlers, and non-JSON Transit formats remain
+partial.
+
+Portable external libraries can also be compiled directly rather than copied
+into Gobb. The source stage reads pinned `.clj` and `.cljc` trees with the
+Clojure feature selected, normalizes them into Gloat inputs, prevents duplicate
+namespace providers, and records their original paths. `babashka.cli` 0.8.67
+is the first complete source tree using this route.
+
+The template wave includes core Hiccup and Hiccup2 element rendering, escaping,
+raw content, attributes, styles, and tag shorthand against the pinned
+2.0.0-RC1 behavior. Page, form, middleware, URI helpers, and the complete
+compile-time optimizer remain partial.
+
+The logging wave provides the common `clojure.tools.logging` and Timbre level,
+formatting, filtering, configuration, spy, throwable, and println-appender
+behavior over a small native Gobb logger. JVM logging-facade discovery and
+Timbre's complete middleware, appender, rate-limit, and profiling APIs remain
+outside this portable slice.
+
+Gobb also compiles `clojure.zip` directly from the pinned Clojure 1.12.4
+source. The source stage preserves its semantic zipper metadata explicitly,
+and traversal plus editing are checked differentially against BB.
+
+rewrite-clj 1.2.54 is pinned but not included in production staging yet. Its
+source and `clojure.zip` prerequisite can be normalized, but Glojure 0.7.3 AOT
+currently rejects the interpreted `lang.ArityFn` roots loaded by rewrite-clj's
+protocol namespace. The inventory assigns that compiler-dependent closure to
+the final compatibility milestone rather than claiming incomplete support.
+
 ## Repository boundaries
 
 Gobb selectively ports BB behavior rather than maintaining a wholesale fork.

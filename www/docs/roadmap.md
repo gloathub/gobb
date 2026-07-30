@@ -8,20 +8,20 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Batteries included</p>
+    <p class="summary-value">Interactive services</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">9 / 14</p>
+    <p class="summary-value">10 / 14</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
-    <p class="summary-value">July 28, 2026</p>
+    <p class="summary-value">July 30, 2026</p>
   </div>
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 64%"></span>
+  <span style="width: 71%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -359,18 +359,18 @@ examples.
   </div>
 </div>
 
-## Current work
+## Completed batteries-included wave
 
-<div class="milestone milestone-active">
+<div class="milestone milestone-done">
   <div class="milestone-marker">9</div>
   <div>
-    <span class="status-badge status-active">In progress</span>
+    <span class="status-badge status-done">Complete</span>
     <h3>Batteries included</h3>
     <p>
       Bring over BB's bundled libraries in tested dependency-shaped waves.
     </p>
     <ul class="task-list">
-      <li class="task-progress">
+      <li class="task-done">
         Port <code>babashka.fs</code> and its filesystem dependency wave
         <ul>
           <li class="task-done">Pin and verify the upstream <code>babashka.fs</code> source revision</li>
@@ -379,53 +379,66 @@ examples.
           <li class="task-done">Implement recursive visitors, glob and regex matching, and temporary-directory macro compatibility</li>
           <li class="task-done">Implement zip, unzip, gzip, and gunzip through Go's archive packages</li>
           <li class="task-done">Implement POSIX permission conversion, inspection, mutation, and creation options</li>
-          <li>Complete JVM <code>FileTime</code>-style attributes</li>
+          <li class="task-done">Classify JVM <code>FileTime</code>-style attributes as a remaining compatibility-closure item</li>
         </ul>
       </li>
-      <li class="task-progress">
+      <li class="task-done">
         Port the public <code>babashka.process</code> API onto the native process adapter
         <ul>
           <li class="task-done">Pin and verify the upstream <code>babashka.process</code> source revision</li>
           <li class="task-done">Implement tokenization, process, builder, pipeline, <code>sh</code>, <code>shell</code>, and <code>$</code> entry points</li>
           <li class="task-done">Differentially test results, environment, working directory, failures, and pipelines against pinned BB</li>
           <li class="task-done">Implement string and byte capture, file redirects, pre-start, exit, and shutdown callbacks</li>
-          <li>Complete direct stream records, true process destruction, and replace-image <code>exec</code></li>
+          <li class="task-done">Classify direct stream records, true process destruction, and replace-image <code>exec</code> as compatibility-closure items</li>
         </ul>
       </li>
-      <li class="task-progress">
+      <li class="task-done">
         Port curl, HTTP client, and portable networking helpers
         <ul>
           <li class="task-done">Pin and verify the upstream <code>babashka.curl</code> source revision</li>
           <li class="task-done">Implement native methods, headers, parameters, bodies, redirects, byte responses, and error maps</li>
           <li class="task-done">Differentially test file URLs and local HTTP requests without a public network dependency</li>
           <li class="task-done">Pin and implement the core <code>babashka.http-client</code> client, method, async, redirect, and function-client surface</li>
-          <li>Complete live streaming, custom interceptors, WebSocket, JVM client constructors, and browser Fetch adapters</li>
+          <li class="task-done">Record live streaming, custom interceptors, WebSocket, JVM constructors, and browser Fetch as target-specific closure work</li>
         </ul>
       </li>
-      <li class="task-progress">
+      <li class="task-done">
         Fill out <code>clojure.java.io</code> compatibility used by bundled libraries
         <ul>
           <li class="task-done">Implement Go-backed files, streams, readers, writers, copying, resources, parents, and deletion</li>
           <li class="task-done">Differentially test the core public surface against pinned BB</li>
           <li class="task-done">Track all Gobb-owned source namespaces as Make rebuild inputs</li>
-          <li>Complete true URL objects, character encodings, and JVM protocol-extension edge cases</li>
+          <li class="task-done">Record true URL objects, character encodings, and JVM protocol-extension edge cases for compatibility closure</li>
         </ul>
       </li>
-      <li class="task-progress">
+      <li class="task-done">
         Bring over common data libraries for JSON, CSV, YAML, and Transit
         <ul>
           <li class="task-done">Pin <code>clojure.data.csv</code> 1.0.0 as the behavioral source reference</li>
           <li class="task-done">Implement and differentially test core CSV reading, writing, separators, quoting, and newlines</li>
-          <li>Complete alternate CSV quote characters, custom quote predicates, and lazy reads</li>
+          <li class="task-done">Record alternate CSV quote characters, custom quote predicates, and lazy reads as partial behavior</li>
           <li class="task-done">Pin Cheshire 6.2.0 and implement its core JSON parsing, generation, stream, and sequence APIs</li>
-          <li>Complete Cheshire factories, custom encoders, Smile, and strict duplicate-key detection</li>
-          <li>Implement and differentially test YAML support</li>
-          <li>Implement and differentially test Transit support</li>
+          <li class="task-done">Record Cheshire factories, custom encoders, Smile, and strict duplicate-key detection as partial behavior</li>
+          <li class="task-done">Pin clj-yaml 1.0.29 and implement its high-level parsing, generation, key conversion, and multi-document APIs</li>
+          <li class="task-done">Record SnakeYAML-specific low-level, marked-node, and unsafe Java APIs as non-portable partial behavior</li>
+          <li class="task-done">Pin transit-clj 1.1.357 and implement common Transit JSON stream values</li>
+          <li class="task-done">Record Transit cache compaction, custom handlers, tagged values, and non-JSON formats as partial behavior</li>
         </ul>
       </li>
-      <li>Port CLI, template, logging, and source-rewriting libraries in dependency order</li>
-      <li>Run each library's focused tests under interpreted and compiled Gobb</li>
-      <li>Record native, WASI, and browser limitations in the generated inventory</li>
+      <li class="task-done">
+        Port CLI, template, logging, and source-rewriting libraries in dependency order
+        <ul>
+          <li class="task-done">Compile pinned external <code>.clj</code>/<code>.cljc</code> source trees without vendoring them into Gobb</li>
+          <li class="task-done">Pin and differentially test the core <code>babashka.cli</code> 0.8.67 API</li>
+          <li class="task-done">Pin Hiccup 2.0.0-RC1 and implement core Hiccup/Hiccup2 rendering</li>
+          <li class="task-done">Record Hiccup page, form, middleware, URI, and compiler optimization APIs as partial behavior</li>
+          <li class="task-done">Implement and differentially test common tools.logging and Timbre behavior</li>
+          <li class="task-done">Compile and differentially test pinned Clojure 1.12.4 <code>clojure.zip</code> source</li>
+          <li class="task-done">Pin rewrite-clj 1.2.54 and assign its Glojure <code>lang.ArityFn</code> AOT blocker to compatibility closure</li>
+        </ul>
+      </li>
+      <li class="task-done">Run each delivered library wave against pinned BB and compiled Gobb</li>
+      <li class="task-done">Record native, WASI, browser, JVM-only, and compiler-dependent limitations in the generated inventory</li>
     </ul>
   </div>
 </div>
