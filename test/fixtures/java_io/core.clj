@@ -21,6 +21,11 @@
       writer-file (io/file root "writer.txt")
       _ (with-open [output (io/writer writer-file)]
           (io/copy "writer" output))
+      spit-file (io/file root "spit.txt")
+      _ (spit spit-file "spit")
+      _ (spit spit-file "-append" :append true)
+      spit-content (with-open [input (io/input-stream spit-file)]
+                     (slurp input))
       string-output (java.io.StringWriter.)
       copied (io/copy "memory" string-output)
       resource
@@ -36,6 +41,7 @@
     :content [from-stream
               from-reader
               byte-input
+              spit-content
               (str string-output)
               copied]
     :resource [(some? resource)

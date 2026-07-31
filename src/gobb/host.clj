@@ -12,6 +12,21 @@
 (def shutdown-ran? (atom false))
 (def current-source (atom no-source-path))
 
+(defn spit* [file content & options]
+  ;; Glojure's clojure.core/spit currently targets the unimplemented
+  ;; glojure.go.io/writer host form. Route it through Gobb's Java I/O
+  ;; compatibility namespace instead.
+  (require 'clojure.java.io)
+  (let [writer-fn (ns-resolve 'clojure.java.io 'writer)
+        writer (apply writer-fn file options)]
+    (try
+      (let [[_ error] (io.WriteString writer (str content))]
+        (when error
+          (throw error))
+        nil)
+      (finally
+        (.Close writer)))))
+
 (defn initialize! []
   ;; Glojure initializes *in* and *out* at bootstrap, but its generated
   ;; clojure.core currently leaves *err* nil. Own all three roots here so the
@@ -19,6 +34,7 @@
   (alter-var-root #'*in* (constantly os.Stdin))
   (alter-var-root #'*out* (constantly os.Stdout))
   (alter-var-root #'*err* (constantly os.Stderr))
+  (alter-var-root #'clojure.core/spit (constantly spit*))
   (in-ns 'user)
   (refer 'clojure.core))
 

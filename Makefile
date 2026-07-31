@@ -493,10 +493,6 @@ $(REPL-SOURCE-STAGE-STAMP): \
   $(BABASHKA-SOURCES) \
   $(BB) \
   $(GOBB-SOURCES) \
-  $(BABASHKA-CLI-DEP) \
-  $(CLOJURE-SOURCE-DEP) \
-  $(BABASHKA-CLI-SOURCES) \
-  $(CLOJURE-ZIP-SOURCE) \
   $(SOURCE-MANIFEST) \
   $(STAGE-SOURCES) \
   $(TOP)/Makefile \
@@ -509,8 +505,7 @@ $(REPL-SOURCE-STAGE-STAMP): \
 	  '$(REPL-SOURCE-STAGE)' \
 	  '$(VERSION-FILE)' \
 	  'gobb.web-repl' \
-	  '$(BABASHKA-CLI-SOURCE-ROOT)' \
-	  '$(CLOJURE-ZIP-SOURCE)'
+	  '--gobb-namespaces=gobb.web-repl,gobb.repl,gobb.host,gobb.capabilities,gobb.capability-matrix'
 	$Q touch '$@'
 	@$(ECHO)
 

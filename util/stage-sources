@@ -217,13 +217,28 @@
                "\n"))))
 
 (let [[manifest-file babashka-dir gobb-src-dir stage-dir version-file
-       entry-namespace-arg & external-roots]
+       entry-namespace-arg & extra-arguments]
       *command-line-args*]
   (when (some nil? [manifest-file babashka-dir gobb-src-dir
                     stage-dir version-file])
     (die (str "usage: stage-sources MANIFEST BABASHKA-DIR GOBB-SRC-DIR "
               "STAGE-DIR VERSION-FILE [ENTRY-NAMESPACE [EXTERNAL-ROOT...]]")))
-  (let [manifest (edn/read-string (slurp manifest-file))
+  (let [namespace-prefix "--gobb-namespaces="
+        namespace-option
+        (some #(when (str/starts-with? % namespace-prefix) %)
+              extra-arguments)
+        external-roots
+        (remove #(str/starts-with? % namespace-prefix)
+                extra-arguments)
+        selected-gobb-namespaces
+        (when namespace-option
+          (->> (str/split
+                (subs namespace-option (count namespace-prefix))
+                #",")
+               (remove str/blank?)
+               (map symbol)
+               set))
+        manifest (edn/read-string (slurp manifest-file))
         entry-namespace (symbol (or entry-namespace-arg "gobb.cli"))
         source-root (fs/path babashka-dir
                              (get-in manifest [:babashka :source-root]))
@@ -243,7 +258,14 @@
         adapted (filter (fn [[_ data]]
                           (= :adapted (:disposition data)))
                         ledger)
-        gobb-files (sort (fs/glob gobb-src-dir "**/*.clj"))
+        gobb-files
+        (->> (fs/glob gobb-src-dir "**/*.clj")
+             (filter
+              (fn [source]
+                (or (nil? selected-gobb-namespaces)
+                    (contains? selected-gobb-namespaces
+                               (namespace-in source)))))
+             sort)
         providers (atom {})
         external-count (atom 0)]
     (when-not (fs/directory? source-root)
