@@ -4,8 +4,8 @@ site_description:
   A Go-native Babashka powered by Gloat and the full Glojure runtime
 site_author: Ingy dot Net
 
-repo_name: clojurestar/gobb
-repo_url: https://github.com/clojurestar/gobb
+repo_name: gloathub/gobb
+repo_url: https://github.com/gloathub/gobb
 edit_uri: edit/main/www/docs/
 
 theme:
@@ -100,7 +100,7 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/clojurestar/gobb
+      link: https://github.com/gloathub/gobb
       name: Gobb on GitHub
 
 copyright: Copyright &copy; 2026 Ingy dot Net

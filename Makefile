@@ -553,7 +553,7 @@ $(GOBB): $(SOURCE-STAGE-STAMP) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 build: $(GOBB)
@@ -567,7 +567,7 @@ $(GOBB-WASM): $(REPL-SOURCE-STAGE-STAMP) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 $(WASM-EXEC): $(GLOAT)
@@ -612,7 +612,7 @@ $(CAPABILITY-NATIVE): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 $(CAPABILITY-WASI): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
@@ -624,7 +624,7 @@ $(CAPABILITY-WASI): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 $(CAPABILITY-BROWSER): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
@@ -636,7 +636,7 @@ $(CAPABILITY-BROWSER): $(CAPABILITY-STAGE-STAMP) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 smoke: $(SMOKE-NATIVE) $(SMOKE-WASI) $(SMOKE-BROWSER) $(WASMTIME) $(NODE)
@@ -717,7 +717,7 @@ $(JAVA-COMPAT-NATIVE): $(JAVA-COMPAT-SOURCE) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 $(JAVA-COMPAT-WASI): $(JAVA-COMPAT-SOURCE) $(GLOAT)
@@ -729,7 +729,7 @@ $(JAVA-COMPAT-WASI): $(JAVA-COMPAT-SOURCE) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 $(JAVA-COMPAT-BROWSER): $(JAVA-COMPAT-SOURCE) $(GLOAT)
@@ -741,7 +741,7 @@ $(JAVA-COMPAT-BROWSER): $(JAVA-COMPAT-SOURCE) $(GLOAT)
 	  --force \
 	  --quiet \
 	  --ext=goimports \
-	  --module=github.com/clojurestar/gobb
+	  --module=github.com/gloathub/gobb
 	@$(ECHO)
 
 java-compat-test: \

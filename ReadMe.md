@@ -2,7 +2,7 @@
 
 **Go + BB**
 
-Gobb (pronounced "Joby"; rhymes with "Moby") is the
+Gobb (pronounced "Joe-Bee"; rhymes with "Moby") is the
 [Babashka](https://github.com/babashka/babashka) source code compiled by
 [Gloat](https://gloathub.org/) using the Go hosted
 [Glojure](https://github.com/glojurelang/glojure) runtime; without SCI,
@@ -12,18 +12,27 @@ Gloat AOT compiles the Babashka Clojure source code to Go source code which
 then compiles to a native `gobb` binary for up to 25 different platform
 architectures including WebAssembly binaries for both server and browser.
 
+> Try out the [Gobb REPL in a browser](https://gobb.site/repl)!
+
 Gobb currently releases prebuilt binaries for 15 platforms.
 Gobb's runtime speed should be as fast or faster than `bb` compiled with
 GraalVM's `native-image` compiler.
 
 > [!IMPORTANT]
-> Gobb is an early architecture proof, not yet a general BB replacement.
+> Gobb is an early architecture proof of concept.
+> It is not meant to compete with or replace Babashka.
+> To the contrary, it is a research project meant to see if new technologies
+> can expand Babashka's reach.
+> The goal is to see how much of Babashka can work when replacing the
+> native-image compiler and SCI runtime with Glojure.
+> If `gobb` can work the same as `bb`, that means Glojure can take bb to lots
+> of new places.
 
 
 ## Install
 
 You can install Gobb by downloading a [pre-built release binary](
-https://github.com/clojurestar/gobb/releases/) and adding it to a directory in
+https://github.com/gloathub/gobb/releases/) and adding it to a directory in
 your `PATH`, or by simply running the `make install` command.
 
 Building and installing Gobb requires only `git`, `make`, `curl`, and a `bash`
@@ -31,7 +40,7 @@ binary.
 You do not need Go, BB, Glojure, Gloat, GraalVM, Java, or a JVM pre-installed.
 
 ```bash
-git clone https://github.com/clojurestar/gobb
+git clone https://github.com/gloathub/gobb
 make -C gobb install
 ```
 
@@ -46,7 +55,7 @@ make -C gobb install PREFIX=/some/path
 ```
 
 Prebuilt archives for supported platforms are available from
-[GitHub Releases](https://github.com/clojurestar/gobb/releases).
+[GitHub Releases](https://github.com/gloathub/gobb/releases).
 
 
 ## Gobb's Goals
@@ -75,7 +84,7 @@ Oracle GraalVM (GFTC licensed) `native-image` compiler:
 Gloat/Glojure solves all of these problems.
 It compiles very fast and cross-compiles to ~25 platforms including mac/Intel,
 BSDs, Wasm and 32-bit (Gobb releases ship [prebuilt binaries for 15 of those](
-https://github.com/clojurestar/gobb/releases/)).
+https://github.com/gloathub/gobb/releases/)).
 It replaces the need for SCI with the Glojure runtime which is a faithful port
 of Clojure hosted on the Go language.
 All under an open, OSI-approved license.

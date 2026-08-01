@@ -23,7 +23,7 @@ export UV_LINK_MODE := copy
 export UV_CACHE_DIR := $(TOP)/.cache/uv
 export NO_MKDOCS_2_WARNING := 1
 
-REPO ?= git@github.com:clojurestar/gobb
+REPO ?= git@github.com:gloathub/gobb
 
 MAKES-CLEAN := \
   site \
