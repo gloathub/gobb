@@ -230,6 +230,13 @@ check "compiled project and local dependency" \
   '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :override :project-override, :args ("one" "two")}' \
   "$compiled" one two
 
+compiled_repeat="$tmp/project-program-repeat"
+GOBB_GLOAT="$GOBB_GLOAT" \
+  "$GOBB" --config "$projects/basic/build.edn" \
+  build "$projects/basic/main.clj" -o "$compiled_repeat"
+cmp "$compiled" "$compiled_repeat" ||
+  fail "repeated native builds were not byte-identical"
+
 wasi="$tmp/project-program.wasm"
 GOBB_GLOAT="$GOBB_GLOAT" \
   "$GOBB" --config "$projects/basic/build.edn" \

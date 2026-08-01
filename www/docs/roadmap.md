@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Production build command</p>
+    <p class="summary-value">Upstream conformance harness</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">12 / 17</p>
+    <p class="summary-value">13 / 17</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 71%"></span>
+  <span style="width: 76%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -33,29 +33,6 @@ architecture proof, not yet a general BB replacement.
 The generated BB surface ledger now tracks 1,022 CLI, project, namespace,
 library, Java-class, platform, upstream-test, and representative-program items
 with explicit compatibility states and milestone assignments.
-
-## Current work
-
-<div class="milestone milestone-active">
-  <div class="milestone-marker">12</div>
-  <div>
-    <span class="status-badge status-active">In progress</span>
-    <h3>Production build command</h3>
-    <p>
-      Turn <code>gobb build</code> into a self-contained, reproducible native
-      and Wasm compiler frontend through Gloat.
-    </p>
-    <ul class="task-list">
-      <li class="task-done">Embed Gobb's selected runtime source graph in the Gobb executable</li>
-      <li class="task-done">Select the transitive bundled namespace closure required by each program</li>
-      <li class="task-done">Stage project, dependency, and selected bundled sources together for Gloat</li>
-      <li class="task-done">Compile and run bundled <code>clojure.java.io</code> and <code>babashka.fs</code> use in native, WASI, and browser-Wasm project tests</li>
-      <li class="task-done">Allow project namespaces to override bundled namespaces without duplicate inputs</li>
-      <li>Make repeated builds byte-for-byte reproducible; Gloat's <code>-trimpath</code> fix and regression test are complete, awaiting a release and Gobb pin</li>
-      <li class="task-done">Validate target syntax, compiler output, and staging cleanup while retaining native, WASI, and browser-Wasm execution coverage</li>
-    </ul>
-  </div>
-</div>
 
 ## Completed foundation
 
@@ -512,6 +489,29 @@ Finalize deterministic native and Wasm program builds through Gloat.
       <li class="task-done">Serve Ring handlers through the core <code>org.httpkit.server</code> API</li>
       <li class="task-done">Test socket REPL, nREPL, pod, project-pod, and HTTP behavior against real native processes</li>
       <li class="task-done">Record registry pods, alternate payload formats, WebSockets, and non-native listeners as explicit compatibility limits</li>
+    </ul>
+  </div>
+</div>
+
+## Completed production builds
+
+<div class="milestone milestone-done">
+  <div class="milestone-marker">12</div>
+  <div>
+    <span class="status-badge status-done">Complete</span>
+    <h3>Production build command</h3>
+    <p>
+      Turn <code>gobb build</code> into a self-contained, reproducible native
+      and Wasm compiler frontend through Gloat.
+    </p>
+    <ul class="task-list">
+      <li class="task-done">Embed Gobb's selected runtime source graph in the Gobb executable</li>
+      <li class="task-done">Select the transitive bundled namespace closure required by each program</li>
+      <li class="task-done">Stage project, dependency, and selected bundled sources together for Gloat</li>
+      <li class="task-done">Compile and run bundled <code>clojure.java.io</code> and <code>babashka.fs</code> use in native, WASI, and browser-Wasm project tests</li>
+      <li class="task-done">Allow project namespaces to override bundled namespaces without duplicate inputs</li>
+      <li class="task-done">Produce byte-identical native builds through managed Gloat <code>0.1.68</code></li>
+      <li class="task-done">Validate target syntax, compiler output, and staging cleanup while retaining native, WASI, and browser-Wasm execution coverage</li>
     </ul>
   </div>
 </div>
