@@ -1,5 +1,6 @@
 bin/
 dist/
+/examples
 www/site/
 www/venv/
 www/docs/repl/gobb.wasm

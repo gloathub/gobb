@@ -117,6 +117,7 @@ LIB_TESTS-RESULT := $(TOP)/compat/lib-tests-results.edn
 LIB_TESTS-RUN-RESULT = $(if $(strip $(LIB_TESTS)),$(UPSTREAM-TEST-DIR)/lib_tests/selected.edn,$(LIB_TESTS-RESULT))
 EXAMPLES-MANIFEST := $(TOP)/compat/examples.edn
 EXAMPLES-RESULT := $(TOP)/compat/examples-results.edn
+EXAMPLES-DIR := $(TOP)/examples
 EXAMPLES-RUN-RESULT = $(if $(strip $(EXAMPLES)),$(UPSTREAM-TEST-DIR)/examples/selected.edn,$(EXAMPLES-RESULT))
 TESTING-REPORT-RUNNER := $(TOP)/util/testing-report
 TESTING-REPORT := $(TOP)/www/docs/testing.md
@@ -159,6 +160,7 @@ MAKES-CLEAN := \
   $(JAVA-COMPAT-DIR) \
   $(COMPAT-DIR) \
   $(UPSTREAM-TEST-DIR) \
+  $(EXAMPLES-DIR) \
   $(GOBB-WASM) \
   $(WASM-EXEC) \
 
@@ -481,7 +483,6 @@ $(SOURCE-STAGE-STAMP): \
   $(CLOJURE-ZIP-SOURCE) \
   $(SOURCE-MANIFEST) \
   $(STAGE-SOURCES) \
-  $(TOP)/Makefile \
   $(VERSION-FILE)
 	@$(ECHO) "* Staging Gobb and selected Babashka sources"
 	$Q $(BB) '$(STAGE-SOURCES)' \
@@ -505,7 +506,6 @@ $(REPL-SOURCE-STAGE-STAMP): \
   $(GOBB-SOURCES) \
   $(SOURCE-MANIFEST) \
   $(STAGE-SOURCES) \
-  $(TOP)/Makefile \
   $(VERSION-FILE)
 	@$(ECHO) "* Staging the Gobb browser REPL"
 	$Q $(BB) '$(STAGE-SOURCES)' \
@@ -531,7 +531,6 @@ $(CAPABILITY-STAGE-STAMP): \
   $(CAPABILITY-SOURCE) \
   $(SOURCE-MANIFEST) \
   $(STAGE-SOURCES) \
-  $(TOP)/Makefile \
   $(VERSION-FILE)
 	@$(ECHO) "* Staging the cross-target capability probe"
 	$Q $(BB) '$(STAGE-SOURCES)' \
@@ -830,6 +829,7 @@ test-examples: \
   $(BB) \
   $(GLOAT) \
   $(BABASHKA-SOURCE-DEP) \
+  $(EXAMPLES-DIR) \
   $(EXAMPLES-MANIFEST) \
   $(UPSTREAM-TEST-RUNNER) \
   $(TESTING-REPORT-RUNNER)
@@ -843,6 +843,10 @@ test-examples: \
 	    '$(LIB_TESTS-RESULT)' '$(EXAMPLES-RESULT)' '$(TESTING-REPORT)'; \
 	  exit $$status
 	@$(ECHO)
+
+$(EXAMPLES-DIR): $(BABASHKA-SOURCE-DEP)
+	$Q $(RM) '$@'
+	$Q ln -s '$(BABASHKA-SOURCE)/examples' '$@'
 
 testing-report: $(BB) $(TESTING-REPORT-RUNNER)
 	@$(ECHO) "* Rendering committed upstream test snapshots"

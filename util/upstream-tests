@@ -236,10 +236,16 @@
           _ (fs/create-dirs log-dir)
           context {:source source :bb bb :gobb gobb :gloat gloat
                    :cache cache}
+          name-width (apply max (map count selected))
           results (mapv (fn [name]
-                          (println (str "example: " name))
+                          (print (format (str "example: %-" name-width "s ")
+                                         name))
+                          (flush)
                           (let [entry (example-result context name (get examples name))]
                             (write-edn! (fs/path log-dir (str name ".edn")) entry)
+                            (println
+                             (str/upper-case
+                              (clojure.core/name (:status entry))))
                             entry))
                         selected)
           counts (frequencies (map :status results))
