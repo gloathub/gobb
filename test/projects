@@ -203,7 +203,7 @@ GOBB_GLOAT="$GOBB_GLOAT" \
   "$GOBB" --config "$projects/basic/build.edn" \
   build "$projects/basic/main.clj" -o "$compiled"
 check "compiled project and local dependency" \
-  '{:compiled :local-dependency, :args ("one" "two")}' \
+  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :args ("one" "two")}' \
   "$compiled" one two
 
 wasi="$tmp/project-program.wasm"
@@ -212,7 +212,7 @@ GOBB_GLOAT="$GOBB_GLOAT" \
   build "$projects/basic/main.clj" -o "$wasi" \
   --platform wasip1/wasm
 check "compiled WASI project and local dependency" \
-  '{:compiled :local-dependency, :args ("one" "two")}' \
+  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :args ("one" "two")}' \
   "$WASMTIME" "$wasi" one two
 
 browser="$tmp/project-program-browser.wasm"
@@ -223,7 +223,7 @@ GOBB_GLOAT="$GOBB_GLOAT" \
 go=$("$GOBB_GLOAT" --which=go)
 goroot=$("$go" env GOROOT)
 check "compiled browser-Wasm project and local dependency" \
-  '{:compiled :local-dependency, :args ("one" "two")}' \
+  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :args ("one" "two")}' \
   env -i HOME=/tmp PATH="$(dirname "$NODE"):/usr/bin:/bin" \
   "$goroot/lib/wasm/go_js_wasm_exec" "$browser" one two
 

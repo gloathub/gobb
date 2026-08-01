@@ -93,6 +93,13 @@ $ gobb build src/app.clj -o app.wasm --platform wasip1/wasm
 $ gobb build src/app.clj -o app.wasm --platform js/wasm
 ```
 
+The Gobb executable carries the portable source graph used by its own runtime.
+During a build, Gobb scans the project sources, selects referenced bundled
+namespaces, follows their transitive namespace dependencies, and stages that
+closure beside the project's own sources. The resulting program can therefore
+use bundled namespaces such as `clojure.java.io` and `babashka.fs` without a
+separate Gobb source checkout at build time.
+
 Dependency download and Git operations happen on the native build host.
 Compiled WASI and browser artifacts contain the selected portable source and
 do not perform dynamic dependency resolution in the sandbox or browser.

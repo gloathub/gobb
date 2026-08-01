@@ -34,6 +34,29 @@ The generated BB surface ledger now tracks 1,022 CLI, project, namespace,
 library, Java-class, platform, upstream-test, and representative-program items
 with explicit compatibility states and milestone assignments.
 
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">12</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Production build command</h3>
+    <p>
+      Turn <code>gobb build</code> into a self-contained, reproducible native
+      and Wasm compiler frontend through Gloat.
+    </p>
+    <ul class="task-list">
+      <li class="task-done">Embed Gobb's selected runtime source graph in the Gobb executable</li>
+      <li class="task-done">Select the transitive bundled namespace closure required by each program</li>
+      <li class="task-done">Stage project, dependency, and selected bundled sources together for Gloat</li>
+      <li class="task-done">Compile and run bundled <code>clojure.java.io</code> and <code>babashka.fs</code> use in native, WASI, and browser-Wasm project tests</li>
+      <li>Allow project namespaces to override bundled namespaces without duplicate inputs</li>
+      <li>Make repeated builds byte-for-byte reproducible; Gloat currently embeds its random build path</li>
+      <li>Finalize production diagnostics and output validation for every target</li>
+    </ul>
+  </div>
+</div>
+
 ## Completed foundation
 
 <div class="milestone milestone-done">
@@ -496,11 +519,6 @@ Finalize deterministic native and Wasm program builds through Gloat.
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>12</span>
-    <h3>Production build command</h3>
-    <p>Finalize deterministic native and Wasm builds through Gloat.</p>
-  </article>
   <article class="roadmap-card">
     <span>13</span>
     <h3>Upstream conformance harness</h3>
