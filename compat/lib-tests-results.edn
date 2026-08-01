@@ -1,12 +1,1563 @@
-{:schema 1,
- :diagnostic
- "exit 1: failed to load /clojure/spec/test/alpha: not found in load path",
+{:schema 2,
  :babashka
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
- :exit 1,
  :corpus {:libraries 111, :namespaces 261},
- :summary nil,
- :status :blocked,
+ :summary {:test 9, :pass 48, :fail 20, :error 2},
+ :runner-adaptations
+ [:omit-spec-instrumentation-reset :normalize-keyword-destructuring],
+ :case-summary {:total 261, :pass 2, :fail 2, :blocked 257},
+ :status :fail,
  :suite :lib-tests,
- :selection :all}
+ :selection :all,
+ :results
+ [{:namespace "aero.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+  {:namespace "again.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /again/core: not found in load path"}
+  {:namespace "arrangement.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /arrangement/core: not found in load path"}
+  {:namespace "babashka.curl-test",
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 0, :fail 0, :error 0},
+   :diagnostic nil}
+  {:namespace "babashka.process-exec-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /babashka/process_exec_test: not found in load path"}
+  {:namespace "babashka.process-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /babashka/process_test: not found in load path"}
+  {:namespace "babashka.statecharts-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/fulcrologic/statecharts: not found in load path"}
+  {:namespace "better-cond.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /better_cond/core: not found in load path"}
+  {:namespace "bond.assertions-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /bond/assertions: not found in load path"}
+  {:namespace "bond.james-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /bond/james: not found in load path"}
+  {:namespace "bond.target-data",
+   :status :blocked,
+   :exit 1,
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
+  {:namespace "borkdude.deps.smoke-test",
+   :status :fail,
+   :exit 1,
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
+  {:namespace "camel-snake-kebab.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /camel_snake_kebab/core: not found in load path"}
+  {:namespace "camel-snake-kebab.extras-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /camel_snake_kebab/core: not found in load path"}
+  {:namespace "camel-snake-kebab.internals.string-separator-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /camel_snake_kebab/internals/string_separator: not found in load path"}
+  {:namespace "cheshire.test.core",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cheshire/factory: not found in load path"}
+  {:namespace "clarktown.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/core: not found in load path"}
+  {:namespace "clarktown.parsers.bold-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/bold: not found in load path"}
+  {:namespace "clarktown.parsers.code-block-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/code_block: not found in load path"}
+  {:namespace "clarktown.parsers.empty-block-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/empty_block: not found in load path"}
+  {:namespace "clarktown.parsers.heading-block-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/heading_block: not found in load path"}
+  {:namespace "clarktown.parsers.horizontal-line-block-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/horizontal_line_block: not found in load path"}
+  {:namespace "clarktown.parsers.inline-code-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/inline_code: not found in load path"}
+  {:namespace "clarktown.parsers.italic-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/italic: not found in load path"}
+  {:namespace "clarktown.parsers.link-and-image-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/link_and_image: not found in load path"}
+  {:namespace "clarktown.parsers.quote-block-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/quote_block: not found in load path"}
+  {:namespace "clarktown.parsers.strikethrough-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clarktown/parsers/strikethrough: not found in load path"}
+  {:namespace "cli-matic.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cli_matic/platform: not found in load path"}
+  {:namespace "cli-matic.help-gen-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cli_matic/help_gen: not found in load path"}
+  {:namespace "cli-matic.presets-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cljc/java_time/zone_id: not found in load path"}
+  {:namespace "cli-matic.utils-candidates-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cli_matic/utils_candidates: not found in load path"}
+  {:namespace "cli-matic.utils-convert-config-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cli_matic/optionals: not found in load path"}
+  {:namespace "cli-matic.utils-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cli_matic/utils: not found in load path"}
+  {:namespace "cli-matic.utils-v2-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cli_matic/optionals: not found in load path"}
+  {:namespace "clj-commons.digest-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clj_commons/digest: not found in load path"}
+  {:namespace "clj-http.lite.client-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clj_http/lite/client: not found in load path"}
+  {:namespace "clj-http.lite.test-runner",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clj_http/lite/client: not found in load path"}
+  {:namespace "clj-stacktrace.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clj_stacktrace/core: not found in load path"}
+  {:namespace "clj-stacktrace.repl-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clj_stacktrace/utils: not found in load path"}
+  {:namespace "clj-yaml.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "cljc.java-time-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cljc/java_time/temporal/chrono_field: not found in load path"}
+  {:namespace "clojure-csv.test.core",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "clojure-csv.test.utils",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "clojure.algo.test-monads",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/algo/monads: not found in load path"}
+  {:namespace "clojure.core.cache-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/core/cache: not found in load path"}
+  {:namespace "clojure.core.cache.wrapped-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/core/cache/wrapped: not found in load path"}
+  {:namespace "clojure.data.csv-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "clojure.data.generators-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/data/generators: not found in load path"}
+  {:namespace "clojure.data.json-compat-0-1-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/data/json: not found in load path"}
+  {:namespace "clojure.data.json-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/data/json: not found in load path"}
+  {:namespace "clojure.data.json-test-suite-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/data/json: not found in load path"}
+  {:namespace "clojure.data.zip-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/data/xml: not found in load path"}
+  {:namespace "clojure.math.test-combinatorics",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/math/combinatorics: not found in load path"}
+  {:namespace "clojure.math.test-numeric-tower",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/math/numeric_tower: not found in load path"}
+  {:namespace "clojure.term.colors-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/term/colors: not found in load path"}
+  {:namespace "clojure.test-clojure.instr",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "clojure.test-clojure.spec",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "clojure.tools.gitlibs.test-impl",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/gitlibs/impl: not found in load path"}
+  {:namespace "clojure.tools.namespace.dependency-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/namespace/dependency: not found in load path"}
+  {:namespace "clojure.tools.namespace.find-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "clojure.tools.namespace.move-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/namespace/move: not found in load path"}
+  {:namespace "clojure.tools.namespace.parse-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/namespace/parse: not found in load path"}
+  {:namespace "clojure.tools.namespace.test-helpers",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "clojure.tools.test-gitlibs",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/gitlibs: not found in load path"}
+  {:namespace "cloverage.args-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/cli: not found in load path"}
+  {:namespace "cloverage.dependency-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/namespace/dependency: not found in load path"}
+  {:namespace "cloverage.instrument-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/pprint: not found in load path"}
+  {:namespace "cloverage.report.console-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: cloverage.report.console"}
+  {:namespace "cloverage.source-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/namespace/file: not found in load path"}
+  {:namespace "cognitect.test-runner-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cognitect/test_runner: not found in load path"}
+  {:namespace "cognitect.test-runner.sample-property-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/test/check: not found in load path"}
+  {:namespace "cognitect.test-runner.samples-test",
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 3, :fail 0, :error 0},
+   :diagnostic nil}
+  {:namespace "com.potetm.fusebox.bulwark-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/potetm/fusebox/bulkhead: not found in load path"}
+  {:namespace "com.potetm.fusebox.circuit-breaker-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/potetm/fusebox/circuit_breaker: not found in load path"}
+  {:namespace "com.potetm.fusebox.fallback-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/potetm/fusebox/fallback: not found in load path"}
+  {:namespace "com.potetm.fusebox.memoize-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/potetm/fusebox/memoize: not found in load path"}
+  {:namespace "com.potetm.fusebox.registry-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/potetm/fusebox/registry: not found in load path"}
+  {:namespace "com.potetm.fusebox.retry-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/potetm/fusebox/retry: not found in load path"}
+  {:namespace "com.rpl.specter.cljs-test-helpers",
+   :status :blocked,
+   :exit 1,
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
+  {:namespace "com.rpl.specter.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+  {:namespace "com.rpl.specter.test-helpers",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/test/check/generators: not found in load path"}
+  {:namespace "com.rpl.specter.zipper-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+  {:namespace "com.stuartsierra.component-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/set: not found in load path"}
+  {:namespace "com.stuartsierra.dependency-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/stuartsierra/dependency: not found in load path"}
+  {:namespace "com.wsscode.misc.coll-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/wsscode/misc/coll: not found in load path"}
+  {:namespace "com.wsscode.misc.macros-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/wsscode/misc/macros: not found in load path"}
+  {:namespace "com.wsscode.misc.math-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/wsscode/misc/math: not found in load path"}
+  {:namespace "com.wsscode.misc.refs-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/wsscode/misc/refs: not found in load path"}
+  {:namespace "com.wsscode.misc.uuid-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /com/wsscode/misc/uuid: not found in load path"}
+  {:namespace "comb.test.template",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /comb/template: not found in load path"}
+  {:namespace "contajners.impl-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /contajners/impl: not found in load path"}
+  {:namespace "core-match.core-tests",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/core/match: not found in load path"}
+  {:namespace "cprop.smoke-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /cprop/core: not found in load path"}
+  {:namespace "crispin.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /crispin/core: not found in load path"}
+  {:namespace "datalog.parser-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /datalog/parser: not found in load path"}
+  {:namespace "datalog.parser.impl-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /datalog/parser/impl: not found in load path"}
+  {:namespace "datalog.parser.pull-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /datalog/parser/pull: not found in load path"}
+  {:namespace "datalog.parser.test.util",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /:as/test: not found in load path"}
+  {:namespace "datalog.unparser-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /datalog/unparser: not found in load path"}
+  {:namespace "docopt.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /docopt/core: not found in load path"}
+  {:namespace "doric.test.core",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /doric/core: not found in load path"}
+  {:namespace "doric.test.doctest",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "doric.test.readme",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+  {:namespace "edn-query-language.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "environ.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /environ/core: not found in load path"}
+  {:namespace "exoscale.coax-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "exoscale.interceptor-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/core/async: not found in load path"}
+  {:namespace "exoscale.lingo.test.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /exoscale/lingo: not found in load path"}
+  {:namespace "expectations.clojure.test-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /expectations/clojure/test: not found in load path"}
+  {:namespace "expound.print-length-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "expound.problems-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "expound.spec-gen",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "expound.specs-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /expound/specs: not found in load path"}
+  {:namespace "expound.test-utils",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "failjure.test-core",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+  {:namespace "gaka.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /gaka/core: not found in load path"}
+  {:namespace "hasch.test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hasch/core: not found in load path"}
+  {:namespace "hato.client-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hato/client: not found in load path"}
+  {:namespace "helins.binf.test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /helins/binf: not found in load path"}
+  {:namespace "hiccup.core-test",
+   :status :fail,
+   :exit 1,
+   :summary {:test 5, :pass 45, :fail 20, :error 1},
+   :diagnostic nil}
+  {:namespace "hiccup2.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hiccup/util: not found in load path"}
+  {:namespace "hickory.test.convert",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hickory/convert: not found in load path"}
+  {:namespace "hickory.test.core",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hickory/core: not found in load path"}
+  {:namespace "hickory.test.hiccup-utils",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hickory/hiccup_utils: not found in load path"}
+  {:namespace "hickory.test.render",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hickory/core: not found in load path"}
+  {:namespace "hickory.test.select",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hickory/core: not found in load path"}
+  {:namespace "hickory.test.zip",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hickory/core: not found in load path"}
+  {:namespace "honey.sql-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /honey/sql: not found in load path"}
+  {:namespace "honey.sql.helpers-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /honey/sql: not found in load path"}
+  {:namespace "honey.sql.postgres-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /honey/sql/helpers: not found in load path"}
+  {:namespace "honeysql.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+  {:namespace "honeysql.format-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+  {:namespace "httpkit.client-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /org/httpkit/client: not found in load path"}
+  {:namespace "hugsql.babashka-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /hugsql/core: not found in load path"}
+  {:namespace "integrant.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /integrant/core: not found in load path"}
+  {:namespace "integrant.test.bar",
+   :status :blocked,
+   :exit 1,
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
+  {:namespace "integrant.test.baz",
+   :status :blocked,
+   :exit 1,
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
+  {:namespace "integrant.test.foo",
+   :status :blocked,
+   :exit 1,
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
+  {:namespace "integrant.test.quz",
+   :status :blocked,
+   :exit 1,
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
+  {:namespace "io.aviso.binary-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /io/aviso/binary: not found in load path"}
+  {:namespace "jasentaa.collections-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /jasentaa/collections: not found in load path"}
+  {:namespace "jasentaa.parser.basic-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+  {:namespace "jasentaa.parser.combinators-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+  {:namespace "jasentaa.position-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /jasentaa/position: not found in load path"}
+  {:namespace "jasentaa.test-helpers",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+  {:namespace "jasentaa.worked-example-1",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+  {:namespace "jasentaa.worked-example-2",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+  {:namespace "java-http-clj.smoke-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /java_http_clj/core: not found in load path"}
+  {:namespace "lambdaisland.regal-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /lambdaisland/regal: not found in load path"}
+  {:namespace "lambdaisland.regal.test-util",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /lambdaisland/regal: not found in load path"}
+  {:namespace "linked.map-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: NO_SOURCE_PATH: failed to load /linked/map_test: not found in load path"}
+  {:namespace "loom.test.alg",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/graph: not found in load path"}
+  {:namespace "loom.test.alg-generic",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/alg_generic: not found in load path"}
+  {:namespace "loom.test.attr",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/graph: not found in load path"}
+  {:namespace "loom.test.compliance-tester",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/graph: not found in load path"}
+  {:namespace "loom.test.derived",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/derived: not found in load path"}
+  {:namespace "loom.test.flow",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/graph: not found in load path"}
+  {:namespace "loom.test.graph",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/graph: not found in load path"}
+  {:namespace "loom.test.label",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/graph: not found in load path"}
+  {:namespace "loom.test.network-simplex",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /loom/network_simplex: not found in load path"}
+  {:namespace "malli.clj-kondo-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/clj_kondo: not found in load path"}
+  {:namespace "malli.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/test/check/generators: not found in load path"}
+  {:namespace "malli.destructure-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.dot-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/dot: not found in load path"}
+  {:namespace "malli.error-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.experimental-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/dev: not found in load path"}
+  {:namespace "malli.experimental.time-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.experimental.time.transform-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.instrument-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.json-schema-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/test/check/generators: not found in load path"}
+  {:namespace "malli.plantuml-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/plantuml: not found in load path"}
+  {:namespace "malli.provider-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.registry-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.swagger-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.transform-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "malli.util-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /malli/core: not found in load path"}
+  {:namespace "markdown.md-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /markdown/core: not found in load path"}
+  {:namespace "me.raynes.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /me/raynes/fs: not found in load path"}
+  {:namespace "meander.defsyntax-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /meander/epsilon: not found in load path"}
+  {:namespace "meander.defsyntax-test.gh-145",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /meander/epsilon: not found in load path"}
+  {:namespace "meander.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "meander.interpreter.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /meander/interpreter/epsilon: not found in load path"}
+  {:namespace "meander.match.check.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "meander.match.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /meander/match/epsilon: not found in load path"}
+  {:namespace "meander.match.ir.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "meander.matrix.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "meander.strategy.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/test/check/clojure_test: not found in load path"}
+  {:namespace "meander.substitute.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/test/check/clojure_test: not found in load path"}
+  {:namespace "meander.syntax.epsilon-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /meander/epsilon: not found in load path"}
+  {:namespace "medley.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /medley/core: not found in load path"}
+  {:namespace "meta-merge.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /meta_merge/core: not found in load path"}
+  {:namespace "minimallist.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /minimallist/core: not found in load path"}
+  {:namespace "minimallist.util-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /minimallist/util: not found in load path"}
+  {:namespace "missing.test.assertions-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /missing/test/assertions: not found in load path"}
+  {:namespace "missing.test.old-methods",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /missing/test/assertions: not found in load path"}
+  {:namespace "msgpack.core-check",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /msgpack/core: not found in load path"}
+  {:namespace "msgpack.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/walk: not found in load path"}
+  {:namespace "multigrep.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /multigrep/core: not found in load path"}
+  {:namespace "net.cgrand.xforms-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /net/cgrand/xforms: not found in load path"}
+  {:namespace "nextjournal.markdown-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /matcher_combinators/ansi_color: not found in load path"}
+  {:namespace "nextjournal.markdown.multi-threading-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /nextjournal/markdown: not found in load path"}
+  {:namespace "odoyle.rules-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /odoyle/rules: not found in load path"}
+  {:namespace "ol.sfv.api-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /ol/sfv: not found in load path"}
+  {:namespace "ol.sfv.conformance-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /alphabase/base32: not found in load path"}
+  {:namespace "ol.sfv.error-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /ol/sfv: not found in load path"}
+  {:namespace "ol.sfv.example-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/walk: not found in load path"}
+  {:namespace "ol.sfv.parser-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /ol/sfv/impl: not found in load path"}
+  {:namespace "ol.sfv.serialization-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /ol/sfv: not found in load path"}
+  {:namespace "omniconf.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /omniconf/core: not found in load path"}
+  {:namespace "orchestra.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic "exit 1: {}"}
+  {:namespace "orchestra.expound-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic "exit 1: {}"}
+  {:namespace "orchestra.make-fns",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic "exit 1: {}"}
+  {:namespace "orchestra.many-fns",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic "exit 1: {}"}
+  {:namespace "orchestra.reload-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic "exit 1: {}"}
+  {:namespace "plumbing.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /schema/core: not found in load path"}
+  {:namespace "portal.bench",
+   :status :blocked,
+   :exit 1,
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
+  {:namespace "portal.e2e",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /portal/colors: not found in load path"}
+  {:namespace "portal.runtime.cson-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /portal/runtime/cson: not found in load path"}
+  {:namespace "portal.runtime.fs-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /portal/runtime/fs: not found in load path"}
+  {:namespace "portal.test-runner",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /portal/api: not found in load path"}
+  {:namespace "postmortem.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /postmortem/core: not found in load path"}
+  {:namespace "postmortem.instrument-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /postmortem/core: not found in load path"}
+  {:namespace "progrock.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /progrock/core: not found in load path"}
+  {:namespace "promesa.tests.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /promesa/core: not found in load path"}
+  {:namespace "qbits.auspex-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /qbits/auspex: not found in load path"}
+  {:namespace "reifyhealth.specmonstah.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "reifyhealth.specmonstah.spec-gen-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "reifyhealth.specmonstah.test-data",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+  {:namespace "rewrite-clj.node-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+  {:namespace "rewrite-clj.node.coercer-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+  {:namespace "rewrite-clj.paredit-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+  {:namespace "rewrite-clj.parser-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/reader: not found in load path"}
+  {:namespace "rewrite-clj.zip-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+  {:namespace "rewrite-clj.zip.subedit-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /rewrite_clj/zip: not found in load path"}
+  {:namespace "riddley.walk-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /riddley/compiler: not found in load path"}
+  {:namespace "ruuter.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+  {:namespace "schema.coerce-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /schema/core: not found in load path"}
+  {:namespace "schema.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /:as/pprint: not found in load path"}
+  {:namespace "schema.experimental.abstract-map-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /schema/core: not found in load path"}
+  {:namespace "schema.macros-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /schema/core: not found in load path"}
+  {:namespace "schema.test-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /schema/core: not found in load path"}
+  {:namespace "schema.utils-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /schema/utils: not found in load path"}
+  {:namespace "selmer.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /selmer/filters: not found in load path"}
+  {:namespace "selmer.our-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /selmer/parser: not found in load path"}
+  {:namespace "slingshot.slingshot-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /slingshot/slingshot: not found in load path"}
+  {:namespace "slingshot.support-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /slingshot/slingshot: not found in load path"}
+  {:namespace "slingshot.test-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /slingshot/slingshot: not found in load path"}
+  {:namespace "sluj.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /sluj/core: not found in load path"}
+  {:namespace "swirrl.dogstatsd-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /swirrl/dogstatsd: not found in load path"}
+  {:namespace "table.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /table/core: not found in load path"}
+  {:namespace "table.width-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /table/width: not found in load path"}
+  {:namespace "test-check.smoke-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /clojure/test/check: not found in load path"}
+  {:namespace "testdoc.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /testdoc/core: not found in load path"}
+  {:namespace "testdoc.style.code-first-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /testdoc/style/code_first: not found in load path"}
+  {:namespace "testdoc.style.repl-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /testdoc/style/repl: not found in load path"}
+  {:namespace "vault.client.http-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /vault/authenticate: not found in load path"}
+  {:namespace "vault.lease-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /vault/lease: not found in load path"}
+  {:namespace "version-clj.compare-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /version_clj/compare: not found in load path"}
+  {:namespace "version-clj.core-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /version_clj/core: not found in load path"}
+  {:namespace "version-clj.split-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /version_clj/split: not found in load path"}
+  {:namespace "version-clj.via-use-test",
+   :status :blocked,
+   :exit 1,
+   :summary nil,
+   :diagnostic
+   "exit 1: failed to load /version_clj/core: not found in load path"}]}

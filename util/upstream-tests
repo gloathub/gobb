@@ -4,7 +4,8 @@
          '[babashka.process :as process]
          '[clojure.edn :as edn]
          '[clojure.pprint :as pprint]
-         '[clojure.string :as str])
+         '[clojure.string :as str]
+         '[clojure.walk :as walk])
 
 (defn fail! [message]
   (binding [*out* *err*] (println (str "upstream-tests: " message)))
@@ -80,14 +81,100 @@
     {:libraries (count manifest)
      :namespaces namespaces}))
 
+(defn spec-test-require? [value]
+  (and (vector? value)
+       (= 'clojure.spec.test.alpha (first value))))
+
+(defn adapt-lib-runner-form [form]
+  (cond
+    (and (seq? form) (= 'ns (first form)))
+    (map (fn [clause]
+           (if (and (seq? clause) (= :require (first clause)))
+             (remove spec-test-require? clause)
+             clause))
+         form)
+
+    (and (seq? form)
+         (= 'def (first form))
+         (= 'orig-spec-checking-fn (second form)))
+    '(def orig-spec-checking-fn nil)
+
+    :else
+    (walk/postwalk
+     (fn [value]
+       (cond
+         (and (seq? value)
+              (= 'alter-var-root (first value))
+              (= '(var st/spec-checking-fn) (second value)))
+         nil
+
+         (and (map? value) (vector? (:keys value)))
+         (update value :keys
+                 #(mapv (fn [binding]
+                          (if (keyword? binding)
+                            (symbol (name binding))
+                            binding))
+                        %))
+
+         :else value))
+     form)))
+
+(defn prepare-lib-runner! [runner log-dir]
+  (let [output (fs/path log-dir "run_all_libtests.clj")
+        forms (with-open [reader (java.io.PushbackReader.
+                                  (clojure.java.io/reader (str runner)))]
+                (loop [values []]
+                  (let [value (read {:eof ::eof} reader)]
+                    (if (= ::eof value)
+                      values
+                      (recur (conj values value))))))]
+    (spit (str output)
+          (with-out-str
+            (doseq [form forms]
+              (pprint/pprint (adapt-lib-runner-form form)))))
+    output))
+
+(defn lib-case-result
+  [{:keys [root gobb cache work environment command-prefix log-dir]}
+   namespace]
+  (let [execution (run-command (conj command-prefix namespace)
+                               {:dir (str work) :extra-env environment})
+        summary (lib-summary (:out execution))
+        normalized-execution
+        (update-vals execution
+                     #(if (string? %)
+                        (normalize % [[root "<BABASHKA>"]
+                                      [(fs/absolutize cache) "<CACHE>"]
+                                      [(fs/absolutize gobb) "<GOBB>"]])
+                        %))
+        status (cond
+                 (and summary
+                      (pos? (+ (get summary :fail 0)
+                               (get summary :error 0)))) :fail
+                 (and summary (zero? (:exit execution))) :pass
+                 :else :blocked)
+        entry {:namespace namespace
+               :status status
+               :exit (:exit execution)
+               :summary summary
+               :diagnostic (when (= :blocked status)
+                             (concise-error normalized-execution))}
+        base (str/replace namespace #"[^A-Za-z0-9_.-]" "_")]
+    (spit (str (fs/path log-dir (str base ".stdout.log"))) (:out execution))
+    (spit (str (fs/path log-dir (str base ".stderr.log"))) (:err execution))
+    (write-edn! (fs/path log-dir (str base ".edn")) entry)
+    entry))
+
 (defn lib-tests! [{:keys [source bb gobb cache result filters]}]
   (let [root (fs/absolutize source)
         corpus (lib-test-corpus root)
-        unknown (remove (set (:namespaces corpus)) filters)
+        selected (if (seq filters) (vec filters) (:namespaces corpus))
+        unknown (remove (set (:namespaces corpus)) selected)
         work (fs/path cache "lib_tests" "work")
         home (fs/path cache "lib_tests" "home")
-        log-dir (fs/path cache "lib_tests")
-        config (fs/path log-dir "config.edn")
+        suite-dir (fs/path cache "lib_tests")
+        log-dir (fs/path suite-dir "namespaces")
+        config (fs/path suite-dir "config.edn")
         upstream-config (read-edn (fs/path root "deps.edn"))
         process-root (fs/path root "process")
         paths (cond-> [(str (fs/path root "test-resources" "lib_tests"))]
@@ -100,60 +187,71 @@
                                     [:aliases :lib-tests :extra-deps])}
         runner (fs/path root "test-resources" "lib_tests"
                         "babashka" "run_all_libtests.clj")
-        command (into ["timeout" "600" (str gobb)
-                       "--config" (str config)
-                       "--deps-root" (str root)
-                       "-cp" (str (fs/path root "test-resources" "lib_tests"))
-                       "-e" (str "(load-file " (pr-str (str runner)) ")")]
-                      filters)
         path (str (fs/path root "process" "test" "on-path")
                   ":" (System/getenv "PATH"))]
     (when (seq unknown)
       (fail! (str "unknown library test namespaces: "
                   (str/join ", " unknown))))
-    (doseq [directory [work home log-dir]] (fs/create-dirs directory))
+    (doseq [directory [work home suite-dir log-dir]] (fs/create-dirs directory))
     (write-edn! config config-value)
-    (let [link (fs/path work "bb")]
+    (let [prepared-runner (prepare-lib-runner! runner suite-dir)
+          command-prefix ["timeout" "120" (str gobb)
+                          "--config" (str config)
+                          "--deps-root" (str root)
+                          "-cp" (str (fs/path root "test-resources" "lib_tests"))
+                          "-e" (str "(load-file "
+                                    (pr-str (str prepared-runner)) ")")]
+          environment {"HOME" (str home)
+                       "GOBB_CACHE" (str (fs/path cache "gobb-cache"))
+                       "BABASHKA_TEST_ENV" "native"
+                       "GITHUB_REF_NAME" "gobb-upstream-tests"
+                       "PATH" path}
+          link (fs/path work "bb")]
       (when (fs/exists? link) (fs/delete link))
-      (fs/create-sym-link link (fs/absolutize gobb)))
-    (let [execution (run-command command
-                                 {:dir (str work)
-                                  :extra-env {"HOME" (str home)
-                                              "GOBB_CACHE" (str (fs/path cache "gobb-cache"))
-                                              "BABASHKA_TEST_ENV" "native"
-                                              "GITHUB_REF_NAME" "gobb-upstream-tests"
-                                              "PATH" path}})
-          summary (lib-summary (:out execution))
-          normalized-execution
-          (update-vals execution
-                       #(if (string? %)
-                          (normalize % [[root "<BABASHKA>"]
-                                        [(fs/absolutize cache) "<CACHE>"]
-                                        [(fs/absolutize gobb) "<GOBB>"]])
-                          %))
-          status (cond
-                   (zero? (:exit execution)) :pass
-                   summary :fail
-                   :else :blocked)
-          snapshot {:schema 1
-                    :suite :lib-tests
-                    :babashka {:version "1.12.218"
-                               :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"}
-                    :corpus {:libraries (:libraries corpus)
-                             :namespaces (count (:namespaces corpus))}
-                    :selection (if (seq filters) (vec filters) :all)
-                    :status status
-                    :exit (:exit execution)
-                    :summary summary
-                    :diagnostic (when-not (= :pass status)
-                                  (concise-error normalized-execution))}]
-      (spit (str (fs/path log-dir "stdout.log")) (:out execution))
-      (spit (str (fs/path log-dir "stderr.log")) (:err execution))
-      (write-edn! result snapshot)
-      (println (format "lib_tests: %s%s"
-                       (name status)
-                       (if summary (str " " summary) "")))
-      (when-not (= :pass status) (System/exit 1)))))
+      (fs/create-sym-link link (fs/absolutize gobb))
+      (let [context {:root root :gobb gobb :cache cache :work work
+                     :environment environment :command-prefix command-prefix
+                     :log-dir log-dir}
+            width (apply max (map count selected))
+            results
+            (mapv (fn [namespace]
+                    (print (format (str "lib_test: %-" width "s ") namespace))
+                    (flush)
+                    (let [entry (lib-case-result context namespace)]
+                      (println (str/upper-case (name (:status entry))))
+                      entry))
+                  selected)
+            counts (frequencies (map :status results))
+            summaries (keep :summary results)
+            summary (reduce #(merge-with + %1 %2)
+                            {:test 0 :pass 0 :fail 0 :error 0}
+                            summaries)
+            case-summary {:total (count results)
+                          :pass (get counts :pass 0)
+                          :fail (get counts :fail 0)
+                          :blocked (get counts :blocked 0)}
+            status (cond
+                     (= (count results) (:pass case-summary)) :pass
+                     (= (count results) (:blocked case-summary)) :blocked
+                     :else :fail)
+            snapshot {:schema 2
+                      :suite :lib-tests
+                      :babashka {:version "1.12.218"
+                                 :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"}
+                      :corpus {:libraries (:libraries corpus)
+                               :namespaces (count (:namespaces corpus))}
+                      :runner-adaptations
+                      [:omit-spec-instrumentation-reset
+                       :normalize-keyword-destructuring]
+                      :selection (if (seq filters) (vec filters) :all)
+                      :status status
+                      :case-summary case-summary
+                      :summary summary
+                      :results results}]
+        (write-edn! result snapshot)
+        (println (str "lib_tests: " (name status) " " case-summary
+                      " " summary))
+        (when-not (= :pass status) (System/exit 1))))))
 
 (defn discover-examples [source]
   (->> (fs/list-dir (fs/path source "examples"))

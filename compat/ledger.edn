@@ -17,16 +17,16 @@
  {:intentional-difference 24,
   :not-applicable 5,
   :partial 64,
-  :planned 844,
+  :planned 843,
   :platform-limited 6,
-  :supported 79},
+  :supported 80},
  :categories
  [{:category :built-in-library,
    :count 38,
    :states {:partial 11, :planned 27}}
   {:category :built-in-namespace,
    :count 104,
-   :states {:partial 19, :planned 80, :supported 5}}
+   :states {:partial 19, :planned 79, :supported 6}}
   {:category :capability,
    :count 41,
    :states
@@ -75,15 +75,15 @@
    :count 18,
    :states {:partial 6, :planned 6, :supported 6}}
   {:milestone 12, :count 2, :states {:planned 2}}
-  {:milestone 13, :count 2, :states {:supported 2}}
+  {:milestone 13, :count 3, :states {:supported 3}}
   {:milestone 14, :count 98, :states {:planned 98}}
   {:milestone 15, :count 32, :states {:planned 32}}
   {:milestone 16,
-   :count 764,
+   :count 763,
    :states
    {:intentional-difference 23,
     :partial 1,
-    :planned 706,
+    :planned 705,
     :supported 34}}]}
  :items
  [
@@ -178,7 +178,7 @@
 {:state :planned, :milestone 16, :id "namespace/clojure.spec.gen.alpha", :category :built-in-namespace, :name "clojure.spec.gen.alpha", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 16, :id "namespace/clojure.spec.test.alpha", :category :built-in-namespace, :name "clojure.spec.test.alpha", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 16, :id "namespace/clojure.stacktrace", :category :built-in-namespace, :name "clojure.stacktrace", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 16, :id "namespace/clojure.test", :category :built-in-namespace, :name "clojure.test", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :supported, :milestone 13, :id "namespace/clojure.test", :category :built-in-namespace, :name "clojure.test", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :implementation, :path "src/gobb/host.clj"} {:kind :test, :path "test/gobb"}]}
 {:state :planned, :milestone 16, :id "namespace/clojure.test.check", :category :built-in-namespace, :name "clojure.test.check", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 16, :id "namespace/clojure.test.check.generators", :category :built-in-namespace, :name "clojure.test.check.generators", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 16, :id "namespace/clojure.test.check.properties", :category :built-in-namespace, :name "clojure.test.check.properties", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}

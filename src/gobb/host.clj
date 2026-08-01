@@ -12,6 +12,13 @@
 (def shutdown-ran? (atom false))
 (def current-source (atom no-source-path))
 
+(defn load-clojure-test! []
+  ;; Referencing Glojure's precompiled stdlib package links its namespace
+  ;; loaders into Gobb without recompiling clojure.test from source. Load the
+  ;; protocol roots first because clojure.test reduces over test Vars.
+  (github.com:glojurelang:glojure:pkg:stdlib:clojure:core:protocols.LoadNS)
+  (github.com:glojurelang:glojure:pkg:stdlib:clojure:test.LoadNS))
+
 (defn spit* [file content & options]
   ;; Glojure's clojure.core/spit currently targets the unimplemented
   ;; glojure.go.io/writer host form. Route it through Gobb's Java I/O
@@ -35,6 +42,7 @@
   (alter-var-root #'*out* (constantly os.Stdout))
   (alter-var-root #'*err* (constantly os.Stderr))
   (alter-var-root #'clojure.core/spit (constantly spit*))
+  (load-clojure-test!)
   (in-ns 'user)
   (refer 'clojure.core))
 

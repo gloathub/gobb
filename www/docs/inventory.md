@@ -11,7 +11,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | built-in-library | 38 | 0 | 11 | 27 | 0 |
-| built-in-namespace | 104 | 5 | 19 | 80 | 0 |
+| built-in-namespace | 104 | 6 | 19 | 79 | 0 |
 | capability | 41 | 12 | 20 | 0 | 9 |
 | cli | 36 | 8 | 1 | 24 | 3 |
 | compatible-library | 98 | 0 | 1 | 97 | 0 |
@@ -163,6 +163,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `namespace/clojure.core.server` | built-in-namespace | **partial** | src/clojure/core/server.clj<br>test/interactive-services |
 | `namespace/clojure.data.csv` | built-in-namespace | **partial** | src/clojure/data/csv.clj<br>test/data-csv |
 | `namespace/clojure.java.io` | built-in-namespace | **partial** | src/clojure/java/io.clj<br>test/java-io<br>:loading/resource |
+| `namespace/clojure.test` | built-in-namespace | **supported** | src/gobb/host.clj<br>test/gobb |
 | `namespace/clojure.tools.logging` | built-in-namespace | **partial** | src/clojure/tools/logging.clj<br>test/logging |
 | `namespace/clojure.tools.logging.impl` | built-in-namespace | **partial** | src/clojure/tools/logging/impl.clj<br>test/logging |
 | `namespace/clojure.tools.logging.readable` | built-in-namespace | **supported** | src/clojure/tools/logging/readable.clj<br>test/logging |
@@ -212,7 +213,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | 12 | 2 |
 | 14 | 98 |
 | 15 | 32 |
-| 16 | 706 |
+| 16 | 705 |
 
 ## Authoritative inputs
 

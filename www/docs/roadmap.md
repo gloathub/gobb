@@ -8,11 +8,11 @@ description: Current Gobb implementation progress and upcoming milestones
 <div class="roadmap-summary">
   <div>
     <p class="summary-label">Current phase</p>
-    <p class="summary-value">Upstream conformance harness</p>
+    <p class="summary-value">Library-test closure</p>
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">13 / 17</p>
+    <p class="summary-value">14 / 17</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
@@ -21,7 +21,7 @@ description: Current Gobb implementation progress and upcoming milestones
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 76%"></span>
+  <span style="width: 82%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -37,26 +37,23 @@ with explicit compatibility states and milestone assignments.
 ## Current work
 
 <div class="milestone milestone-active">
-  <div class="milestone-marker">13</div>
+  <div class="milestone-marker">14</div>
   <div>
     <span class="status-badge status-active">In progress</span>
-    <h3>Upstream conformance harness</h3>
+    <h3>Library-test closure</h3>
     <p>
-      Run Babashka's library tests and examples against Gobb, keep complete
-      diagnostics, and publish committed full-suite snapshots.
+      Make every applicable test in Babashka's
+      <code>test-resources/lib_tests</code> corpus pass, with documented
+      waivers for genuinely non-portable behavior.
     </p>
     <ul class="task-list">
-      <li class="task-done">Add a filterable <code>make test-lib_tests</code> target</li>
-      <li class="task-done">Discover and report the complete upstream library and test-namespace corpus</li>
-      <li class="task-done">Add the <code>babashka.classpath</code> and <code>babashka.core</code> host namespaces required by the upstream runner</li>
-      <li class="task-done">Preserve the underlying namespace-load diagnostic when the runner cannot start</li>
-      <li class="task-done">Compile every upstream <code>.clj</code> example</li>
-      <li class="task-done">Run safe deterministic examples against BB and Gobb</li>
-      <li class="task-done">Track explicit environmental and interactive waivers</li>
-      <li>Continue through all library-test cases and fail after recording the summary</li>
-      <li class="task-done">Continue through all example cases and fail after recording the summary</li>
-      <li class="task-done">Detect additions or removals in the upstream example set</li>
-      <li class="task-done">Publish current results on the Testing page without rerunning tests</li>
+      <li class="task-done">Establish the 261-namespace baseline: 2 pass, 2 fail, and 257 blocked</li>
+      <li>Resolve dependency and source-classpath blockers</li>
+      <li>Provide the required Clojure spec and test.check namespaces</li>
+      <li>Close Glojure host-interop and evaluator gaps exposed by runnable tests</li>
+      <li>Turn runnable failures into passing differential results</li>
+      <li>Document waivers only for genuinely non-portable behavior</li>
+      <li>Pass every applicable library-test namespace</li>
     </ul>
   </div>
 </div>
@@ -543,18 +540,36 @@ Finalize deterministic native and Wasm program builds through Gloat.
   </div>
 </div>
 
+## Completed upstream conformance harness
+
+<div class="milestone milestone-done">
+  <div class="milestone-marker">13</div>
+  <div>
+    <span class="status-badge status-done">Complete</span>
+    <h3>Upstream conformance harness</h3>
+    <p>
+      Run Babashka's library tests and examples against Gobb, keep complete
+      diagnostics, and publish committed full-suite snapshots.
+    </p>
+    <ul class="task-list">
+      <li class="task-done">Add a filterable <code>make test-lib_tests</code> target</li>
+      <li class="task-done">Discover and report the complete upstream library and test-namespace corpus</li>
+      <li class="task-done">Add the <code>babashka.classpath</code> and <code>babashka.core</code> host namespaces required by the upstream runner</li>
+      <li class="task-done">Link Glojure's precompiled <code>clojure.test</code> runtime into Gobb</li>
+      <li class="task-done">Preserve underlying namespace-load diagnostics</li>
+      <li class="task-done">Compile every upstream <code>.clj</code> example</li>
+      <li class="task-done">Run safe deterministic examples against BB and Gobb</li>
+      <li class="task-done">Track explicit environmental and interactive waivers</li>
+      <li class="task-done">Continue through all library-test and example cases before returning failure</li>
+      <li class="task-done">Detect additions or removals in the upstream example set</li>
+      <li class="task-done">Publish current results on the Testing page without rerunning tests</li>
+    </ul>
+  </div>
+</div>
+
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>14</span>
-    <h3>Library-test closure</h3>
-    <p>
-      Make every applicable test in Babashka's
-      <code>test-resources/lib_tests</code> corpus pass, with documented
-      waivers for genuinely non-portable behavior.
-    </p>
-  </article>
   <article class="roadmap-card">
     <span>15</span>
     <h3>Example-program closure</h3>

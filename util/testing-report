@@ -20,15 +20,32 @@
 (defn summary-value [summary key]
   (if (map? summary) (get summary key 0) "—"))
 
+(defn library-rows [results]
+  (if (seq results)
+    (apply str
+           (for [{:keys [namespace status summary diagnostic]} results]
+             (str "| `" namespace "` | " (name status)
+                  " | " (summary-value summary :test)
+                  " | " (summary-value summary :pass)
+                  " | " (summary-value summary :fail)
+                  " | " (summary-value summary :error)
+                  " | " (escape-cell diagnostic) " |\n")))
+    "| — | not run | — | — | — | — | — |\n"))
+
 (defn library-section [result]
   (let [summary (:summary result)
-        corpus (:corpus result)]
+        corpus (:corpus result)
+        cases (:case-summary result)]
     (str "## Library tests\n\n"
          "Status: **" (display-status (:status result)) "**\n\n"
-         "| Libraries | Test namespaces | Tests | Assertions passed | Failures | Errors |\n"
-         "| ---: | ---: | ---: | ---: | ---: | ---: |\n"
+         "| Libraries | Test namespaces | Cases run | Cases passed | Cases failed | Cases blocked | Tests | Assertions passed | Failures | Errors |\n"
+         "| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n"
          "| " (summary-value corpus :libraries)
          " | " (summary-value corpus :namespaces)
+         " | " (summary-value cases :total)
+         " | " (summary-value cases :pass)
+         " | " (summary-value cases :fail)
+         " | " (summary-value cases :blocked)
          " | " (summary-value summary :test)
          " | " (summary-value summary :pass)
          " | " (summary-value summary :fail)
@@ -39,7 +56,11 @@
          "```sh\nmake test-lib_tests\n```\n\n"
          "Limit an investigative run to selected namespaces without replacing "
          "the published full-suite snapshot:\n\n"
-         "```sh\nmake test-lib_tests LIB_TESTS='namespace.one namespace.two'\n```\n\n")))
+         "```sh\nmake test-lib_tests LIB_TESTS='namespace.one namespace.two'\n```\n\n"
+         "### Per-namespace results\n\n"
+         "| Namespace | Status | Tests | Assertions passed | Failures | Errors | Note |\n"
+         "| --- | --- | ---: | ---: | ---: | ---: | --- |\n"
+         (library-rows (:results result)) "\n")))
 
 (defn example-rows [results]
   (if (seq results)

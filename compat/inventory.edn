@@ -75,6 +75,11 @@
    :milestone 13
    :evidence [{:kind :implementation :path "src/babashka/core.clj"}
               {:kind :test :path "test/gobb"}]}
+  "namespace/clojure.test"
+  {:state :supported
+   :milestone 13
+   :evidence [{:kind :implementation :path "src/gobb/host.clj"}
+              {:kind :test :path "test/gobb"}]}
   "namespace/babashka.pods"
   {:state :partial
    :milestone 11

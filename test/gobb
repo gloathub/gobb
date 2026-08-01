@@ -123,6 +123,15 @@ check "Babashka platform predicate" \
   "$("$BB" -e "(require '[babashka.core :as bb]) (bb/windows?)")" \
   "$GOBB" -e "(require '[babashka.core :as bb]) (bb/windows?)"
 
+clojure_test_output=$(
+  "$GOBB" -e \
+    "(require '[clojure.test :as t])
+     (t/deftest gobb-smoke-test (t/is (= 3 (+ 1 2))))
+     (prn (select-keys (t/run-tests 'user) [:test :pass :fail :error]))"
+)
+[[ $clojure_test_output == *'{:test 1, :pass 1, :fail 0, :error 0}'* ]] ||
+  fail "clojure.test did not run a passing test: $clojure_test_output"
+
 check "stdin evaluation" "5" \
   bash -c "printf '(+ 2 3)\\n' | \"\$1\"" _ "$GOBB"
 
