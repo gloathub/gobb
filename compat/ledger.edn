@@ -17,16 +17,16 @@
  {:intentional-difference 24,
   :not-applicable 5,
   :partial 64,
-  :planned 846,
+  :planned 844,
   :platform-limited 6,
-  :supported 77},
+  :supported 79},
  :categories
  [{:category :built-in-library,
    :count 38,
    :states {:partial 11, :planned 27}}
   {:category :built-in-namespace,
    :count 104,
-   :states {:partial 19, :planned 82, :supported 3}}
+   :states {:partial 19, :planned 80, :supported 5}}
   {:category :capability,
    :count 41,
    :states
@@ -75,14 +75,15 @@
    :count 18,
    :states {:partial 6, :planned 6, :supported 6}}
   {:milestone 12, :count 2, :states {:planned 2}}
+  {:milestone 13, :count 2, :states {:supported 2}}
   {:milestone 14, :count 98, :states {:planned 98}}
   {:milestone 15, :count 32, :states {:planned 32}}
   {:milestone 16,
-   :count 766,
+   :count 764,
    :states
    {:intentional-difference 23,
     :partial 1,
-    :planned 708,
+    :planned 706,
     :supported 34}}]}
  :items
  [
@@ -125,9 +126,9 @@
 {:state :planned, :milestone 16, :id "built-in-library/seancorfield/next.jdbc", :category :built-in-library, :name "seancorfield/next.jdbc", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 16, :id "built-in-library/selmer/selmer", :category :built-in-library, :name "selmer/selmer", :source {:kind :upstream-source, :path "deps.edn", :definition ":deps"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :planned, :milestone 16, :id "namespace/babashka.classes", :category :built-in-namespace, :name "babashka.classes", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
-{:state :planned, :milestone 16, :id "namespace/babashka.classpath", :category :built-in-namespace, :name "babashka.classpath", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :supported, :milestone 13, :id "namespace/babashka.classpath", :category :built-in-namespace, :name "babashka.classpath", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :implementation, :path "src/babashka/classpath.clj"} {:kind :test, :path "test/gobb"}]}
 {:state :partial, :milestone 9, :id "namespace/babashka.cli", :category :built-in-namespace, :name "babashka.cli", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "Pinned upstream parsing, coercion, alias, collection, and command functions are compiled into Gobb; the complete exec dispatch surface remains to be exercised", :evidence [{:kind :implementation, :path "util/stage-sources"} {:kind :test, :path "test/babashka-cli", :description "Differential core babashka.cli behavior against pinned BB"}]}
-{:state :planned, :milestone 16, :id "namespace/babashka.core", :category :built-in-namespace, :name "babashka.core", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
+{:state :supported, :milestone 13, :id "namespace/babashka.core", :category :built-in-namespace, :name "babashka.core", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :implementation, :path "src/babashka/core.clj"} {:kind :test, :path "test/gobb"}]}
 {:state :partial, :milestone 9, :id "namespace/babashka.curl", :category :built-in-namespace, :name "babashka.curl", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "GET, HEAD, POST, PUT, PATCH, DELETE, headers, query and form parameters, body and byte modes, redirects, debug commands, and error dispositions are implemented; live streaming remains buffered", :evidence [{:kind :implementation, :path "src/gobb/curl.clj"} {:kind :test, :path "test/curl", :description "Differential requests against file URLs and a local HTTP server"}]}
 {:state :planned, :milestone 16, :id "namespace/babashka.deps", :category :built-in-namespace, :name "babashka.deps", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :evidence [{:kind :inventory, :description "Discovered from pinned Babashka source"}]}
 {:state :partial, :milestone 9, :id "namespace/babashka.fs", :category :built-in-namespace, :name "babashka.fs", :source {:kind :upstream-source, :path "src/babashka/main.clj", :definition "namespaces"}, :rationale "Core paths, predicates, traversal, glob matching, file I/O, copies, moves, links, archives, POSIX permissions, temporary scopes, and executable lookup are implemented through Go; JVM FileTime-style attributes remain", :evidence [{:kind :implementation, :path "src/gobb/fs.clj"} {:kind :test, :path "test/fs", :description "Differential core filesystem behavior against pinned BB"}]}

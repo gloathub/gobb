@@ -21,12 +21,15 @@
   (if (map? summary) (get summary key 0) "—"))
 
 (defn library-section [result]
-  (let [summary (:summary result)]
+  (let [summary (:summary result)
+        corpus (:corpus result)]
     (str "## Library tests\n\n"
          "Status: **" (display-status (:status result)) "**\n\n"
-         "| Tests | Assertions passed | Failures | Errors |\n"
-         "| ---: | ---: | ---: | ---: |\n"
-         "| " (summary-value summary :test)
+         "| Libraries | Test namespaces | Tests | Assertions passed | Failures | Errors |\n"
+         "| ---: | ---: | ---: | ---: | ---: | ---: |\n"
+         "| " (summary-value corpus :libraries)
+         " | " (summary-value corpus :namespaces)
+         " | " (summary-value summary :test)
          " | " (summary-value summary :pass)
          " | " (summary-value summary :fail)
          " | " (summary-value summary :error) " |\n\n"

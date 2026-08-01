@@ -104,6 +104,25 @@ check "classpath system property" '"test/fixtures/classpath"' \
   "$GOBB" -cp test/fixtures/classpath \
   -e '(System/getProperty "java.class.path")'
 
+check "dynamic Babashka classpath" \
+  '["test/fixtures/classpath" 42]' \
+  "$GOBB" -e \
+  "(require '[babashka.classpath :as cp])
+   (cp/add-classpath \"test/fixtures/classpath\")
+   (require '[gobb.fixture.math-ops :as math])
+   [(cp/get-classpath) (math/answer 40)]"
+
+check "split Babashka classpath" \
+  '["first" "second"]' \
+  "$GOBB" -e \
+  "(require '[babashka.classpath :as cp])
+   (cp/split-classpath
+    (str \"first\" (System/getProperty \"path.separator\") \"second\"))"
+
+check "Babashka platform predicate" \
+  "$("$BB" -e "(require '[babashka.core :as bb]) (bb/windows?)")" \
+  "$GOBB" -e "(require '[babashka.core :as bb]) (bb/windows?)"
+
 check "stdin evaluation" "5" \
   bash -c "printf '(+ 2 3)\\n' | \"\$1\"" _ "$GOBB"
 

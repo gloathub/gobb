@@ -11,11 +11,11 @@ Gobb measures compatibility against Babashka **v1.12.218** at commit `0fb349c414
 
 Status: **BLOCKED**
 
-| Tests | Assertions passed | Failures | Errors |
-| ---: | ---: | ---: | ---: |
-| — | — | — | — |
+| Libraries | Test namespaces | Tests | Assertions passed | Failures | Errors |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 111 | 261 | — | — | — | — |
 
-Current blocker: `exit 1: <BABASHKA>/test-resources/lib_tests/babashka/run_all_libtests.clj: String index out of range`
+Current blocker: `exit 1: failed to load /clojure/spec/test/alpha: not found in load path`
 
 Run the complete suite with:
 

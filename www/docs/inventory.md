@@ -11,7 +11,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | Surface | Items | Supported | Partial | Planned | Other |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | built-in-library | 38 | 0 | 11 | 27 | 0 |
-| built-in-namespace | 104 | 3 | 19 | 82 | 0 |
+| built-in-namespace | 104 | 5 | 19 | 80 | 0 |
 | capability | 41 | 12 | 20 | 0 | 9 |
 | cli | 36 | 8 | 1 | 24 | 3 |
 | compatible-library | 98 | 0 | 1 | 97 | 0 |
@@ -149,7 +149,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | `cli/repl` | cli | **partial** | test/gobb |
 | `cli/socket-repl` | cli | **supported** | test/interactive-services |
 | `compatible-library/babashka/babashka.curl` | compatible-library | **partial** | src/gobb/curl.clj<br>test/curl |
+| `namespace/babashka.classpath` | built-in-namespace | **supported** | src/babashka/classpath.clj<br>test/gobb |
 | `namespace/babashka.cli` | built-in-namespace | **partial** | util/stage-sources<br>test/babashka-cli |
+| `namespace/babashka.core` | built-in-namespace | **supported** | src/babashka/core.clj<br>test/gobb |
 | `namespace/babashka.curl` | built-in-namespace | **partial** | src/gobb/curl.clj<br>test/curl |
 | `namespace/babashka.fs` | built-in-namespace | **partial** | src/gobb/fs.clj<br>test/fs |
 | `namespace/babashka.http-client` | built-in-namespace | **partial** | src/gobb/http_client.clj<br>test/http-client |
@@ -210,7 +212,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | 12 | 2 |
 | 14 | 98 |
 | 15 | 32 |
-| 16 | 708 |
+| 16 | 706 |
 
 ## Authoritative inputs
 

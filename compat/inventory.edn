@@ -60,11 +60,21 @@
   "cli/socket-repl" {:state :supported
                       :milestone 11
                       :evidence [{:kind :test :path "test/interactive-services"}]}
-  "namespace/babashka.nrepl.server"
+ "namespace/babashka.nrepl.server"
   {:state :supported
    :milestone 11
    :evidence [{:kind :implementation :path "src/babashka/nrepl/server.clj"}
               {:kind :test :path "test/interactive-services"}]}
+  "namespace/babashka.classpath"
+  {:state :supported
+   :milestone 13
+   :evidence [{:kind :implementation :path "src/babashka/classpath.clj"}
+              {:kind :test :path "test/gobb"}]}
+  "namespace/babashka.core"
+  {:state :supported
+   :milestone 13
+   :evidence [{:kind :implementation :path "src/babashka/core.clj"}
+              {:kind :test :path "test/gobb"}]}
   "namespace/babashka.pods"
   {:state :partial
    :milestone 11

@@ -34,6 +34,33 @@ The generated BB surface ledger now tracks 1,022 CLI, project, namespace,
 library, Java-class, platform, upstream-test, and representative-program items
 with explicit compatibility states and milestone assignments.
 
+## Current work
+
+<div class="milestone milestone-active">
+  <div class="milestone-marker">13</div>
+  <div>
+    <span class="status-badge status-active">In progress</span>
+    <h3>Upstream conformance harness</h3>
+    <p>
+      Run Babashka's library tests and examples against Gobb, keep complete
+      diagnostics, and publish committed full-suite snapshots.
+    </p>
+    <ul class="task-list">
+      <li class="task-done">Add a filterable <code>make test-lib_tests</code> target</li>
+      <li class="task-done">Discover and report the complete upstream library and test-namespace corpus</li>
+      <li class="task-done">Add the <code>babashka.classpath</code> and <code>babashka.core</code> host namespaces required by the upstream runner</li>
+      <li class="task-done">Preserve the underlying namespace-load diagnostic when the runner cannot start</li>
+      <li class="task-done">Compile every upstream <code>.clj</code> example</li>
+      <li class="task-done">Run safe deterministic examples against BB and Gobb</li>
+      <li class="task-done">Track explicit environmental and interactive waivers</li>
+      <li>Continue through all library-test cases and fail after recording the summary</li>
+      <li class="task-done">Continue through all example cases and fail after recording the summary</li>
+      <li class="task-done">Detect additions or removals in the upstream example set</li>
+      <li class="task-done">Publish current results on the Testing page without rerunning tests</li>
+    </ul>
+  </div>
+</div>
+
 ## Completed foundation
 
 <div class="milestone milestone-done">
@@ -519,23 +546,6 @@ Finalize deterministic native and Wasm program builds through Gloat.
 ## Planned milestones
 
 <div class="roadmap-grid">
-  <article class="roadmap-card">
-    <span>13</span>
-    <h3>Upstream conformance harness</h3>
-    <p>
-      Run Babashka's library tests and examples against Gobb, keep complete
-      diagnostics, and publish committed full-suite snapshots.
-    </p>
-    <ul>
-      <li>Add a filterable <code>make test-lib_tests</code> target</li>
-      <li>Compile every upstream <code>.clj</code> example</li>
-      <li>Run safe deterministic examples against BB and Gobb</li>
-      <li>Track explicit environmental and interactive waivers</li>
-      <li>Continue through all cases and fail after recording the summary</li>
-      <li>Detect additions or removals in the upstream example set</li>
-      <li>Publish current results on the Testing page without rerunning tests</li>
-    </ul>
-  </article>
   <article class="roadmap-card">
     <span>14</span>
     <h3>Library-test closure</h3>

@@ -65,8 +65,25 @@
             (catch Exception _ nil)))
         (reverse (str/split-lines text))))
 
+(def extra-lib-test-namespaces
+  '[babashka.process-test babashka.process-exec-test])
+
+(defn lib-test-corpus [root]
+  (let [manifest (read-edn
+                  (fs/path root "test-resources" "lib_tests"
+                           "bb-tested-libs.edn"))
+        namespaces (->> (concat (mapcat :test-namespaces (vals manifest))
+                                extra-lib-test-namespaces)
+                        distinct
+                        (sort-by str)
+                        (mapv str))]
+    {:libraries (count manifest)
+     :namespaces namespaces}))
+
 (defn lib-tests! [{:keys [source bb gobb cache result filters]}]
   (let [root (fs/absolutize source)
+        corpus (lib-test-corpus root)
+        unknown (remove (set (:namespaces corpus)) filters)
         work (fs/path cache "lib_tests" "work")
         home (fs/path cache "lib_tests" "home")
         log-dir (fs/path cache "lib_tests")
@@ -87,10 +104,13 @@
                        "--config" (str config)
                        "--deps-root" (str root)
                        "-cp" (str (fs/path root "test-resources" "lib_tests"))
-                       (str runner)]
+                       "-e" (str "(load-file " (pr-str (str runner)) ")")]
                       filters)
         path (str (fs/path root "process" "test" "on-path")
                   ":" (System/getenv "PATH"))]
+    (when (seq unknown)
+      (fail! (str "unknown library test namespaces: "
+                  (str/join ", " unknown))))
     (doseq [directory [work home log-dir]] (fs/create-dirs directory))
     (write-edn! config config-value)
     (let [link (fs/path work "bb")]
@@ -119,6 +139,8 @@
                     :suite :lib-tests
                     :babashka {:version "1.12.218"
                                :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"}
+                    :corpus {:libraries (:libraries corpus)
+                             :namespaces (count (:namespaces corpus))}
                     :selection (if (seq filters) (vec filters) :all)
                     :status status
                     :exit (:exit execution)
