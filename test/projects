@@ -125,6 +125,30 @@ EOF
 grep -q 'requires babashka 300.0.0 or newer' "$tmp/err" ||
   fail ":min-bb-version did not produce a warning"
 
+if "$GOBB" build "$projects/basic/main.clj" -o "$tmp/invalid-platform" \
+  --platform linux >"$tmp/out" 2>"$tmp/err"; then
+  fail "invalid build platform succeeded"
+fi
+grep -q -- '--platform requires OS/ARCH' "$tmp/err" ||
+  fail "invalid build platform lacked a useful diagnostic"
+
+cat > "$tmp/fake-gloat" <<'EOF'
+#!/usr/bin/env sh
+exit 0
+EOF
+chmod +x "$tmp/fake-gloat"
+mkdir -p "$tmp/build-temp"
+if TMPDIR="$tmp/build-temp" GOBB_GLOAT="$tmp/fake-gloat" \
+  "$GOBB" build "$projects/basic/main.clj" \
+  -o "$tmp/missing-output" >"$tmp/out" 2>"$tmp/err"; then
+  fail "build succeeded without producing its output"
+fi
+grep -q 'Gloat did not produce OUTPUT' "$tmp/err" ||
+  fail "missing build output lacked a useful diagnostic"
+if compgen -G "$tmp/build-temp/gobb-build-*" >/dev/null; then
+  fail "failed build left its temporary staging directory behind"
+fi
+
 cp -R "$projects/git-lib" "$tmp/git-lib"
 git -C "$tmp/git-lib" init -q
 git -C "$tmp/git-lib" add .
@@ -203,7 +227,7 @@ GOBB_GLOAT="$GOBB_GLOAT" \
   "$GOBB" --config "$projects/basic/build.edn" \
   build "$projects/basic/main.clj" -o "$compiled"
 check "compiled project and local dependency" \
-  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :args ("one" "two")}' \
+  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :override :project-override, :args ("one" "two")}' \
   "$compiled" one two
 
 wasi="$tmp/project-program.wasm"
@@ -212,7 +236,7 @@ GOBB_GLOAT="$GOBB_GLOAT" \
   build "$projects/basic/main.clj" -o "$wasi" \
   --platform wasip1/wasm
 check "compiled WASI project and local dependency" \
-  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :args ("one" "two")}' \
+  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :override :project-override, :args ("one" "two")}' \
   "$WASMTIME" "$wasi" one two
 
 browser="$tmp/project-program-browser.wasm"
@@ -223,7 +247,7 @@ GOBB_GLOAT="$GOBB_GLOAT" \
 go=$("$GOBB_GLOAT" --which=go)
 goroot=$("$go" env GOROOT)
 check "compiled browser-Wasm project and local dependency" \
-  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :args ("one" "two")}' \
+  '{:compiled :local-dependency, :runtime ["bundled-io" "bundled-fs"], :override :project-override, :args ("one" "two")}' \
   env -i HOME=/tmp PATH="$(dirname "$NODE"):/usr/bin:/bin" \
   "$goroot/lib/wasm/go_js_wasm_exec" "$browser" one two
 

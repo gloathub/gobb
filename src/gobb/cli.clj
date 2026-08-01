@@ -124,7 +124,7 @@
         (recur (next args) (assoc options :input arg)))
       options)))
 
-(defn build-source-text [directory]
+(defn build-source-files [directory]
   (let [[entries error] (os.ReadDir directory)]
     (when error
       (throw
@@ -132,30 +132,42 @@
         (str "cannot inspect build sources: " error)
         {:gobb/build :source-read-failed
          :path directory})))
-    (apply str
-           (for [entry entries
-                 :when (and (not (.IsDir entry))
-                            (contains? #{".clj" ".cljc" ".glj"}
-                                       (path:filepath.Ext (.Name entry))))]
-             (let [source-path (path:filepath.Join directory (.Name entry))
-                   [content read-error] (os.ReadFile source-path)]
-               (when read-error
-                 (throw
-                  (ex-info
-                   (str "cannot read build source " source-path ": "
-                        read-error)
-                   {:gobb/build :source-read-failed
-                    :path source-path})))
-               (go/string content))))))
+    (vec
+     (for [entry entries
+           :when (and (not (.IsDir entry))
+                      (contains? #{".clj" ".cljc" ".glj"}
+                                 (path:filepath.Ext (.Name entry))))]
+       (let [source-path (path:filepath.Join directory (.Name entry))
+             [content read-error] (os.ReadFile source-path)]
+         (when read-error
+           (throw
+            (ex-info
+             (str "cannot read build source " source-path ": " read-error)
+             {:gobb/build :source-read-failed
+              :path source-path})))
+         {:path source-path
+          :source (go/string content)})))))
 
-(defn selected-build-runtime [source]
+(defn build-source-namespace [source]
+  (try
+    (let [start (host/skip-layout source 0)
+          end (host/form-end source start)
+          form (read-string (subs source start end))]
+      (when (and (seq? form)
+                 (= 'ns (first form))
+                 (symbol? (second form)))
+        (second form)))
+    (catch Exception _ nil)))
+
+(defn selected-build-runtime [source provided]
   (let [initial (for [namespace (keys build-sources/sources)
                       :when (strings.Contains source (str namespace))]
                   namespace)]
     (loop [pending (seq initial)
            selected #{}]
       (if-let [namespace (first pending)]
-        (if (contains? selected namespace)
+        (if (or (contains? selected namespace)
+                (contains? provided namespace))
           (recur (next pending) selected)
           (recur (concat (get-in build-sources/sources
                                  [namespace :requires])
@@ -164,8 +176,11 @@
         selected))))
 
 (defn stage-build-runtime! [destination source-directory]
-  (let [selected (selected-build-runtime
-                  (build-source-text source-directory))]
+  (let [files (build-source-files source-directory)
+        provided (set (keep (comp build-source-namespace :source) files))
+        selected (selected-build-runtime
+                  (apply str (map :source files))
+                  provided)]
     (doseq [namespace (sort selected)
             :let [{:keys [stage-path source]}
                   (get build-sources/sources namespace)]]
@@ -196,6 +211,9 @@
           (build-fail! "INPUT is required"))
         (when-not output
           (build-fail! "-o OUTPUT is required"))
+        (when (and platform
+                   (not (re-matches #"[^/]+/[^/]+" platform)))
+          (build-fail! "--platform requires OS/ARCH"))
         (let [[input-bytes input-error] (os.ReadFile input)]
           (when input-error
             (build-fail! (str "cannot read INPUT: " input-error)))
@@ -205,57 +223,73 @@
               (build-fail!
                (str "cannot create temporary directory: "
                     temporary-error)))
-            (let [source-dir (path:filepath.Join temporary-dir "source")]
-              (doseq [directory [source-dir]]
-                (when-let [error (os.MkdirAll directory 0755)]
+            (try
+              (let [source-dir (path:filepath.Join temporary-dir "source")]
+                (when-let [error (os.MkdirAll source-dir 0755)]
                   (os.RemoveAll temporary-dir)
                   (build-fail!
-                   (str "cannot create build staging directory: " error))))
-            (project/stage-classpath! source-dir)
-            (let [staged-input (path:filepath.Join
-                                source-dir "main.clj")
-                  staged-source
-                  (host/prepare-build-source
-                   (fmt.Sprintf "%s" input-bytes))
-                  write-error
-                  (os.WriteFile staged-input
-                                (.getBytes staged-source)
-                                0644)]
-              (when write-error
+                   (str "cannot create build staging directory: " error)))
+                (project/stage-classpath! source-dir)
+                (let [staged-input (path:filepath.Join source-dir "main.clj")
+                      staged-source
+                      (host/prepare-build-source
+                       (fmt.Sprintf "%s" input-bytes))
+                      write-error
+                      (os.WriteFile staged-input
+                                    (.getBytes staged-source)
+                                    0644)]
+                  (when write-error
+                    (os.RemoveAll temporary-dir)
+                    (build-fail!
+                     (str "cannot stage INPUT: " write-error)))
+                  (stage-build-runtime! source-dir source-dir)
+                  (let [gloat (or (os.Getenv "GOBB_GLOAT") "gloat")
+                        target-option
+                        (when platform
+                          (if (= "js/wasm" platform)
+                            "--to=js"
+                            (str "--platform=" platform)))
+                        args (cond-> [gloat source-dir
+                                      (str "--out=" output)
+                                      "--force"
+                                      "--quiet"
+                                      "--ext=goimports"]
+                               target-option (conj target-option))
+                        command (apply os:exec.Command args)
+                        _ (set! (.Env command)
+                                (apply
+                                 go/append
+                                 (go/make (go/slice-of go/string) 0)
+                                 (concat
+                                  (os.Environ)
+                                  [(str "GLJ_CLASSPATH=" source-dir)])))
+                        [command-output command-error]
+                        (.CombinedOutput command)]
+                    (when command-error
+                      (let [details
+                            (strings.TrimSpace (go/string command-output))]
+                        (os.RemoveAll temporary-dir)
+                        (build-fail!
+                         (str "Gloat failed"
+                              (if (empty? details)
+                                (str ": " (fmt.Sprint command-error))
+                                (str ":\n" details))))))
+                    (let [[output-info output-error] (os.Stat output)]
+                      (when output-error
+                        (os.RemoveAll temporary-dir)
+                        (build-fail!
+                         (str "Gloat did not produce OUTPUT " output ": "
+                              output-error)))
+                      (when (.IsDir output-info)
+                        (os.RemoveAll temporary-dir)
+                        (build-fail!
+                         (str "Gloat produced a directory for OUTPUT "
+                              output))))
+                    (os.RemoveAll temporary-dir)
+                    output)))
+              (catch Exception error
                 (os.RemoveAll temporary-dir)
-                (build-fail!
-                 (str "cannot stage INPUT: " write-error)))
-              (stage-build-runtime! source-dir source-dir)
-              (let [gloat (or (os.Getenv "GOBB_GLOAT") "gloat")
-              target-option (when platform
-                              (if (= "js/wasm" platform)
-                                "--to=js"
-                                (str "--platform=" platform)))
-              args (cond-> [gloat source-dir
-                            (str "--out=" output)
-                            "--force"
-                            "--quiet"
-                            "--ext=goimports"]
-                     target-option (conj target-option))
-              command (apply os:exec.Command args)
-              _ (set! (.Env command)
-                      (apply
-                       go/append
-                       (go/make (go/slice-of go/string) 0)
-                       (concat
-                        (os.Environ)
-                        [(str "GLJ_CLASSPATH=" source-dir)])))
-              [command-output command-error] (.CombinedOutput command)]
-          (when command-error
-            (let [details (strings.TrimSpace (go/string command-output))]
-              (os.RemoveAll temporary-dir)
-              (build-fail!
-               (str "Gloat failed"
-                    (if (empty? details)
-                      (str ": " (fmt.Sprint command-error))
-                      (str ":\n" details))))))
-          (os.RemoveAll temporary-dir)
-          output)))))))))
+                (throw error)))))))))
 
 (defn evaluate-expression [expression args]
   (host/evaluate-source

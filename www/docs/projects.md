@@ -98,7 +98,13 @@ During a build, Gobb scans the project sources, selects referenced bundled
 namespaces, follows their transitive namespace dependencies, and stages that
 closure beside the project's own sources. The resulting program can therefore
 use bundled namespaces such as `clojure.java.io` and `babashka.fs` without a
-separate Gobb source checkout at build time.
+separate Gobb source checkout at build time. A namespace supplied by the
+project or one of its dependencies takes precedence over the bundled version;
+Gobb omits the bundled source and its bundled-only dependency closure.
+
+Build target names must use `OS/ARCH`. Gobb verifies that Gloat creates the
+requested file and removes its temporary source staging directory after both
+successful and failed builds.
 
 Dependency download and Git operations happen on the native build host.
 Compiled WASI and browser artifacts contain the selected portable source and

@@ -16,7 +16,7 @@ description: Current Gobb implementation progress and upcoming milestones
   </div>
   <div>
     <p class="summary-label">Last updated</p>
-    <p class="summary-value">July 31, 2026</p>
+    <p class="summary-value">August 1, 2026</p>
   </div>
 </div>
 
@@ -50,9 +50,9 @@ with explicit compatibility states and milestone assignments.
       <li class="task-done">Select the transitive bundled namespace closure required by each program</li>
       <li class="task-done">Stage project, dependency, and selected bundled sources together for Gloat</li>
       <li class="task-done">Compile and run bundled <code>clojure.java.io</code> and <code>babashka.fs</code> use in native, WASI, and browser-Wasm project tests</li>
-      <li>Allow project namespaces to override bundled namespaces without duplicate inputs</li>
-      <li>Make repeated builds byte-for-byte reproducible; Gloat currently embeds its random build path</li>
-      <li>Finalize production diagnostics and output validation for every target</li>
+      <li class="task-done">Allow project namespaces to override bundled namespaces without duplicate inputs</li>
+      <li>Make repeated builds byte-for-byte reproducible; Gloat's <code>-trimpath</code> fix and regression test are complete, awaiting a release and Gobb pin</li>
+      <li class="task-done">Validate target syntax, compiler output, and staging cleanup while retaining native, WASI, and browser-Wasm execution coverage</li>
     </ul>
   </div>
 </div>

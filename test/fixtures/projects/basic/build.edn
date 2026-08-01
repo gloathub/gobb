@@ -1,1 +1,2 @@
-{:deps {fixture/local {:local/root "../local-lib"}}}
+{:paths ["override"]
+ :deps {fixture/local {:local/root "../local-lib"}}}
