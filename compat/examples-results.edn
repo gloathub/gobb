@@ -1,0 +1,210 @@
+{:schema 1,
+ :suite :examples,
+ :babashka
+ {:version "1.12.218",
+  :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
+ :selection :all,
+ :status :fail,
+ :summary
+ {:total 34,
+  :pass 1,
+  :fail 33,
+  :waived 0,
+  :execution-waivers 27,
+  :compile-pass 1,
+  :compile-fail 33},
+ :results
+ [{:name "cprop.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/classpath: not found in load path"}
+  {:name "db_who.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/shell: not found in load path"}
+  {:name "digitalocean-ping.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/curl: not found in load path"}
+  {:name "download-aliases.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/edn: not found in load path"}
+  {:name "fzf.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/process: not found in load path"}
+  {:name "hsqldb_unused_vars.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/pods: not found in load path"}
+  {:name "htmx_todoapp.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic "exit 1: <preloads>: String index out of range"}
+  {:name "http-server.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/fs: not found in load path"}
+  {:name "http_server_from_scratch.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "httpkit_server.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/pprint: not found in load path"}
+  {:name "image-viewer.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/browse: not found in load path"}
+  {:name "is_tty.clj",
+   :scenario :run,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/process: not found in load path"}
+  {:name "logger.clj", :scenario :run, :compile :pass, :status :pass}
+  {:name "ls_jar.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "memo.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: unsupported value type lang.ArityFn: {<nil> [<ADDR> <ADDR> <ADDR> <nil> <nil> <nil>] map[] 2 {<nil> 2 <ADDR>} 2}"}
+  {:name "mysql_cmdline.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic "exit 1: EvalASTMaybeHostForm: shell/sh"}
+  {:name "normalize-keywords.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/pods: not found in load path"}
+  {:name "notes.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "outdated.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/edn: not found in load path"}
+  {:name "pom_version_get.clj",
+   :scenario :run,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/data/xml: not found in load path"}
+  {:name "pom_version_get_xml_zip.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/deps: not found in load path"}
+  {:name "pom_version_set.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/data/xml: not found in load path"}
+  {:name "portal.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/deps: not found in load path"}
+  {:name "process_builder.clj",
+   :scenario :run,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "pst.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: EvalASTMaybeHostForm: java.time.ZonedDateTime/now"}
+  {:name "random_doc.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: cannot compile /clojure/repl: filesystem is not writable"}
+  {:name "sqlite.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic "exit 1: bad binding form: :ns"}
+  {:name "torrent-viewer.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "tree.clj",
+   :scenario :run,
+   :compile :fail,
+   :status :fail,
+   :diagnostic "exit 1: <preloads>: String index out of range"}
+  {:name "vim.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "whatsapp_frequencies.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "which.clj",
+   :scenario :run,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /clojure/java/io: not found in load path"}
+  {:name "wiki-translate.clj",
+   :scenario :waived,
+   :compile :fail,
+   :status :fail,
+   :diagnostic
+   "exit 1: failed to load /babashka/curl: not found in load path"}
+  {:name "xml-example.clj",
+   :scenario :run,
+   :compile :fail,
+   :status :fail,
+   :diagnostic "exit 1: EvalASTMaybeHostForm: xml/indent-str"}]}

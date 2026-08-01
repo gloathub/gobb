@@ -1,0 +1,11 @@
+{:schema 1,
+ :suite :lib-tests,
+ :babashka
+ {:version "1.12.218",
+  :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
+ :selection :all,
+ :status :blocked,
+ :exit 1,
+ :summary nil,
+ :diagnostic
+ "exit 1: <BABASHKA>/test-resources/lib_tests/babashka/run_all_libtests.clj: String index out of range"}

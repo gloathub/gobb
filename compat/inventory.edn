@@ -42,16 +42,16 @@
    "representative-program/examples/process_builder.clj"}
 
  :defaults
- {:cli {:state :planned :milestone 13}
+ {:cli {:state :planned :milestone 16}
   :project-config {:state :planned :milestone 7}
   :task-config {:state :planned :milestone 8}
-  :built-in-namespace {:state :planned :milestone 13}
-  :built-in-library {:state :planned :milestone 13}
-  :compatible-library {:state :planned :milestone 13}
-  :java-class {:state :planned :milestone 13}
+  :built-in-namespace {:state :planned :milestone 16}
+  :built-in-library {:state :planned :milestone 16}
+  :compatible-library {:state :planned :milestone 14}
+  :java-class {:state :planned :milestone 16}
   :capability {:state :planned :milestone 5}
-  :upstream-test {:state :planned :milestone 13}
-  :representative-program {:state :planned :milestone 13}}
+  :upstream-test {:state :planned :milestone 16}
+  :representative-program {:state :planned :milestone 15}}
 
  :overrides
  {"cli/nrepl-server" {:state :supported
@@ -549,7 +549,7 @@
                :description "Differential zipper traversal and editing against pinned BB"}]}
   "built-in-library/rewrite-clj/rewrite-clj"
   {:state :planned
-   :milestone 13
+   :milestone 14
    :rationale "Pinned rewrite-clj 1.2.54 source stages successfully, but Glojure 0.7.3 AOT cannot yet serialize the lang.ArityFn roots loaded by rewrite-clj's protocol namespace"
    :evidence [{:kind :upstream-source
                :path "https://github.com/clj-commons/rewrite-clj"
@@ -827,16 +827,16 @@
   {:pattern "(nrepl|socket_repl|server|pod)" :area :interactive-services
    :milestone 11}
   {:pattern "(classes|interop|proxy|reify|java_)" :area :java-compatibility
-   :milestone 13}
+   :milestone 16}
   {:pattern "(io_test|file_var|classpath)" :area :filesystem
-   :milestone 13}
+   :milestone 16}
   {:pattern "(shutdown_hook|interrupt|kill_child)" :area :platform
-   :milestone 13}
+   :milestone 16}
   {:pattern "(uberjar|uberscript)" :area :build :milestone 12}]
 
  :program-routes
  [{:pattern "(process|pst|which|fzf)" :area :process :milestone 8}
   {:pattern "(http|download|digitalocean|torrent)" :area :network
-   :milestone 13}
-  {:pattern "(ls_jar|tree|notes)" :area :filesystem :milestone 13}
+   :milestone 15}
+  {:pattern "(ls_jar|tree|notes)" :area :filesystem :milestone 15}
   {:pattern "(server|portal)" :area :interactive-services :milestone 11}]}

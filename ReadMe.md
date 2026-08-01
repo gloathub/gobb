@@ -295,6 +295,9 @@ WASI, and browser-Wasm executables.
 | `deps` | Download and verify the pinned Babashka source checkout. |
 | `stage` | Generate the source tree selected from Gobb and Babashka. |
 | `test` | Build Gobb and run native and differential BB tests. |
+| `test-lib_tests` | Run Babashka's upstream library test suite, optionally filtered with `LIB_TESTS`. |
+| `test-examples` | Compile every upstream example and run applicable scenarios, optionally filtered with `EXAMPLES`. |
+| `testing-report` | Render the website Testing page from committed full-suite snapshots. |
 | `smoke` | Build and execute equivalent interpreted, native, WASI, and browser-Wasm smoke programs. |
 | `capabilities` | Generate the runtime platform contract and website capability matrix. |
 | `capability-test` | Compile and execute the capability probe under native, WASI, and browser Wasm. |

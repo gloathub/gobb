@@ -246,7 +246,7 @@
     (when-not (allowed-states (:state item))
       (fail! (str (:id item) " has invalid state " (:state item))))
     (when-not (and (integer? (:milestone item))
-                   (<= 0 (:milestone item) 13))
+                   (<= 0 (:milestone item) 16))
       (fail! (str (:id item) " has invalid milestone "
                   (:milestone item))))
     (when-not (seq (:evidence item))

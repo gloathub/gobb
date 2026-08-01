@@ -208,7 +208,9 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 | ---: | ---: |
 | 11 | 6 |
 | 12 | 2 |
-| 13 | 838 |
+| 14 | 98 |
+| 15 | 32 |
+| 16 | 708 |
 
 ## Authoritative inputs
 

@@ -12,16 +12,16 @@ description: Current Gobb implementation progress and upcoming milestones
   </div>
   <div>
     <p class="summary-label">Completed milestones</p>
-    <p class="summary-value">12 / 14</p>
+    <p class="summary-value">12 / 17</p>
   </div>
   <div>
     <p class="summary-label">Last updated</p>
-    <p class="summary-value">July 30, 2026</p>
+    <p class="summary-value">July 31, 2026</p>
   </div>
 </div>
 
 <div class="overall-progress" aria-label="Overall roadmap progress">
-  <span style="width: 86%"></span>
+  <span style="width: 71%"></span>
 </div>
 
 The first native Gobb executable is now working. It evaluates expressions,
@@ -299,6 +299,9 @@ make smoke          # Execute interpreted, native, WASI, and browser-Wasm proof
 make capabilities   # Generate the runtime and website platform matrix
 make capability-test # Execute the matrix under all three target families
 make compat         # Generate the BB-vs-Gobb compatibility report
+make test-lib_tests # Run Babashka's library test suite with Gobb
+make test-examples  # Compile and exercise Babashka's examples with Gobb
+make testing-report # Render committed upstream-suite result snapshots
 make inventory      # Generate the complete BB surface ledger and report
 make java-compat    # Rank and assign all exposed Java classes
 make java-compat-test # Exercise the core class wave on all target families
@@ -500,8 +503,45 @@ Finalize deterministic native and Wasm program builds through Gloat.
   </article>
   <article class="roadmap-card">
     <span>13</span>
-    <h3>Compatibility closure</h3>
-    <p>Close remaining BB gaps, establish performance baselines, and release.</p>
+    <h3>Upstream conformance harness</h3>
+    <p>
+      Run Babashka's library tests and examples against Gobb, keep complete
+      diagnostics, and publish committed full-suite snapshots.
+    </p>
+    <ul>
+      <li>Add a filterable <code>make test-lib_tests</code> target</li>
+      <li>Compile every upstream <code>.clj</code> example</li>
+      <li>Run safe deterministic examples against BB and Gobb</li>
+      <li>Track explicit environmental and interactive waivers</li>
+      <li>Continue through all cases and fail after recording the summary</li>
+      <li>Detect additions or removals in the upstream example set</li>
+      <li>Publish current results on the Testing page without rerunning tests</li>
+    </ul>
+  </article>
+  <article class="roadmap-card">
+    <span>14</span>
+    <h3>Library-test closure</h3>
+    <p>
+      Make every applicable test in Babashka's
+      <code>test-resources/lib_tests</code> corpus pass, with documented
+      waivers for genuinely non-portable behavior.
+    </p>
+  </article>
+  <article class="roadmap-card">
+    <span>15</span>
+    <h3>Example-program closure</h3>
+    <p>
+      Close compilation and execution gaps across Babashka's examples and
+      replace temporary waivers whenever portable automation is possible.
+    </p>
+  </article>
+  <article class="roadmap-card">
+    <span>16</span>
+    <h3>Final compatibility and release</h3>
+    <p>
+      Close the remaining BB CLI, namespace, Java, and upstream-test gaps,
+      establish performance baselines, and release the full implementation.
+    </p>
   </article>
 </div>
 

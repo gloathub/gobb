@@ -1,0 +1,107 @@
+{:schema 1
+ :examples
+  {"cprop.clj"
+  {:scenario :waived
+   :reason "Requires the Clojure CLI and project-specific configuration files"}
+  "db_who.clj"
+  {:scenario :waived
+   :reason "Requires a configured database and credentials"}
+  "digitalocean-ping.clj"
+  {:scenario :waived
+   :reason "Requires public network access"}
+  "download-aliases.clj"
+  {:scenario :waived
+   :reason "Downloads remote data and mutates the working tree"}
+  "fzf.clj"
+  {:scenario :waived
+   :reason "Requires the interactive fzf program and a terminal"}
+  "hsqldb_unused_vars.clj"
+  {:scenario :waived
+   :reason "Requires HSQLDB and a configured database"}
+  "htmx_todoapp.clj"
+  {:scenario :waived
+   :reason "Starts a long-running HTTP server"}
+  "http-server.clj"
+  {:scenario :waived
+   :reason "Starts a long-running HTTP server"}
+  "http_server_from_scratch.clj"
+  {:scenario :waived
+   :reason "Starts a long-running HTTP server"}
+  "httpkit_server.clj"
+  {:scenario :waived
+   :reason "Starts a long-running HTTP server"}
+  "image-viewer.clj"
+  {:scenario :waived
+   :reason "Requires a graphical desktop and image viewer"}
+  "is_tty.clj"
+  {:scenario :run
+   :description "Reports whether standard input is a terminal"}
+  "logger.clj"
+  {:scenario :run
+   :description "Loads the example logging macro"}
+  "ls_jar.clj"
+  {:scenario :waived
+   :reason "Requires a selected archive and JVM archive behavior"}
+  "memo.clj"
+  {:scenario :waived
+   :reason "Reads and mutates user-specific persistent state"}
+  "mysql_cmdline.clj"
+  {:scenario :waived
+   :reason "Requires the mysql command and a configured database"}
+  "normalize-keywords.clj"
+  {:scenario :waived
+   :reason "Requires an external database and project-specific input"}
+  "notes.clj"
+  {:scenario :waived
+   :reason "Reads and mutates user-specific note files"}
+  "outdated.clj"
+  {:scenario :waived
+   :reason "Resolves remote dependency metadata"}
+  "pom_version_get.clj"
+  {:scenario :run
+   :args ["test-resources/pom.xml"]
+   :description "Reads a version from the pinned Babashka test POM"}
+  "pom_version_get_xml_zip.clj"
+  {:scenario :waived
+   :reason "Downloads and loads dependencies dynamically"}
+  "pom_version_set.clj"
+  {:scenario :waived
+   :reason "Mutates a supplied POM file"}
+  "portal.clj"
+  {:scenario :waived
+   :reason "Requires a graphical Portal session"}
+  "process_builder.clj"
+  {:scenario :run
+   :description "Exercises portable process-builder behavior"}
+  "pst.clj"
+  {:scenario :waived
+   :reason "Inspects nondeterministic host process state"}
+  "random_doc.clj"
+  {:scenario :waived
+   :reason "Produces nondeterministic output"}
+  "sqlite.clj"
+  {:scenario :waived
+   :reason "Requires SQLite and a configured database"}
+  "torrent-viewer.clj"
+  {:scenario :waived
+   :reason "Requires public network access and remote torrent data"}
+  "tree.clj"
+  {:scenario :run
+   :args ["test-resources"]
+   :description "Prints a deterministic test-resource directory tree"}
+  "vim.clj"
+  {:scenario :waived
+   :reason "Requires an interactive Vim session"}
+  "whatsapp_frequencies.clj"
+  {:scenario :waived
+   :reason "Requires a private WhatsApp export"}
+  "which.clj"
+  {:scenario :run
+   :args ["sh"]
+   :description "Finds a stable shell executable on PATH"}
+  "wiki-translate.clj"
+  {:scenario :waived
+   :reason "Requires public network access to Wikipedia"}
+  "xml-example.clj"
+  {:scenario :run
+   :description "Exercises portable XML parsing"}}}

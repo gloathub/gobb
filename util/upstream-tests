@@ -1,0 +1,282 @@
+#!/usr/bin/env bb
+
+(require '[babashka.fs :as fs]
+         '[babashka.process :as process]
+         '[clojure.edn :as edn]
+         '[clojure.pprint :as pprint]
+         '[clojure.string :as str])
+
+(defn fail! [message]
+  (binding [*out* *err*] (println (str "upstream-tests: " message)))
+  (System/exit 2))
+
+(defn read-edn [path]
+  (edn/read-string (slurp (str path))))
+
+(defn write-edn! [path value]
+  (fs/create-dirs (fs/parent path))
+  (spit (str path) (with-out-str (pprint/pprint value))))
+
+(defn run-command [command options]
+  (let [result @(process/process command
+                                 (merge {:out :string
+                                         :err :string
+                                         :continue true}
+                                        options))]
+    {:exit (:exit result)
+     :out (:out result)
+     :err (:err result)}))
+
+(defn concise-error [{:keys [exit out err]}]
+  (let [lines (->> (str/split-lines (str err "\n" out))
+                   (map str/trim)
+                   (remove str/blank?)
+                   (remove #(or (= "GLJ Stack:" %)
+                                (str/starts-with? % "Usage: "))))
+        diagnostic (or (some #(when (re-find
+                                     #"(failed to load|unable to|unsupported|cannot compile|String index|requires|bad binding|EvalASTMaybeHostForm)"
+                                     %)
+                                %)
+                             lines)
+                       (last lines))
+        diagnostic (some-> diagnostic
+                           (str/replace
+                            #"^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} " "")
+                           (str/replace #"^.*error evaluating [^:]+:\s*" "")
+                           (str/replace #"0x[0-9a-fA-F]+" "<ADDR>"))]
+    (str "exit " exit (when diagnostic (str ": " diagnostic)))))
+
+(defn normalize [text replacements]
+  (reduce (fn [value [from to]]
+            (str/replace value (str from) to))
+          (-> text
+              (str/replace "\\" "/")
+              (str/replace #"\r\n" "\n"))
+          replacements))
+
+(defn lib-summary [text]
+  (some (fn [line]
+          (try
+            (let [value (edn/read-string line)]
+              (when (and (map? value)
+                         (every? #(contains? value %)
+                                 [:test :pass :fail :error]))
+                value))
+            (catch Exception _ nil)))
+        (reverse (str/split-lines text))))
+
+(defn lib-tests! [{:keys [source bb gobb cache result filters]}]
+  (let [root (fs/absolutize source)
+        work (fs/path cache "lib_tests" "work")
+        home (fs/path cache "lib_tests" "home")
+        log-dir (fs/path cache "lib_tests")
+        config (fs/path log-dir "config.edn")
+        upstream-config (read-edn (fs/path root "deps.edn"))
+        process-root (fs/path root "process")
+        paths (cond-> [(str (fs/path root "test-resources" "lib_tests"))]
+                (fs/exists? (fs/path process-root "src"))
+                (conj (str (fs/path process-root "src")))
+                (fs/exists? (fs/path process-root "test"))
+                (conj (str (fs/path process-root "test"))))
+        config-value {:paths paths
+                      :deps (get-in upstream-config
+                                    [:aliases :lib-tests :extra-deps])}
+        runner (fs/path root "test-resources" "lib_tests"
+                        "babashka" "run_all_libtests.clj")
+        command (into ["timeout" "600" (str gobb)
+                       "--config" (str config)
+                       "--deps-root" (str root)
+                       "-cp" (str (fs/path root "test-resources" "lib_tests"))
+                       (str runner)]
+                      filters)
+        path (str (fs/path root "process" "test" "on-path")
+                  ":" (System/getenv "PATH"))]
+    (doseq [directory [work home log-dir]] (fs/create-dirs directory))
+    (write-edn! config config-value)
+    (let [link (fs/path work "bb")]
+      (when (fs/exists? link) (fs/delete link))
+      (fs/create-sym-link link (fs/absolutize gobb)))
+    (let [execution (run-command command
+                                 {:dir (str work)
+                                  :extra-env {"HOME" (str home)
+                                              "GOBB_CACHE" (str (fs/path cache "gobb-cache"))
+                                              "BABASHKA_TEST_ENV" "native"
+                                              "GITHUB_REF_NAME" "gobb-upstream-tests"
+                                              "PATH" path}})
+          summary (lib-summary (:out execution))
+          normalized-execution
+          (update-vals execution
+                       #(if (string? %)
+                          (normalize % [[root "<BABASHKA>"]
+                                        [(fs/absolutize cache) "<CACHE>"]
+                                        [(fs/absolutize gobb) "<GOBB>"]])
+                          %))
+          status (cond
+                   (zero? (:exit execution)) :pass
+                   summary :fail
+                   :else :blocked)
+          snapshot {:schema 1
+                    :suite :lib-tests
+                    :babashka {:version "1.12.218"
+                               :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"}
+                    :selection (if (seq filters) (vec filters) :all)
+                    :status status
+                    :exit (:exit execution)
+                    :summary summary
+                    :diagnostic (when-not (= :pass status)
+                                  (concise-error normalized-execution))}]
+      (spit (str (fs/path log-dir "stdout.log")) (:out execution))
+      (spit (str (fs/path log-dir "stderr.log")) (:err execution))
+      (write-edn! result snapshot)
+      (println (format "lib_tests: %s%s"
+                       (name status)
+                       (if summary (str " " summary) "")))
+      (when-not (= :pass status) (System/exit 1)))))
+
+(defn discover-examples [source]
+  (->> (fs/list-dir (fs/path source "examples"))
+       (filter fs/regular-file?)
+       (filter #(str/ends-with? (str %) ".clj"))
+       (map #(str (fs/file-name %)))
+       sort vec))
+
+(defn example-command [program source spec]
+  (into ["timeout" "30" (str program)
+         (str (fs/path source "examples" (:name spec)))]
+        (map #(str/replace % "test-resources"
+                           (str (fs/path source "test-resources")))
+             (:args spec))))
+
+(defn compile-example [gobb gloat source cache name]
+  (let [build-root (fs/path cache "examples" "build")
+        input (fs/path source "examples" name)
+        staged (fs/path build-root "source" name)
+        output (fs/path build-root "bin" (str/replace name #"\.clj$" ""))
+        source-text (slurp (str input))
+        compile-text (if (re-find #"\(defn\s+-main\b" source-text)
+                       source-text
+                       (str source-text
+                            "\n\n(defn -main [& _gobb-example-args])\n"))]
+    (fs/create-dirs (fs/parent staged))
+    (fs/create-dirs (fs/parent output))
+    (spit (str staged) compile-text)
+    (let [result (run-command ["timeout" "180" (str gobb) "build"
+                               (str staged) "-o" (str output)]
+                              {:extra-env {"GOBB_GLOAT" (str gloat)}})
+          log-root (fs/path cache "examples" "logs")]
+      (fs/create-dirs log-root)
+      (spit (str (fs/path log-root (str name ".compile.out"))) (:out result))
+      (spit (str (fs/path log-root (str name ".compile.err"))) (:err result))
+      result)))
+
+(defn example-result [context name spec]
+  (let [{:keys [source bb gobb gloat cache]} context
+        compile (compile-example gobb gloat source cache name)
+        compile-ok? (zero? (:exit compile))
+        base {:name name
+              :scenario (:scenario spec)
+              :compile (if compile-ok? :pass :fail)}]
+    (cond
+      (not compile-ok?)
+      (assoc base :status :fail :diagnostic (concise-error compile))
+
+      (= :waived (:scenario spec))
+      (assoc base :status :waived :reason (:reason spec))
+
+      :else
+      (let [example-key (str/replace name #"\.clj$" "")
+            bb-work (fs/path cache "examples" "work" example-key "bb")
+            gobb-work (fs/path cache "examples" "work" example-key "gobb")
+            _ (doseq [directory [bb-work gobb-work]]
+                (fs/create-dirs directory))
+            replacements [[source "<BABASHKA>"]
+                          [(fs/absolutize bb-work) "<WORKDIR>"]
+                          [(fs/absolutize gobb-work) "<WORKDIR>"]]
+            bb-run (run-command (example-command bb source (assoc spec :name name))
+                                {:dir (str bb-work)})
+            gobb-run (run-command (example-command gobb source (assoc spec :name name))
+                                  {:dir (str gobb-work)})
+            log-root (fs/path cache "examples" "logs")
+            _ (doseq [[suffix text] [["bb.out" (:out bb-run)]
+                                     ["bb.err" (:err bb-run)]
+                                     ["gobb.out" (:out gobb-run)]
+                                     ["gobb.err" (:err gobb-run)]]]
+                (spit (str (fs/path log-root (str name "." suffix)))
+                      text))
+            comparable (fn [result]
+                         {:exit (:exit result)
+                          :out (normalize (:out result) replacements)
+                          :err (normalize (:err result) replacements)})
+            bb-value (comparable bb-run)
+            gobb-value (comparable gobb-run)]
+        (if (= bb-value gobb-value)
+          (assoc base :status :pass)
+          (assoc base :status :fail
+                 :diagnostic (str "BB " (pr-str bb-value)
+                                  "; Gobb " (pr-str gobb-value))))))))
+
+(defn examples! [{:keys [source bb gobb gloat cache manifest result filters]}]
+  (let [source (fs/absolutize source)
+        manifest-value (read-edn manifest)
+        examples (:examples manifest-value)
+        discovered (discover-examples source)
+        declared (sort (keys examples))
+        selected (if (seq filters) (vec filters) discovered)
+        unknown (remove (set discovered) selected)
+        missing (remove (set declared) discovered)
+        extra (remove (set discovered) declared)]
+    (when-not (= 1 (:schema manifest-value))
+      (fail! "unsupported examples manifest schema"))
+    (when (or (seq missing) (seq extra))
+      (fail! (str "example manifest drift; missing declarations " (vec missing)
+                  ", stale declarations " (vec extra))))
+    (when (seq unknown)
+      (fail! (str "unknown examples: " (str/join ", " unknown))))
+    (let [log-dir (fs/path cache "examples" "logs")
+          _ (fs/create-dirs log-dir)
+          context {:source source :bb bb :gobb gobb :gloat gloat
+                   :cache cache}
+          results (mapv (fn [name]
+                          (println (str "example: " name))
+                          (let [entry (example-result context name (get examples name))]
+                            (write-edn! (fs/path log-dir (str name ".edn")) entry)
+                            entry))
+                        selected)
+          counts (frequencies (map :status results))
+          compile-counts (frequencies (map :compile results))
+          status (if (zero? (get counts :fail 0)) :pass :fail)
+          snapshot {:schema 1
+                    :suite :examples
+                    :babashka {:version "1.12.218"
+                               :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"}
+                    :selection (if (seq filters) (vec filters) :all)
+                    :status status
+                    :summary {:total (count results)
+                              :pass (get counts :pass 0)
+                              :fail (get counts :fail 0)
+                              :waived (get counts :waived 0)
+                              :execution-waivers
+                              (count (filter #(= :waived (:scenario %)) results))
+                              :compile-pass (get compile-counts :pass 0)
+                              :compile-fail (get compile-counts :fail 0)}
+                    :results results}]
+      (write-edn! result snapshot)
+      (println (str "examples: " (name status) " " (:summary snapshot)))
+      (when-not (= :pass status) (System/exit 1)))))
+
+(let [[mode & args] *command-line-args*]
+  (case mode
+    "lib-tests"
+    (let [[source bb gobb cache result & filters] args]
+      (when-not result (fail! "lib-tests requires source bb gobb cache result"))
+      (lib-tests! {:source source :bb bb :gobb gobb :cache cache
+                   :result result :filters filters}))
+
+    "examples"
+    (let [[source bb gobb gloat cache manifest result & filters] args]
+      (when-not result
+        (fail! "examples requires source bb gobb gloat cache manifest result"))
+      (examples! {:source source :bb bb :gobb gobb :gloat gloat :cache cache
+                  :manifest manifest :result result :filters filters}))
+
+    (fail! "expected lib-tests or examples")))

@@ -111,6 +111,15 @@ COMPAT-FIXTURES := $(TOP)/compat/fixtures.edn
 COMPAT-RUNNER := $(TOP)/util/compat
 COMPAT-DIR := $(TOP)/.cache/compat
 COMPAT-REPORT := $(TOP)/www/docs/compatibility.md
+UPSTREAM-TEST-RUNNER := $(TOP)/util/upstream-tests
+UPSTREAM-TEST-DIR := $(TOP)/.cache/upstream-tests
+LIB_TESTS-RESULT := $(TOP)/compat/lib-tests-results.edn
+LIB_TESTS-RUN-RESULT = $(if $(strip $(LIB_TESTS)),$(UPSTREAM-TEST-DIR)/lib_tests/selected.edn,$(LIB_TESTS-RESULT))
+EXAMPLES-MANIFEST := $(TOP)/compat/examples.edn
+EXAMPLES-RESULT := $(TOP)/compat/examples-results.edn
+EXAMPLES-RUN-RESULT = $(if $(strip $(EXAMPLES)),$(UPSTREAM-TEST-DIR)/examples/selected.edn,$(EXAMPLES-RESULT))
+TESTING-REPORT-RUNNER := $(TOP)/util/testing-report
+TESTING-REPORT := $(TOP)/www/docs/testing.md
 CAPABILITY-SPEC := $(TOP)/compat/capabilities.edn
 CAPABILITY-RUNNER := $(TOP)/util/capabilities
 CAPABILITY-SOURCE := $(TOP)/src/gobb/capability_matrix.clj
@@ -149,6 +158,7 @@ MAKES-CLEAN := \
   $(CAPABILITY-DIR) \
   $(JAVA-COMPAT-DIR) \
   $(COMPAT-DIR) \
+  $(UPSTREAM-TEST-DIR) \
   $(GOBB-WASM) \
   $(WASM-EXEC) \
 
@@ -797,6 +807,49 @@ test: \
 	$Q GOBB='$(GOBB)' \
 	  GO="$$('$(GLOAT)' --which=go)" test/interactive-services
 
+test-lib_tests: \
+  $(GOBB) \
+  $(BB) \
+  $(BABASHKA-SOURCE-DEP) \
+  $(BABASHKA-PROCESS-DEP) \
+  $(UPSTREAM-TEST-RUNNER) \
+  $(TESTING-REPORT-RUNNER)
+	@$(ECHO) "* Running Babashka's library test suite with Gobb"
+	$Q status=0; \
+	  $(BB) '$(UPSTREAM-TEST-RUNNER)' lib-tests \
+	    '$(BABASHKA-SOURCE)' '$(BB)' '$(GOBB)' \
+	    '$(UPSTREAM-TEST-DIR)' '$(LIB_TESTS-RUN-RESULT)' \
+	    $(LIB_TESTS) || status=$$?; \
+	  $(BB) '$(TESTING-REPORT-RUNNER)' \
+	    '$(LIB_TESTS-RESULT)' '$(EXAMPLES-RESULT)' '$(TESTING-REPORT)'; \
+	  exit $$status
+	@$(ECHO)
+
+test-examples: \
+  $(GOBB) \
+  $(BB) \
+  $(GLOAT) \
+  $(BABASHKA-SOURCE-DEP) \
+  $(EXAMPLES-MANIFEST) \
+  $(UPSTREAM-TEST-RUNNER) \
+  $(TESTING-REPORT-RUNNER)
+	@$(ECHO) "* Compiling and exercising Babashka's examples with Gobb"
+	$Q status=0; \
+	  $(BB) '$(UPSTREAM-TEST-RUNNER)' examples \
+	    '$(BABASHKA-SOURCE)' '$(BB)' '$(GOBB)' '$(GLOAT)' \
+	    '$(UPSTREAM-TEST-DIR)' '$(EXAMPLES-MANIFEST)' \
+	    '$(EXAMPLES-RUN-RESULT)' $(EXAMPLES) || status=$$?; \
+	  $(BB) '$(TESTING-REPORT-RUNNER)' \
+	    '$(LIB_TESTS-RESULT)' '$(EXAMPLES-RESULT)' '$(TESTING-REPORT)'; \
+	  exit $$status
+	@$(ECHO)
+
+testing-report: $(BB) $(TESTING-REPORT-RUNNER)
+	@$(ECHO) "* Rendering committed upstream test snapshots"
+	$Q $(BB) '$(TESTING-REPORT-RUNNER)' \
+	  '$(LIB_TESTS-RESULT)' '$(EXAMPLES-RESULT)' '$(TESTING-REPORT)'
+	@$(ECHO)
+
 compat: _compat
 
 _compat: $(GOBB) $(BB) $(GLOAT) $(COMPAT-FIXTURES) $(COMPAT-RUNNER)
@@ -837,10 +890,10 @@ release: $(GH) $(WASMTIME)
 source-ledger: $(SOURCE-STAGE-STAMP)
 	@cat '$(SOURCE-STAGE)/ledger.edn'
 
-site: capabilities inventory java-compat repl-wasm
+site: capabilities inventory java-compat repl-wasm testing-report
 	$(MAKE) -C www site
 
-serve publish: capabilities inventory java-compat repl-wasm
+serve publish: capabilities inventory java-compat repl-wasm testing-report
 	$(MAKE) -C www $@
 
 serve-www: serve

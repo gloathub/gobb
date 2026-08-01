@@ -61,6 +61,7 @@ nav:
   - Java: java-compatibility.md
   - BB Inventory: inventory.md
   - Compatibility: compatibility.md
+  - Testing: testing.md
   - Roadmap: roadmap.md
 
 markdown_extensions:

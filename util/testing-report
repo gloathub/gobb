@@ -1,0 +1,102 @@
+#!/usr/bin/env bb
+
+(require '[babashka.fs :as fs]
+         '[clojure.edn :as edn]
+         '[clojure.string :as str])
+
+(defn read-result [path suite]
+  (if (fs/exists? path)
+    (edn/read-string (slurp path))
+    {:schema 1 :suite suite :status :not-run :summary nil}))
+
+(defn display-status [status]
+  (-> status name (str/replace "-" " ") str/upper-case))
+
+(defn escape-cell [value]
+  (-> (str (or value ""))
+      (str/replace "|" "\\|")
+      (str/replace "\n" " ")))
+
+(defn summary-value [summary key]
+  (if (map? summary) (get summary key 0) "—"))
+
+(defn library-section [result]
+  (let [summary (:summary result)]
+    (str "## Library tests\n\n"
+         "Status: **" (display-status (:status result)) "**\n\n"
+         "| Tests | Assertions passed | Failures | Errors |\n"
+         "| ---: | ---: | ---: | ---: |\n"
+         "| " (summary-value summary :test)
+         " | " (summary-value summary :pass)
+         " | " (summary-value summary :fail)
+         " | " (summary-value summary :error) " |\n\n"
+         (when-let [diagnostic (:diagnostic result)]
+           (str "Current blocker: `" (escape-cell diagnostic) "`\n\n"))
+         "Run the complete suite with:\n\n"
+         "```sh\nmake test-lib_tests\n```\n\n"
+         "Limit an investigative run to selected namespaces without replacing "
+         "the published full-suite snapshot:\n\n"
+         "```sh\nmake test-lib_tests LIB_TESTS='namespace.one namespace.two'\n```\n\n")))
+
+(defn example-rows [results]
+  (if (seq results)
+    (apply str
+           (for [{file-name :name
+                  :keys [scenario compile status reason diagnostic]} results]
+             (str "| `" file-name "` | " (clojure.core/name scenario)
+                  " | " (clojure.core/name compile)
+                  " | " (clojure.core/name status) " | "
+                  (escape-cell (or reason diagnostic)) " |\n")))
+    "| — | — | — | not run | — |\n"))
+
+(defn examples-section [result]
+  (let [summary (:summary result)]
+    (str "## Examples\n\n"
+         "Status: **" (display-status (:status result)) "**\n\n"
+         "Every upstream `.clj` example is compiled. Safe deterministic examples "
+         "are then run under BB and Gobb and compared; environmental or "
+         "interactive examples carry an explicit execution waiver. A waiver does "
+         "not waive compilation.\n\n"
+         "| Total | Passed | Failed | Execution waivers | Compiled | Compile failures |\n"
+         "| ---: | ---: | ---: | ---: | ---: | ---: |\n"
+         "| " (summary-value summary :total)
+         " | " (summary-value summary :pass)
+         " | " (summary-value summary :fail)
+         " | " (summary-value summary :execution-waivers)
+         " | " (summary-value summary :compile-pass)
+         " | " (summary-value summary :compile-fail) " |\n\n"
+         "Run the complete suite with:\n\n"
+         "```sh\nmake test-examples\n```\n\n"
+         "Limit an investigative run without replacing the published full-suite snapshot:\n\n"
+         "```sh\nmake test-examples EXAMPLES='which.clj xml-example.clj'\n```\n\n"
+         "### Per-example results\n\n"
+         "| Example | Scenario | Compile | Result | Note |\n"
+         "| --- | --- | --- | --- | --- |\n"
+         (example-rows (:results result)) "\n")))
+
+(let [[lib-path examples-path output] *command-line-args*]
+  (when-not output
+    (binding [*out* *err*]
+      (println "testing-report: expected lib-result examples-result output"))
+    (System/exit 2))
+  (let [libraries (read-result lib-path :lib-tests)
+        examples (read-result examples-path :examples)
+        markdown
+        (str "---\n"
+             "title: Testing\n"
+             "description: Current Gobb results against Babashka library tests and examples\n"
+             "---\n\n"
+             "# Testing\n\n"
+             "Gobb measures compatibility against Babashka **v1.12.218** at "
+             "commit `0fb349c414e717800be775ba9cb77c95a9eb700d`. These are "
+             "committed full-suite snapshots; building this website never downloads "
+             "Babashka or reruns either suite.\n\n"
+             (library-section libraries)
+             (examples-section examples)
+             "## Result policy\n\n"
+             "Both targets run every applicable case before returning a nonzero "
+             "status when failures remain. Raw logs and filtered-run results stay "
+             "under `.cache/upstream-tests/`; only an unfiltered full run updates "
+             "the committed snapshots rendered here.\n")]
+    (fs/create-dirs (fs/parent output))
+    (spit output markdown)))
