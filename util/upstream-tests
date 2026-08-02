@@ -73,6 +73,18 @@
             (catch Exception _ nil)))
         (reverse (str/split-lines text))))
 
+(def project-fixture-names ["README.md" "DEPS_CLJ_VERSION"])
+
+(defn prepare-project-fixtures! [work roots]
+  (doseq [name project-fixture-names]
+    (let [target (fs/path work name)
+          source (some (fn [root]
+                         (first (fs/glob root
+                                         (str "META-INF/leiningen/**/" name))))
+                       roots)]
+      (when (fs/exists? target) (fs/delete target))
+      (when source (fs/copy source target)))))
+
 (def extra-lib-test-namespaces
   '[babashka.process-test babashka.process-exec-test])
 
@@ -231,8 +243,10 @@
        results))))
 
 (defn lib-case-result
-  [{:keys [root gobb cache work environment command-prefix log-dir]}
+  [{:keys [root gobb cache work environment command-prefix log-dir
+           fixture-paths-for]}
    namespace]
+  (prepare-project-fixtures! work (fixture-paths-for namespace))
   (let [execution (run-command (conj command-prefix namespace)
                                {:dir (str work) :extra-env environment})
         summary (lib-summary (:out execution))
@@ -292,6 +306,10 @@
                   (str/join ", " unknown))))
     (doseq [directory [work home suite-dir log-dir]] (fs/create-dirs directory))
     (write-edn! config config-value)
+    ;; Upstream tests run from a project root. Expose the effective suite
+    ;; configuration there so filesystem-oriented tests see the same deps.edn
+    ;; contract they receive under Babashka's own harness.
+    (spit (str (fs/path work "deps.edn")) (slurp (str config)))
     (let [maven-paths (prepare-maven-classpath!
                        {:grenadine grenadine :cache cache
                         :config-value config-value})
@@ -310,6 +328,11 @@
              "-cp" (classpath-for namespace)
              "-e" (str "(load-file "
                        (pr-str (str prepared-runner)) ")")])
+          fixture-paths-for
+          (fn [namespace]
+            (get maven-paths
+                 (get (:namespace-libraries corpus) namespace)
+                 []))
           environment {"HOME" (str home)
                        "GOBB_CACHE" (str (fs/path cache "gobb-cache"))
                        "BABASHKA_TEST_ENV" "native"
@@ -320,6 +343,7 @@
       (fs/create-sym-link link (fs/absolutize gobb))
       (let [context {:root root :gobb gobb :cache cache :work work
                      :environment environment :command-prefix command-prefix
+                     :fixture-paths-for fixture-paths-for
                      :log-dir log-dir}
             width (apply max (map count selected))
             results

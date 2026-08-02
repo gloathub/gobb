@@ -3,13 +3,13 @@
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
  :corpus {:libraries 111, :namespaces 261},
- :summary {:test 241, :pass 1712, :fail 42, :error 214},
+ :summary {:test 358, :pass 2208, :fail 49, :error 444},
  :runner-adaptations
  [:omit-spec-instrumentation-reset
   :normalize-keyword-destructuring
   :grenadine-per-root-dependency-installation
   :isolated-maven-classpaths],
- :case-summary {:total 261, :pass 25, :fail 23, :blocked 213},
+ :case-summary {:total 261, :pass 35, :fail 18, :blocked 208},
  :status :fail,
  :suite :lib-tests,
  :selection :all,
@@ -59,9 +59,9 @@
    :diagnostic
    "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "bond.assertions-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 5, :pass 0, :fail 0, :error 5},
+   :status :pass,
+   :exit 0,
+   :summary {:test 5, :pass 32, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "bond.james-test",
    :status :blocked,
@@ -230,7 +230,7 @@
   {:namespace "clj-yaml.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 26, :pass 30, :fail 15, :error 12},
+   :summary {:test 26, :pass 32, :fail 13, :error 12},
    :diagnostic nil}
   {:namespace "cljc.java-time-test",
    :status :blocked,
@@ -241,7 +241,7 @@
   {:namespace "clojure-csv.test.core",
    :status :fail,
    :exit 1,
-   :summary {:test 11, :pass 13, :fail 0, :error 48},
+   :summary {:test 11, :pass 23, :fail 0, :error 38},
    :diagnostic nil}
   {:namespace "clojure-csv.test.utils",
    :status :fail,
@@ -301,9 +301,9 @@
    :diagnostic
    "exit 1: failed to load /clojure/data/xml: not found in load path"}
   {:namespace "clojure.math.test-combinatorics",
-   :status :fail,
-   :exit 1,
-   :summary {:test 18, :pass 783, :fail 0, :error 13},
+   :status :pass,
+   :exit 0,
+   :summary {:test 18, :pass 999, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.math.test-numeric-tower",
    :status :blocked,
@@ -329,9 +329,9 @@
    :diagnostic
    "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
   {:namespace "clojure.tools.gitlibs.test-impl",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 16, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.tools.namespace.dependency-test",
    :status :blocked,
@@ -484,7 +484,7 @@
   {:namespace "com.wsscode.misc.coll-test",
    :status :fail,
    :exit 1,
-   :summary {:test 28, :pass 56, :fail 0, :error 10},
+   :summary {:test 28, :pass 58, :fail 0, :error 8},
    :diagnostic nil}
   {:namespace "com.wsscode.misc.macros-test",
    :status :pass,
@@ -507,9 +507,9 @@
    :summary {:test 1, :pass 1, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "comb.test.template",
-   :status :fail,
-   :exit 1,
-   :summary {:test 2, :pass 0, :fail 0, :error 6},
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 6, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "contajners.impl-test",
    :status :blocked,
@@ -570,10 +570,10 @@
    :diagnostic
    "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "doric.test.core",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: EvalASTMaybeHostForm: Character/toTitleCase"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 15, :pass 56, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "doric.test.doctest",
    :status :blocked,
    :exit 1,
@@ -582,7 +582,7 @@
   {:namespace "doric.test.readme",
    :status :fail,
    :exit 1,
-   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :summary {:test 1, :pass 2, :fail 9, :error 1},
    :diagnostic nil}
   {:namespace "edn-query-language.core-test",
    :status :blocked,
@@ -591,10 +591,10 @@
    :diagnostic
    "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "environ.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: EvalASTMaybeHostForm: System/getProperties"}
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "exoscale.coax-test",
    :status :blocked,
    :exit 1,
@@ -656,9 +656,9 @@
    :diagnostic
    "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "gaka.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 7, :pass 0, :fail 0, :error 7},
+   :status :pass,
+   :exit 0,
+   :summary {:test 7, :pass 39, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "hasch.test",
    :status :blocked,
@@ -723,23 +723,20 @@
    :diagnostic
    "exit 1: failed to load /hickory/core: not found in load path"}
   {:namespace "honey.sql-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :summary {:test 47, :pass 8, :fail 1, :error 150},
+   :diagnostic nil}
   {:namespace "honey.sql.helpers-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :summary {:test 31, :pass 32, :fail 0, :error 125},
+   :diagnostic nil}
   {:namespace "honey.sql.postgres-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :summary {:test 20, :pass 0, :fail 0, :error 41},
+   :diagnostic nil}
   {:namespace "honeysql.core-test",
    :status :blocked,
    :exit 1,
@@ -1083,7 +1080,7 @@
   {:namespace "medley.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 43, :pass 140, :fail 2, :error 51},
+   :summary {:test 43, :pass 169, :fail 2, :error 22},
    :diagnostic nil}
   {:namespace "meta-merge.core-test",
    :status :pass,
@@ -1240,9 +1237,9 @@
    :summary nil,
    :diagnostic "exit 1: unable to resolve symbol: Byte"}
   {:namespace "portal.runtime.fs-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 3, :fail 1, :error 3},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 8, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "portal.test-runner",
    :status :blocked,
@@ -1263,9 +1260,9 @@
    :diagnostic
    "exit 1: failed to load /postmortem/core: not found in load path"}
   {:namespace "progrock.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 5, :pass 7, :fail 0, :error 8},
+   :status :pass,
+   :exit 0,
+   :summary {:test 5, :pass 15, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "promesa.tests.core-test",
    :status :blocked,
@@ -1442,17 +1439,17 @@
   {:namespace "testdoc.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 8, :pass 17, :fail 0, :error 2},
+   :summary {:test 11, :pass 35, :fail 0, :error 1},
    :diagnostic nil}
   {:namespace "testdoc.style.code-first-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 2, :pass 3, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 11, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "testdoc.style.repl-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 2, :pass 3, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 10, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "vault.client.http-test",
    :status :blocked,

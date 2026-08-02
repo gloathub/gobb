@@ -15,8 +15,11 @@
 (defn load-clojure-test! []
   ;; Referencing Glojure's precompiled stdlib package links its namespace
   ;; loaders into Gobb without recompiling clojure.test from source. Load the
-  ;; protocol roots first because clojure.test reduces over test Vars.
+  ;; protocol roots and template macros first because clojure.test reduces over
+  ;; test Vars and its `are` macro expands through clojure.template.
   (github.com:glojurelang:glojure:pkg:stdlib:clojure:core:protocols.LoadNS)
+  (github.com:glojurelang:glojure:pkg:stdlib:clojure:walk.LoadNS)
+  (github.com:glojurelang:glojure:pkg:stdlib:clojure:template.LoadNS)
   (github.com:glojurelang:glojure:pkg:stdlib:clojure:test.LoadNS))
 
 (defmacro runtime-import [& _]
@@ -42,7 +45,13 @@
    github.com:glojurelang:glojure:pkg:lang.NewLazySeq)
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "github.com/glojurelang/glojure/pkg/lang.Identical"
-   github.com:glojurelang:glojure:pkg:lang.Identical))
+   github.com:glojurelang:glojure:pkg:lang.Identical)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "github.com/glojurelang/glojure/pkg/lang.NewPersistentArrayMapAsIfByAssoc"
+   github.com:glojurelang:glojure:pkg:lang.NewPersistentArrayMapAsIfByAssoc)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "strings.Builder"
+   strings.Builder))
 
 (defn spit* [file content & options]
   ;; Glojure's clojure.core/spit currently targets the unimplemented
@@ -78,6 +87,28 @@
   ;; google UUID value used by Glojure's built-in random-uuid implementation.
   (github.com:glojurelang:glojure:pkg:javacompat:uuid.IsUUID value))
 
+(defn flush* []
+  ;; Gobb's standard streams and strings.Builder writes are immediate; unlike
+  ;; a JVM Writer they do not expose a Sync method.
+  nil)
+
+(defn read*
+  ([] (read* *in*))
+  ([stream] (read* stream true nil false))
+  ([stream eof-error? eof-value] (read* stream eof-error? eof-value false))
+  ([stream eof-error? eof-value _recursive?]
+   (let [reader (github.com:glojurelang:glojure:pkg:reader.New stream)
+         [value error] (.ReadOne reader)]
+     (cond
+       (nil? error) value
+       (and (errors.Is error io.EOF) (not eof-error?)) eof-value
+       :else (throw error))))
+  ([options stream]
+   (read* stream
+          (not (contains? options :eof))
+          (:eof options)
+          false)))
+
 (defn take*
   ;; Clojure treats positive infinity as an unbounded take. The generated
   ;; Glojure core function narrows its numeric argument before dispatch, so
@@ -101,6 +132,42 @@
         (when-let [items (seq collection)]
           (cons (first items) (take* (dec n) (rest items)))))))))
 
+(defn reduce-kv* [f init collection]
+  ;; Glojure's precompiled protocol table predates some hosted collection
+  ;; implementations. Use their public collection semantics directly so newly
+  ;; linked maps and vectors participate without rebuilding the standard lib.
+  (cond
+    (map? collection)
+    (loop [result init
+           entries (seq collection)]
+      (if entries
+        (let [entry (first entries)
+              next-result (f result (key entry) (val entry))]
+          (if (reduced? next-result)
+            @next-result
+            (recur next-result (next entries))))
+        result))
+
+    (vector? collection)
+    (loop [result init
+           index 0]
+      (if (< index (count collection))
+        (let [next-result (f result index (nth collection index))]
+          (if (reduced? next-result)
+            @next-result
+            (recur next-result (inc index))))
+        result))
+
+    :else
+    (clojure.core.protocols/kv-reduce collection f init)))
+
+(defn rseq* [collection]
+  ;; The precompiled core protocol table does not include hosted SubVector.
+  ;; Build the reverse sequence through its public indexed interface.
+  (when (pos? (count collection))
+    (map #(nth collection %)
+         (range (dec (count collection)) -1 -1))))
+
 (defn initialize! []
   ;; Babashka reads shared .cljc sources as both Clojure and Babashka. Keep
   ;; Glojure's default :glj feature and opt this embedding into :clj and :bb.
@@ -113,6 +180,10 @@
   (alter-var-root #'*in* (constantly os.Stdin))
   (alter-var-root #'*out* (constantly os.Stdout))
   (alter-var-root #'*err* (constantly os.Stderr))
+  (alter-var-root #'clojure.core/flush (constantly flush*))
+  (alter-var-root #'clojure.core/read (constantly read*))
+  (alter-var-root #'clojure.core/reduce-kv (constantly reduce-kv*))
+  (alter-var-root #'clojure.core/rseq (constantly rseq*))
   (alter-var-root #'clojure.core/take (constantly take*))
   (alter-var-root #'clojure.core/uuid? (constantly uuid?*))
   (alter-var-root #'clojure.core/slurp (constantly slurp*))
