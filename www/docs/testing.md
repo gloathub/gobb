@@ -13,7 +13,7 @@ Status: **FAIL**
 
 | Libraries | Test namespaces | Cases run | Cases passed | Cases failed | Cases blocked | Tests | Assertions passed | Failures | Errors |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 111 | 261 | 261 | 35 | 18 | 208 | 358 | 2208 | 49 | 444 |
+| 111 | 261 | 261 | 50 | 23 | 188 | 404 | 2610 | 51 | 479 |
 
 Run the complete suite with:
 
@@ -37,11 +37,11 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `babashka.curl-test` | pass | 1 | 0 | 0 | 0 |  |
 | `babashka.process-exec-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `babashka.process-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `babashka.statecharts-test` | blocked | — | — | — | — | exit 1: failed to load /com/fulcrologic/statecharts: not found in load path |
+| `babashka.statecharts-test` | blocked | — | — | — | — | exit 1: failed to load /com/fulcrologic/guardrails/malli/core: not found in load path |
 | `better-cond.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: clojure.spec.alpha.Spec |
 | `bond.assertions-test` | pass | 5 | 32 | 0 | 0 |  |
 | `bond.james-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `bond.target-data` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
+| `bond.target-data` | pass | 0 | 0 | 0 | 0 |  |
 | `borkdude.deps.smoke-test` | fail | 1 | 0 | 0 | 1 |  |
 | `camel-snake-kebab.core-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `camel-snake-kebab.extras-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
@@ -58,25 +58,25 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `clarktown.parsers.link-and-image-test` | pass | 1 | 5 | 0 | 0 |  |
 | `clarktown.parsers.quote-block-test` | pass | 1 | 4 | 0 | 0 |  |
 | `clarktown.parsers.strikethrough-test` | pass | 1 | 2 | 0 | 0 |  |
-| `cli-matic.core-test` | blocked | — | — | — | — | exit 1: failed to load /cli_matic/platform: not found in load path |
-| `cli-matic.help-gen-test` | blocked | — | — | — | — | exit 1: failed to load /cli_matic/platform_macros: not found in load path |
+| `cli-matic.core-test` | blocked | — | — | — | — | exit 1: failed to load /expound/alpha: not found in load path |
+| `cli-matic.help-gen-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `cli-matic.presets-test` | blocked | — | — | — | — | exit 1: failed to load /cljc/java_time/zone_id: not found in load path |
-| `cli-matic.utils-candidates-test` | blocked | — | — | — | — | exit 1: failed to load /cli_matic/utils_candidates: not found in load path |
-| `cli-matic.utils-convert-config-test` | blocked | — | — | — | — | exit 1: failed to load /cli_matic/optionals: not found in load path |
-| `cli-matic.utils-test` | blocked | — | — | — | — | exit 1: failed to load /cli_matic/utils: not found in load path |
-| `cli-matic.utils-v2-test` | blocked | — | — | — | — | exit 1: failed to load /cli_matic/platform_macros: not found in load path |
+| `cli-matic.utils-candidates-test` | pass | 2 | 10 | 0 | 0 |  |
+| `cli-matic.utils-convert-config-test` | blocked | — | — | — | — | exit 1: failed to load /expound/alpha: not found in load path |
+| `cli-matic.utils-test` | blocked | — | — | — | — | exit 1: failed to load /expound/alpha: not found in load path |
+| `cli-matic.utils-v2-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clj-commons.digest-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: Byte/TYPE |
 | `clj-http.lite.client-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clj-http.lite.test-runner` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clj-stacktrace.core-test` | fail | 3 | 3 | 0 | 2 |  |
 | `clj-stacktrace.repl-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `clj-yaml.core-test` | fail | 26 | 32 | 13 | 12 |  |
-| `cljc.java-time-test` | blocked | — | — | — | — | exit 1: failed to load /cljc/java_time/temporal/chrono_field: not found in load path |
+| `clj-yaml.core-test` | fail | 26 | 31 | 14 | 12 |  |
+| `cljc.java-time-test` | blocked | — | — | — | — | exit 1: failed to load /cljs/java_time/interop: not found in load path |
 | `clojure-csv.test.core` | fail | 11 | 23 | 0 | 38 |  |
 | `clojure-csv.test.utils` | fail | 5 | 2 | 0 | 28 |  |
 | `clojure.algo.test-monads` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/specials |
-| `clojure.core.cache-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/core/cache: not found in load path |
-| `clojure.core.cache.wrapped-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/core/cache/wrapped: not found in load path |
+| `clojure.core.cache-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `clojure.core.cache.wrapped-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clojure.data.csv-test` | fail | 4 | 19 | 3 | 2 |  |
 | `clojure.data.generators-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.util.Random |
 | `clojure.data.json-compat-0-1-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
@@ -84,32 +84,32 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `clojure.data.json-test-suite-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
 | `clojure.data.zip-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/data/xml: not found in load path |
 | `clojure.math.test-combinatorics` | pass | 18 | 999 | 0 | 0 |  |
-| `clojure.math.test-numeric-tower` | blocked | — | — | — | — | exit 1: failed to load /clojure/math/numeric_tower: not found in load path |
+| `clojure.math.test-numeric-tower` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.math.BigInteger |
 | `clojure.term.colors-test` | pass | 1 | 0 | 0 | 0 |  |
-| `clojure.test-clojure.instr` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
-| `clojure.test-clojure.spec` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
+| `clojure.test-clojure.instr` | blocked | — | — | — | — | exit 1: unable to resolve symbol: clojure.spec.alpha.Spec |
+| `clojure.test-clojure.spec` | blocked | — | — | — | — | exit 1: unable to resolve symbol: clojure.spec.alpha.Spec |
 | `clojure.tools.gitlibs.test-impl` | pass | 1 | 16 | 0 | 0 |  |
-| `clojure.tools.namespace.dependency-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/namespace/dependency: not found in load path |
-| `clojure.tools.namespace.find-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/namespace/find: not found in load path |
-| `clojure.tools.namespace.move-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/namespace/move: not found in load path |
-| `clojure.tools.namespace.parse-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/namespace/parse: not found in load path |
-| `clojure.tools.namespace.test-helpers` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
+| `clojure.tools.namespace.dependency-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `clojure.tools.namespace.find-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.net.URLClassLoader |
+| `clojure.tools.namespace.move-test` | pass | 1 | 6 | 0 | 0 |  |
+| `clojure.tools.namespace.parse-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `clojure.tools.namespace.test-helpers` | pass | 0 | 0 | 0 | 0 |  |
 | `clojure.tools.test-gitlibs` | fail | 4 | 2 | 0 | 7 |  |
 | `cloverage.args-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/cli: not found in load path |
 | `cloverage.dependency-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/namespace/dependency: not found in load path |
 | `cloverage.instrument-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
 | `cloverage.report.console-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: cloverage.report.console |
 | `cloverage.source-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/namespace/file: not found in load path |
-| `cognitect.test-runner-test` | blocked | — | — | — | — | exit 1: failed to load /cognitect/test_runner: not found in load path |
+| `cognitect.test-runner-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.net.URLClassLoader |
 | `cognitect.test-runner.sample-property-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `cognitect.test-runner.samples-test` | pass | 2 | 3 | 0 | 0 |  |
-| `com.potetm.fusebox.bulwark-test` | blocked | — | — | — | — | exit 1: failed to load /com/potetm/fusebox/bulkhead: not found in load path |
-| `com.potetm.fusebox.circuit-breaker-test` | blocked | — | — | — | — | exit 1: failed to load /com/potetm/fusebox/circuit_breaker: not found in load path |
-| `com.potetm.fusebox.fallback-test` | blocked | — | — | — | — | exit 1: failed to load /com/potetm/fusebox/fallback: not found in load path |
-| `com.potetm.fusebox.memoize-test` | blocked | — | — | — | — | exit 1: failed to load /com/potetm/fusebox/memoize: not found in load path |
-| `com.potetm.fusebox.registry-test` | blocked | — | — | — | — | exit 1: failed to load /com/potetm/fusebox/registry: not found in load path |
-| `com.potetm.fusebox.retry-test` | blocked | — | — | — | — | exit 1: failed to load /com/potetm/fusebox/retry: not found in load path |
-| `com.rpl.specter.cljs-test-helpers` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
+| `com.potetm.fusebox.bulwark-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.circuit-breaker-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.fallback-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.memoize-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.registry-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.retry-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.rpl.specter.cljs-test-helpers` | pass | 0 | 0 | 0 | 0 |  |
 | `com.rpl.specter.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `com.rpl.specter.test-helpers` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `com.rpl.specter.zipper-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
@@ -132,7 +132,7 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `datalog.unparser-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `docopt.core-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `doric.test.core` | pass | 15 | 56 | 0 | 0 |  |
-| `doric.test.doctest` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
+| `doric.test.doctest` | pass | 0 | 0 | 0 | 0 |  |
 | `doric.test.readme` | fail | 1 | 2 | 9 | 1 |  |
 | `edn-query-language.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: clojure.spec.alpha.Spec |
 | `environ.core-test` | fail | 1 | 0 | 0 | 1 |  |
@@ -152,36 +152,36 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `helins.binf.test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: StandardCharsets/UTF_8 |
 | `hiccup.core-test` | fail | 5 | 46 | 20 | 0 |  |
 | `hiccup2.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.net.URI |
-| `hickory.test.convert` | blocked | — | — | — | — | exit 1: failed to load /hickory/convert: not found in load path |
-| `hickory.test.core` | blocked | — | — | — | — | exit 1: failed to load /hickory/core: not found in load path |
-| `hickory.test.hiccup-utils` | blocked | — | — | — | — | exit 1: failed to load /hickory/hiccup_utils: not found in load path |
-| `hickory.test.render` | blocked | — | — | — | — | exit 1: failed to load /hickory/core: not found in load path |
-| `hickory.test.select` | blocked | — | — | — | — | exit 1: failed to load /hickory/core: not found in load path |
-| `hickory.test.zip` | blocked | — | — | — | — | exit 1: failed to load /hickory/core: not found in load path |
+| `hickory.test.convert` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
+| `hickory.test.core` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
+| `hickory.test.hiccup-utils` | pass | 8 | 50 | 0 | 0 |  |
+| `hickory.test.render` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
+| `hickory.test.select` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
+| `hickory.test.zip` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
 | `honey.sql-test` | fail | 47 | 8 | 1 | 150 |  |
 | `honey.sql.helpers-test` | fail | 31 | 32 | 0 | 125 |  |
 | `honey.sql.postgres-test` | fail | 20 | 0 | 0 | 41 |  |
 | `honeysql.core-test` | blocked | — | — | — | — | exit 1: NO_SOURCE_PATH: defrecord protocol implementations are not yet supported |
 | `honeysql.format-test` | blocked | — | — | — | — | exit 1: NO_SOURCE_PATH: defrecord protocol implementations are not yet supported |
 | `httpkit.client-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `hugsql.babashka-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: *clojure-version* |
-| `integrant.core-test` | blocked | — | — | — | — | exit 1: failed to load /integrant/core: not found in load path |
-| `integrant.test.bar` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
-| `integrant.test.baz` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
-| `integrant.test.foo` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
-| `integrant.test.quz` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
+| `hugsql.babashka-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `integrant.core-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `integrant.test.bar` | pass | 0 | 0 | 0 | 0 |  |
+| `integrant.test.baz` | pass | 0 | 0 | 0 | 0 |  |
+| `integrant.test.foo` | pass | 0 | 0 | 0 | 0 |  |
+| `integrant.test.quz` | pass | 0 | 0 | 0 | 0 |  |
 | `io.aviso.binary-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `jasentaa.collections-test` | pass | 3 | 13 | 0 | 0 |  |
 | `jasentaa.parser.basic-test` | pass | 4 | 15 | 0 | 0 |  |
 | `jasentaa.parser.combinators-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `jasentaa.position-test` | fail | 5 | 8 | 0 | 5 |  |
-| `jasentaa.test-helpers` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
+| `jasentaa.test-helpers` | pass | 0 | 0 | 0 | 0 |  |
 | `jasentaa.worked-example-1` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `jasentaa.worked-example-2` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `java-http-clj.smoke-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: HttpClient |
 | `lambdaisland.regal-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `lambdaisland.regal.test-util` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `linked.map-test` | blocked | — | — | — | — | exit 1: NO_SOURCE_PATH: failed to load /linked/map_test: not found in load path |
+| `linked.map-test` | blocked | — | — | — | — | exit 1: NO_SOURCE_PATH: wrong number of arguments: expected 1, got 2 |
 | `loom.test.alg` | blocked | — | — | — | — | exit 1: failed to load /loom/graph: not found in load path |
 | `loom.test.alg-generic` | blocked | — | — | — | — | exit 1: failed to load /loom/alg_generic: not found in load path |
 | `loom.test.attr` | blocked | — | — | — | — | exit 1: failed to load /loom/graph: not found in load path |
@@ -191,97 +191,97 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `loom.test.graph` | blocked | — | — | — | — | exit 1: failed to load /loom/graph: not found in load path |
 | `loom.test.label` | blocked | — | — | — | — | exit 1: failed to load /loom/graph: not found in load path |
 | `loom.test.network-simplex` | blocked | — | — | — | — | exit 1: failed to load /loom/network_simplex: not found in load path |
-| `malli.clj-kondo-test` | blocked | — | — | — | — | exit 1: failed to load /malli/clj_kondo: not found in load path |
+| `malli.clj-kondo-test` | blocked | — | — | — | — | exit 1: failed to load /fipp/edn: not found in load path |
 | `malli.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
-| `malli.destructure-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.dot-test` | blocked | — | — | — | — | exit 1: failed to load /malli/dot: not found in load path |
-| `malli.error-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.experimental-test` | blocked | — | — | — | — | exit 1: failed to load /malli/dev: not found in load path |
-| `malli.experimental.time-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.experimental.time.transform-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.instrument-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
+| `malli.destructure-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.dot-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.error-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.experimental-test` | blocked | — | — | — | — | exit 1: failed to load /fipp/edn: not found in load path |
+| `malli.experimental.time-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.experimental.time.transform-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.instrument-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `malli.json-schema-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
-| `malli.plantuml-test` | blocked | — | — | — | — | exit 1: failed to load /malli/plantuml: not found in load path |
-| `malli.provider-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.registry-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.swagger-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.transform-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
-| `malli.util-test` | blocked | — | — | — | — | exit 1: failed to load /malli/core: not found in load path |
+| `malli.plantuml-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.provider-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.registry-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.swagger-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.transform-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `malli.util-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `markdown.md-test` | blocked | — | — | — | — | exit 1: NO_SOURCE_PATH: wrong number of arguments: expected 1, got 2 |
 | `me.raynes.core-test` | blocked | — | — | — | — | exit 1: failed to load /me/raynes/fs: not found in load path |
-| `meander.defsyntax-test` | blocked | — | — | — | — | exit 1: failed to load /meander/epsilon: not found in load path |
-| `meander.defsyntax-test.gh-145` | blocked | — | — | — | — | exit 1: failed to load /meander/epsilon: not found in load path |
+| `meander.defsyntax-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
+| `meander.defsyntax-test.gh-145` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
 | `meander.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
-| `meander.interpreter.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load /meander/interpreter/epsilon: not found in load path |
+| `meander.interpreter.epsilon-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: ClassNotFoundException |
 | `meander.match.check.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
-| `meander.match.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load /meander/match/epsilon: not found in load path |
+| `meander.match.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
 | `meander.match.ir.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
 | `meander.matrix.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
 | `meander.strategy.epsilon-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `meander.substitute.epsilon-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
-| `meander.syntax.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load /meander/epsilon: not found in load path |
+| `meander.syntax.epsilon-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
 | `medley.core-test` | fail | 43 | 169 | 2 | 22 |  |
 | `meta-merge.core-test` | pass | 1 | 17 | 0 | 0 |  |
 | `minimallist.core-test` | pass | 2 | 338 | 0 | 0 |  |
 | `minimallist.util-test` | pass | 4 | 15 | 0 | 0 |  |
-| `missing.test.assertions-test` | blocked | — | — | — | — | exit 1: failed to load /missing/test/assertions: not found in load path |
-| `missing.test.old-methods` | blocked | — | — | — | — | exit 1: failed to load /missing/test/assertions: not found in load path |
+| `missing.test.assertions-test` | blocked | — | — | — | — | exit 1: bad binding form: :throw? |
+| `missing.test.old-methods` | blocked | — | — | — | — | exit 1: bad binding form: :throw? |
 | `msgpack.core-check` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: Charset/forName |
 | `msgpack.core-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: Charset/forName |
 | `multigrep.core-test` | pass | 2 | 2 | 0 | 0 |  |
-| `net.cgrand.xforms-test` | blocked | — | — | — | — | exit 1: failed to load /net/cgrand/xforms: not found in load path |
+| `net.cgrand.xforms-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: satisfies? |
 | `nextjournal.markdown-test` | blocked | — | — | — | — | exit 1: failed to load /matcher_combinators/ansi_color: not found in load path |
-| `nextjournal.markdown.multi-threading-test` | blocked | — | — | — | — | exit 1: failed to load /nextjournal/markdown: not found in load path |
-| `odoyle.rules-test` | blocked | — | — | — | — | exit 1: failed to load /odoyle/rules: not found in load path |
-| `ol.sfv.api-test` | blocked | — | — | — | — | exit 1: failed to load /ol/sfv: not found in load path |
+| `nextjournal.markdown.multi-threading-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: proxy |
+| `odoyle.rules-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
+| `ol.sfv.api-test` | fail | 10 | 56 | 0 | 2 |  |
 | `ol.sfv.conformance-test` | blocked | — | — | — | — | exit 1: failed to load /alphabase/base32: not found in load path |
-| `ol.sfv.error-test` | blocked | — | — | — | — | exit 1: failed to load /ol/sfv: not found in load path |
-| `ol.sfv.example-test` | blocked | — | — | — | — | exit 1: failed to load /ol/sfv: not found in load path |
-| `ol.sfv.parser-test` | blocked | — | — | — | — | exit 1: failed to load /ol/sfv/impl: not found in load path |
-| `ol.sfv.serialization-test` | blocked | — | — | — | — | exit 1: failed to load /ol/sfv: not found in load path |
+| `ol.sfv.error-test` | fail | 1 | 100 | 0 | 9 |  |
+| `ol.sfv.example-test` | fail | 4 | 20 | 0 | 6 |  |
+| `ol.sfv.parser-test` | fail | 11 | 113 | 1 | 14 |  |
+| `ol.sfv.serialization-test` | fail | 6 | 30 | 0 | 4 |  |
 | `omniconf.core-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
 | `orchestra.core-test` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.expound-test` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.make-fns` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.many-fns` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.reload-test` | blocked | — | — | — | — | exit 1: {} |
-| `plumbing.core-test` | blocked | — | — | — | — | exit 1: failed to load /schema/core: not found in load path |
-| `portal.bench` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
-| `portal.e2e` | blocked | 0 | 0 | 0 | 0 | exit 1: {:test 0, :pass 0, :fail 0, :error 0} |
+| `plumbing.core-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
+| `portal.bench` | pass | 0 | 0 | 0 | 0 |  |
+| `portal.e2e` | pass | 0 | 0 | 0 | 0 |  |
 | `portal.runtime.cson-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: Byte |
 | `portal.runtime.fs-test` | pass | 1 | 8 | 0 | 0 |  |
 | `portal.test-runner` | blocked | — | — | — | — | exit 1: unable to resolve symbol: clojure.lang.Namespace |
-| `postmortem.core-test` | blocked | — | — | — | — | exit 1: failed to load /postmortem/core: not found in load path |
-| `postmortem.instrument-test` | blocked | — | — | — | — | exit 1: failed to load /postmortem/core: not found in load path |
+| `postmortem.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `postmortem.instrument-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `progrock.core-test` | pass | 5 | 15 | 0 | 0 |  |
-| `promesa.tests.core-test` | blocked | — | — | — | — | exit 1: failed to load /promesa/core: not found in load path |
-| `qbits.auspex-test` | blocked | — | — | — | — | exit 1: failed to load /qbits/auspex: not found in load path |
+| `promesa.tests.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: reify |
+| `qbits.auspex-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: CompletableFuture |
 | `reifyhealth.specmonstah.core-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
 | `reifyhealth.specmonstah.spec-gen-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
 | `reifyhealth.specmonstah.test-data` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
 | `rewrite-clj.node-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `rewrite-clj.node.coercer-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `rewrite-clj.paredit-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `rewrite-clj.parser-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: *clojure-version* |
+| `rewrite-clj.parser-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `rewrite-clj.zip-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `rewrite-clj.zip.subedit-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `riddley.walk-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: clojure.lang.Compiler |
 | `ruuter.core-test` | blocked | — | — | — | — | exit 1: failed to load /ruuter/core: not found in load path |
-| `schema.coerce-test` | blocked | — | — | — | — | exit 1: failed to load /schema/core: not found in load path |
-| `schema.core-test` | blocked | — | — | — | — | exit 1: failed to load /schema/core: not found in load path |
-| `schema.experimental.abstract-map-test` | blocked | — | — | — | — | exit 1: failed to load /schema/core: not found in load path |
-| `schema.macros-test` | blocked | — | — | — | — | exit 1: failed to load /schema/core: not found in load path |
-| `schema.test-test` | blocked | — | — | — | — | exit 1: failed to load /schema/core: not found in load path |
-| `schema.utils-test` | blocked | — | — | — | — | exit 1: failed to load /schema/utils: not found in load path |
+| `schema.coerce-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
+| `schema.core-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
+| `schema.experimental.abstract-map-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
+| `schema.macros-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
+| `schema.test-test` | blocked | — | — | — | — | exit 1: failed to load pprint/utilities: not found in load path |
+| `schema.utils-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
 | `selmer.core-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `selmer.our-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `slingshot.slingshot-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `slingshot.support-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `slingshot.test-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `sluj.core-test` | blocked | — | — | — | — | exit 1: failed to load /sluj/core: not found in load path |
+| `sluj.core-test` | pass | 3 | 18 | 0 | 0 |  |
 | `swirrl.dogstatsd-test` | blocked | — | — | — | — | exit 1: failed to load /swirrl/dogstatsd: not found in load path |
-| `table.core-test` | blocked | — | — | — | — | exit 1: failed to load /table/core: not found in load path |
-| `table.width-test` | blocked | — | — | — | — | exit 1: failed to load /table/width: not found in load path |
+| `table.core-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `table.width-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `test-check.smoke-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `testdoc.core-test` | fail | 11 | 35 | 0 | 1 |  |
 | `testdoc.style.code-first-test` | pass | 2 | 11 | 0 | 0 |  |

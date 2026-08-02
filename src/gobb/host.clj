@@ -174,6 +174,12 @@
   (github.com:glojurelang:glojure:pkg:reader.EnableFeature "clj")
   (github.com:glojurelang:glojure:pkg:reader.EnableFeature "bb")
   (register-runtime-host-forms!)
+  ;; Runtime-loaded portable libraries inspect this standard Clojure var when
+  ;; selecting reader and compatibility behavior. Glojure does not currently
+  ;; predeclare it in its hosted core namespace.
+  (when-not (ns-resolve 'clojure.core '*clojure-version*)
+    (intern 'clojure.core '*clojure-version*
+            {:major 1 :minor 12 :incremental 4 :qualifier nil}))
   ;; Glojure initializes *in* and *out* at bootstrap, but its generated
   ;; clojure.core currently leaves *err* nil. Own all three roots here so the
   ;; Gobb execution host has one explicit standard-stream contract.

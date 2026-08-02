@@ -51,6 +51,7 @@ with explicit compatibility states and milestone assignments.
       <li class="task-done">First closure checkpoint: 12 pass, 32 fail, and 217 blocked</li>
       <li class="task-done">Second closure checkpoint: 25 pass, 23 fail, and 213 blocked</li>
       <li class="task-done">Third closure checkpoint: 35 pass, 18 fail, and 208 blocked</li>
+      <li class="task-done">Fourth closure checkpoint: 50 pass, 23 fail, and 188 blocked</li>
       <li>Resolve dependency and source-classpath blockers</li>
       <li>Provide the required Clojure spec and test.check namespaces</li>
       <li>Close Glojure host-interop and evaluator gaps exposed by runnable tests</li>
