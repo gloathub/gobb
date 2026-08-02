@@ -3,10 +3,13 @@
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
  :corpus {:libraries 111, :namespaces 261},
- :summary {:test 9, :pass 48, :fail 20, :error 2},
+ :summary {:test 230, :pass 759, :fail 37, :error 450},
  :runner-adaptations
- [:omit-spec-instrumentation-reset :normalize-keyword-destructuring],
- :case-summary {:total 261, :pass 2, :fail 2, :blocked 257},
+ [:omit-spec-instrumentation-reset
+  :normalize-keyword-destructuring
+  :grenadine-per-root-dependency-installation
+  :isolated-maven-classpaths],
+ :case-summary {:total 261, :pass 12, :fail 32, :blocked 217},
  :status :fail,
  :suite :lib-tests,
  :selection :all,
@@ -16,19 +19,18 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "again.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /again/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "arrangement.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /arrangement/core: not found in load path"}
+   :summary {:test 9, :pass 100, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "babashka.curl-test",
    :status :pass,
    :exit 0,
@@ -39,13 +41,13 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /babashka/process_exec_test: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "babashka.process-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /babashka/process_test: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "babashka.statecharts-test",
    :status :blocked,
    :exit 1,
@@ -56,20 +58,18 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /better_cond/core: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: Object"}
   {:namespace "bond.assertions-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /bond/assertions: not found in load path"}
+   :summary {:test 5, :pass 0, :fail 0, :error 5},
+   :diagnostic nil}
   {:namespace "bond.james-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /bond/james: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "bond.target-data",
    :status :blocked,
    :exit 1,
@@ -85,91 +85,79 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /camel_snake_kebab/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "camel-snake-kebab.extras-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /camel_snake_kebab/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "camel-snake-kebab.internals.string-separator-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /camel_snake_kebab/internals/string_separator: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "cheshire.test.core",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /cheshire/factory: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: JsonFactory"}
   {:namespace "clarktown.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/core: not found in load path"}
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.bold-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/bold: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 3, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.code-block-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/code_block: not found in load path"}
+   :summary {:test 1, :pass 0, :fail 0, :error 2},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.empty-block-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/empty_block: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 3, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.heading-block-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/heading_block: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 9, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.horizontal-line-block-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/horizontal_line_block: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 8, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.inline-code-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/inline_code: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 2, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.italic-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/italic: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 3, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.link-and-image-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/link_and_image: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 5, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.quote-block-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/quote_block: not found in load path"}
+   :summary {:test 1, :pass 3, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "clarktown.parsers.strikethrough-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clarktown/parsers/strikethrough: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 2, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "cli-matic.core-test",
    :status :blocked,
    :exit 1,
@@ -181,7 +169,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /cli_matic/help_gen: not found in load path"}
+   "exit 1: failed to load /cli_matic/platform_macros: not found in load path"}
   {:namespace "cli-matic.presets-test",
    :status :blocked,
    :exit 1,
@@ -211,43 +199,41 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /cli_matic/optionals: not found in load path"}
+   "exit 1: failed to load /cli_matic/platform_macros: not found in load path"}
   {:namespace "clj-commons.digest-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clj_commons/digest: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "clj-http.lite.client-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clj_http/lite/client: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clj-http.lite.test-runner",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clj_http/lite/client: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clj-stacktrace.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clj_stacktrace/core: not found in load path"}
+   :summary {:test 3, :pass 3, :fail 0, :error 2},
+   :diagnostic nil}
   {:namespace "clj-stacktrace.repl-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clj_stacktrace/utils: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clj-yaml.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   :summary {:test 26, :pass 31, :fail 10, :error 16},
+   :diagnostic nil}
   {:namespace "cljc.java-time-test",
    :status :blocked,
    :exit 1,
@@ -255,23 +241,21 @@
    :diagnostic
    "exit 1: failed to load /cljc/java_time/temporal/chrono_field: not found in load path"}
   {:namespace "clojure-csv.test.core",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   :summary {:test 11, :pass 7, :fail 0, :error 54},
+   :diagnostic nil}
   {:namespace "clojure-csv.test.utils",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   :summary {:test 5, :pass 0, :fail 0, :error 30},
+   :diagnostic nil}
   {:namespace "clojure.algo.test-monads",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/algo/monads: not found in load path"}
+   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/specials"}
   {:namespace "clojure.core.cache-test",
    :status :blocked,
    :exit 1,
@@ -285,35 +269,33 @@
    :diagnostic
    "exit 1: failed to load /clojure/core/cache/wrapped: not found in load path"}
   {:namespace "clojure.data.csv-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   :summary {:test 4, :pass 19, :fail 3, :error 2},
+   :diagnostic nil}
   {:namespace "clojure.data.generators-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/data/generators: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: java.util.Random"}
   {:namespace "clojure.data.json-compat-0-1-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/data/json: not found in load path"}
+   "exit 1: failed to load pprint/utilities: not found in load path"}
   {:namespace "clojure.data.json-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/data/json: not found in load path"}
+   "exit 1: failed to load pprint/utilities: not found in load path"}
   {:namespace "clojure.data.json-test-suite-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/data/json: not found in load path"}
+   "exit 1: failed to load pprint/utilities: not found in load path"}
   {:namespace "clojure.data.zip-test",
    :status :blocked,
    :exit 1,
@@ -321,11 +303,10 @@
    :diagnostic
    "exit 1: failed to load /clojure/data/xml: not found in load path"}
   {:namespace "clojure.math.test-combinatorics",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/math/combinatorics: not found in load path"}
+   :summary {:test 18, :pass 0, :fail 0, :error 122},
+   :diagnostic nil}
   {:namespace "clojure.math.test-numeric-tower",
    :status :blocked,
    :exit 1,
@@ -333,11 +314,10 @@
    :diagnostic
    "exit 1: failed to load /clojure/math/numeric_tower: not found in load path"}
   {:namespace "clojure.term.colors-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/term/colors: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 0, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clojure.test-clojure.instr",
    :status :blocked,
    :exit 1,
@@ -355,7 +335,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/tools/gitlibs/impl: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewDelay"}
   {:namespace "clojure.tools.namespace.dependency-test",
    :status :blocked,
    :exit 1,
@@ -367,7 +347,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   "exit 1: failed to load /clojure/tools/namespace/find: not found in load path"}
   {:namespace "clojure.tools.namespace.move-test",
    :status :blocked,
    :exit 1,
@@ -383,15 +363,14 @@
   {:namespace "clojure.tools.namespace.test-helpers",
    :status :blocked,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
   {:namespace "clojure.tools.test-gitlibs",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/tools/gitlibs: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewDelay"}
   {:namespace "cloverage.args-test",
    :status :blocked,
    :exit 1,
@@ -409,7 +388,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/pprint: not found in load path"}
+   "exit 1: failed to load pprint/utilities: not found in load path"}
   {:namespace "cloverage.report.console-test",
    :status :blocked,
    :exit 1,
@@ -433,7 +412,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/test/check: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "cognitect.test-runner.samples-test",
    :status :pass,
    :exit 0,
@@ -485,67 +464,62 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "com.rpl.specter.test-helpers",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/test/check/generators: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "com.rpl.specter.zipper-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "com.stuartsierra.component-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/set: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "com.stuartsierra.dependency-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /com/stuartsierra/dependency: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "com.wsscode.misc.coll-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /com/wsscode/misc/coll: not found in load path"}
+   :summary {:test 28, :pass 51, :fail 0, :error 15},
+   :diagnostic nil}
   {:namespace "com.wsscode.misc.macros-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /com/wsscode/misc/macros: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 2, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "com.wsscode.misc.math-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /com/wsscode/misc/math: not found in load path"}
+   :summary {:test 6, :pass 8, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "com.wsscode.misc.refs-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /com/wsscode/misc/refs: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "com.wsscode.misc.uuid-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /com/wsscode/misc/uuid: not found in load path"}
+   :summary {:test 1, :pass 0, :fail 1, :error 0},
+   :diagnostic nil}
   {:namespace "comb.test.template",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /comb/template: not found in load path"}
+   :summary {:test 2, :pass 0, :fail 0, :error 6},
+   :diagnostic nil}
   {:namespace "contajners.impl-test",
    :status :blocked,
    :exit 1,
@@ -557,91 +531,85 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/core/match: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "cprop.smoke-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /cprop/core: not found in load path"}
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "crispin.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /crispin/core: not found in load path"}
+   "exit 1: NO_SOURCE_PATH: error reading crispin/core.cljc: crispin/core.cljc:35:26: invalid regex: error parsing regexp: invalid character class range: `/p{XDigit}`"}
   {:namespace "datalog.parser-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /datalog/parser: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "datalog.parser.impl-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /datalog/parser/impl: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "datalog.parser.pull-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /datalog/parser/pull: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "datalog.parser.test.util",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /:as/test: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "datalog.unparser-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /datalog/unparser: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "docopt.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /docopt/core: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "doric.test.core",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /doric/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewLazySeq"}
   {:namespace "doric.test.doctest",
    :status :blocked,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
   {:namespace "doric.test.readme",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.Import"}
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "edn-query-language.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: Object"}
   {:namespace "environ.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /environ/core: not found in load path"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: System/getProperties"}
   {:namespace "exoscale.coax-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: Object"}
   {:namespace "exoscale.interceptor-test",
    :status :blocked,
    :exit 1,
@@ -652,14 +620,13 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /exoscale/lingo: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: Object"}
   {:namespace "expectations.clojure.test-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /expectations/clojure/test: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "expound.print-length-test",
    :status :blocked,
    :exit 1,
@@ -683,7 +650,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /expound/specs: not found in load path"}
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
   {:namespace "expound.test-utils",
    :status :blocked,
    :exit 1,
@@ -695,31 +662,30 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "gaka.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /gaka/core: not found in load path"}
+   :summary {:test 7, :pass 0, :fail 0, :error 7},
+   :diagnostic nil}
   {:namespace "hasch.test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /hasch/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "hato.client-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /hato/client: not found in load path"}
+   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
   {:namespace "helins.binf.test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /helins/binf: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "hiccup.core-test",
    :status :fail,
    :exit 1,
@@ -730,7 +696,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /hiccup/util: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "hickory.test.convert",
    :status :blocked,
    :exit 1,
@@ -772,43 +738,42 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /honey/sql: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "honey.sql.helpers-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /honey/sql: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "honey.sql.postgres-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /honey/sql/helpers: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "honeysql.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "honeysql.format-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "httpkit.client-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /org/httpkit/client: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewDelay"}
   {:namespace "hugsql.babashka-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /hugsql/core: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: *clojure-version*"}
   {:namespace "integrant.core-test",
    :status :blocked,
    :exit 1,
@@ -840,67 +805,59 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /io/aviso/binary: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewLazySeq"}
   {:namespace "jasentaa.collections-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /jasentaa/collections: not found in load path"}
+   :summary {:test 3, :pass 1, :fail 0, :error 10},
+   :diagnostic nil}
   {:namespace "jasentaa.parser.basic-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+   :summary {:test 4, :pass 0, :fail 0, :error 15},
+   :diagnostic nil}
   {:namespace "jasentaa.parser.combinators-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.Symbol"}
   {:namespace "jasentaa.position-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /jasentaa/position: not found in load path"}
+   :summary {:test 5, :pass 0, :fail 0, :error 9},
+   :diagnostic nil}
   {:namespace "jasentaa.test-helpers",
    :status :blocked,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
   {:namespace "jasentaa.worked-example-1",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.Symbol"}
   {:namespace "jasentaa.worked-example-2",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /jasentaa/monad: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.Symbol"}
   {:namespace "java-http-clj.smoke-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /java_http_clj/core: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: HttpClient"}
   {:namespace "lambdaisland.regal-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /lambdaisland/regal: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "lambdaisland.regal.test-util",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /lambdaisland/regal: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "linked.map-test",
    :status :blocked,
    :exit 1,
@@ -972,7 +929,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/test/check/generators: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "malli.destructure-test",
    :status :blocked,
    :exit 1,
@@ -1020,7 +977,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/test/check/generators: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "malli.plantuml-test",
    :status :blocked,
    :exit 1,
@@ -1062,7 +1019,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /markdown/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "me.raynes.core-test",
    :status :blocked,
    :exit 1,
@@ -1122,13 +1079,13 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/test/check/clojure_test: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "meander.substitute.epsilon-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/test/check/clojure_test: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "meander.syntax.epsilon-test",
    :status :blocked,
    :exit 1,
@@ -1136,29 +1093,25 @@
    :diagnostic
    "exit 1: failed to load /meander/epsilon: not found in load path"}
   {:namespace "medley.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /medley/core: not found in load path"}
+   :summary {:test 43, :pass 107, :fail 2, :error 81},
+   :diagnostic nil}
   {:namespace "meta-merge.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /meta_merge/core: not found in load path"}
+   :summary {:test 1, :pass 2, :fail 0, :error 15},
+   :diagnostic nil}
   {:namespace "minimallist.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /minimallist/core: not found in load path"}
+   :summary {:test 2, :pass 317, :fail 0, :error 21},
+   :diagnostic nil}
   {:namespace "minimallist.util-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /minimallist/util: not found in load path"}
+   :summary {:test 4, :pass 12, :fail 0, :error 3},
+   :diagnostic nil}
   {:namespace "missing.test.assertions-test",
    :status :blocked,
    :exit 1,
@@ -1175,20 +1128,18 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /msgpack/core: not found in load path"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: Charset/forName"}
   {:namespace "msgpack.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/walk: not found in load path"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: Charset/forName"}
   {:namespace "multigrep.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /multigrep/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "net.cgrand.xforms-test",
    :status :blocked,
    :exit 1,
@@ -1236,7 +1187,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/walk: not found in load path"}
+   "exit 1: failed to load /ol/sfv: not found in load path"}
   {:namespace "ol.sfv.parser-test",
    :status :blocked,
    :exit 1,
@@ -1254,7 +1205,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /omniconf/core: not found in load path"}
+   "exit 1: failed to load pprint/utilities: not found in load path"}
   {:namespace "orchestra.core-test",
    :status :blocked,
    :exit 1,
@@ -1294,27 +1245,24 @@
   {:namespace "portal.e2e",
    :status :blocked,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /portal/colors: not found in load path"}
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
   {:namespace "portal.runtime.cson-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /portal/runtime/cson: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "portal.runtime.fs-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /portal/runtime/fs: not found in load path"}
+   :summary {:test 1, :pass 3, :fail 1, :error 3},
+   :diagnostic nil}
   {:namespace "portal.test-runner",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /portal/api: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.IRef"}
   {:namespace "postmortem.core-test",
    :status :blocked,
    :exit 1,
@@ -1328,11 +1276,10 @@
    :diagnostic
    "exit 1: failed to load /postmortem/core: not found in load path"}
   {:namespace "progrock.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /progrock/core: not found in load path"}
+   :summary {:test 5, :pass 7, :fail 0, :error 8},
+   :diagnostic nil}
   {:namespace "promesa.tests.core-test",
    :status :blocked,
    :exit 1,
@@ -1368,49 +1315,48 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "rewrite-clj.node.coercer-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "rewrite-clj.paredit-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "rewrite-clj.parser-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/tools/reader: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: *clojure-version*"}
   {:namespace "rewrite-clj.zip-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /rewrite_clj/node: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "rewrite-clj.zip.subedit-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /rewrite_clj/zip: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "riddley.walk-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /riddley/compiler: not found in load path"}
+   "exit 1: unable to resolve symbol: clojure.lang.Compiler"}
   {:namespace "ruuter.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: failed to load /ruuter/core: not found in load path"}
   {:namespace "schema.coerce-test",
    :status :blocked,
    :exit 1,
@@ -1422,7 +1368,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /:as/pprint: not found in load path"}
+   "exit 1: failed to load /schema/core: not found in load path"}
   {:namespace "schema.experimental.abstract-map-test",
    :status :blocked,
    :exit 1,
@@ -1452,31 +1398,31 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /selmer/filters: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "selmer.our-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /selmer/parser: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "slingshot.slingshot-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /slingshot/slingshot: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "slingshot.support-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /slingshot/slingshot: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "slingshot.test-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /slingshot/slingshot: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "sluj.core-test",
    :status :blocked,
    :exit 1,
@@ -1506,58 +1452,53 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/test/check: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "testdoc.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /testdoc/core: not found in load path"}
+   :summary {:test 8, :pass 3, :fail 0, :error 10},
+   :diagnostic nil}
   {:namespace "testdoc.style.code-first-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /testdoc/style/code_first: not found in load path"}
+   :summary {:test 2, :pass 0, :fail 0, :error 2},
+   :diagnostic nil}
   {:namespace "testdoc.style.repl-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /testdoc/style/repl: not found in load path"}
+   :summary {:test 2, :pass 0, :fail 0, :error 4},
+   :diagnostic nil}
   {:namespace "vault.client.http-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /vault/authenticate: not found in load path"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: Runtime/getRuntime"}
   {:namespace "vault.lease-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /vault/lease: not found in load path"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: Runtime/getRuntime"}
   {:namespace "version-clj.compare-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /version_clj/compare: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "version-clj.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /version_clj/core: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "version-clj.split-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /version_clj/split: not found in load path"}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
   {:namespace "version-clj.via-use-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /version_clj/core: not found in load path"}]}
+   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}]}

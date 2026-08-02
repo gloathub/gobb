@@ -96,6 +96,7 @@ BABASHKA-CLI-SOURCES := $(shell \
 BABASHKA-SOURCES := $(shell \
   find '$(BABASHKA-SOURCE)/src' -type f -name '*.clj' 2>/dev/null)
 GOBB := $(TOP)/bin/gobb
+GRENADINE ?= $(TOP)/bin/grenadine
 GOBB-WASM := $(TOP)/www/docs/repl/gobb.wasm
 WASM-EXEC := $(TOP)/www/docs/repl/wasm_exec.js
 RELEASE := $(TOP)/util/release
@@ -809,6 +810,7 @@ test: \
 test-lib_tests: \
   $(GOBB) \
   $(BB) \
+  $(GRENADINE) \
   $(BABASHKA-SOURCE-DEP) \
   $(BABASHKA-PROCESS-DEP) \
   $(UPSTREAM-TEST-RUNNER) \
@@ -816,7 +818,7 @@ test-lib_tests: \
 	@$(ECHO) "* Running Babashka's library test suite with Gobb"
 	$Q status=0; \
 	  $(BB) '$(UPSTREAM-TEST-RUNNER)' lib-tests \
-	    '$(BABASHKA-SOURCE)' '$(BB)' '$(GOBB)' \
+	    '$(BABASHKA-SOURCE)' '$(BB)' '$(GOBB)' '$(GRENADINE)' \
 	    '$(UPSTREAM-TEST-DIR)' '$(LIB_TESTS-RUN-RESULT)' \
 	    $(LIB_TESTS) || status=$$?; \
 	  $(BB) '$(TESTING-REPORT-RUNNER)' \

@@ -16,7 +16,14 @@
 
 (defn write-edn! [path value]
   (fs/create-dirs (fs/parent path))
-  (spit (str path) (with-out-str (pprint/pprint value))))
+  (spit (str path)
+        (binding [*print-namespace-maps* false]
+          (with-out-str (pprint/pprint value)))))
+
+(defn fail-command! [description {:keys [exit out err]}]
+  (fail! (str description " failed with exit " exit
+              (when-not (str/blank? err) (str "\n" err))
+              (when-not (str/blank? out) (str "\n" out)))))
 
 (defn run-command [command options]
   (let [result @(process/process command
@@ -73,13 +80,19 @@
   (let [manifest (read-edn
                   (fs/path root "test-resources" "lib_tests"
                            "bb-tested-libs.edn"))
+        namespace-libraries
+        (into {}
+              (for [[library details] manifest
+                    namespace (:test-namespaces details)]
+                [(str namespace) library]))
         namespaces (->> (concat (mapcat :test-namespaces (vals manifest))
                                 extra-lib-test-namespaces)
                         distinct
                         (sort-by str)
                         (mapv str))]
     {:libraries (count manifest)
-     :namespaces namespaces}))
+     :namespaces namespaces
+     :namespace-libraries namespace-libraries}))
 
 (defn spec-test-require? [value]
   (and (vector? value)
@@ -134,6 +147,89 @@
               (pprint/pprint (adapt-lib-runner-form form)))))
     output))
 
+(defn coordinate-jar [repository coordinate]
+  (let [[library version] (str/split coordinate #" ")
+        [group artifact] (str/split library #"/")]
+    (fs/path repository
+             (str/replace group "." "/") artifact version
+             (str artifact "-" version ".jar"))))
+
+(defn extract-maven-coordinate! [repository cache coordinate]
+  (let [jar (coordinate-jar repository coordinate)
+        relative (str (fs/relativize repository jar))
+        directory (fs/path cache "lib_tests" "maven-jars"
+                           (str/replace relative #"[/\\]" "__"))
+        stamp (fs/path directory ".extracted")]
+    (when-not (fs/exists? jar)
+      (fail! (str "Grenadine did not install " coordinate " at " jar)))
+    (when-not (fs/exists? stamp)
+      (fs/create-dirs directory)
+      (let [result (run-command ["unzip" "-q" "-o" (str jar)
+                                 "-d" (str directory)] {})]
+        (when-not (zero? (:exit result))
+          (fail-command! (str "extracting " jar) result)))
+      (spit (str stamp) "ok\n"))
+    (str (fs/absolutize directory))))
+
+(defn expanded-coordinates [text]
+  (->> (str/split-lines text)
+       (filter #(re-matches #"[^ ]+/[^ ]+ [^ ]+" %))
+       vec))
+
+(defn prepare-maven-classpath!
+  [{:keys [grenadine cache config-value]}]
+  (let [suite-dir (fs/path cache "lib_tests")
+        repository (fs/path suite-dir "maven-repository")
+        config-dir (fs/path suite-dir "maven-deps")
+        log-dir (fs/path suite-dir "maven-logs")
+        maven-deps (-> (into (sorted-map)
+                             (filter (comp :mvn/version val))
+                             (:deps config-value))
+                       (assoc 'org.clojure/test.check
+                              {:mvn/version "1.1.1"}))]
+    (doseq [directory [config-dir log-dir]] (fs/create-dirs directory))
+    (let [results
+          (mapv
+           (fn [[library coordinate]]
+             (let [base (str/replace (str library) #"[^A-Za-z0-9_.-]" "_")
+                   config (fs/path config-dir (str base ".edn"))
+                   log (fs/path log-dir (str base ".log"))
+                   maven-config
+                   (cond-> {:deps {library coordinate}}
+                     (:mvn/repos config-value)
+                     (assoc :mvn/repos (:mvn/repos config-value)))
+                   _ (write-edn! config maven-config)
+                   result (run-command [(str grenadine)
+                                        "--repository" (str repository)
+                                        "--quiet" "--add" (str config)] {})
+                   expansion (when (zero? (:exit result))
+                               (run-command [(str grenadine)
+                                             "--repository" (str repository)
+                                             "--expand" (str config)] {}))]
+               (spit (str log) (str (:out result) (:err result)))
+               {:library library
+                :exit (:exit result)
+                :coordinates
+                (when (and expansion (zero? (:exit expansion)))
+                  (expanded-coordinates (:out expansion)))}))
+           maven-deps)
+          failed (filter #(not (zero? (:exit %))) results)]
+      (println (str "Grenadine: installed " (- (count results) (count failed))
+                    "/" (count results) " Maven dependency roots"
+                    (when (seq failed)
+                      (str "; blocked "
+                           (str/join ", " (map :library failed))))))
+      (reduce
+       (fn [paths-by-library {:keys [library coordinates]}]
+         (if (seq coordinates)
+           (assoc paths-by-library library
+                  (mapv #(extract-maven-coordinate!
+                          repository cache %)
+                        coordinates))
+           paths-by-library))
+       {}
+       results))))
+
 (defn lib-case-result
   [{:keys [root gobb cache work environment command-prefix log-dir]}
    namespace]
@@ -165,7 +261,7 @@
     (write-edn! (fs/path log-dir (str base ".edn")) entry)
     entry))
 
-(defn lib-tests! [{:keys [source bb gobb cache result filters]}]
+(defn lib-tests! [{:keys [source bb gobb grenadine cache result filters]}]
   (let [root (fs/absolutize source)
         corpus (lib-test-corpus root)
         selected (if (seq filters) (vec filters) (:namespaces corpus))
@@ -183,8 +279,10 @@
                 (fs/exists? (fs/path process-root "test"))
                 (conj (str (fs/path process-root "test"))))
         config-value {:paths paths
-                      :deps (get-in upstream-config
-                                    [:aliases :lib-tests :extra-deps])}
+                      :deps (merge (:deps upstream-config)
+                                   (get-in upstream-config
+                                           [:aliases :lib-tests :extra-deps]))
+                      :mvn/repos (:mvn/repos upstream-config)}
         runner (fs/path root "test-resources" "lib_tests"
                         "babashka" "run_all_libtests.clj")
         path (str (fs/path root "process" "test" "on-path")
@@ -194,13 +292,24 @@
                   (str/join ", " unknown))))
     (doseq [directory [work home suite-dir log-dir]] (fs/create-dirs directory))
     (write-edn! config config-value)
-    (let [prepared-runner (prepare-lib-runner! runner suite-dir)
-          command-prefix ["timeout" "120" (str gobb)
-                          "--config" (str config)
-                          "--deps-root" (str root)
-                          "-cp" (str (fs/path root "test-resources" "lib_tests"))
-                          "-e" (str "(load-file "
-                                    (pr-str (str prepared-runner)) ")")]
+    (let [maven-paths (prepare-maven-classpath!
+                       {:grenadine grenadine :cache cache
+                        :config-value config-value})
+          platform-paths (get maven-paths 'org.clojure/test.check [])
+          classpath-for
+          (fn [namespace]
+            (let [library (get (:namespace-libraries corpus) namespace)]
+              (str/join (System/getProperty "path.separator")
+                        (distinct
+                         (concat paths platform-paths
+                                 (get maven-paths library []))))))
+          prepared-runner (prepare-lib-runner! runner suite-dir)
+          command-prefix
+          (fn [namespace]
+            ["timeout" "120" (str gobb)
+             "-cp" (classpath-for namespace)
+             "-e" (str "(load-file "
+                       (pr-str (str prepared-runner)) ")")])
           environment {"HOME" (str home)
                        "GOBB_CACHE" (str (fs/path cache "gobb-cache"))
                        "BABASHKA_TEST_ENV" "native"
@@ -217,7 +326,11 @@
             (mapv (fn [namespace]
                     (print (format (str "lib_test: %-" width "s ") namespace))
                     (flush)
-                    (let [entry (lib-case-result context namespace)]
+                    (let [entry (lib-case-result
+                                 (assoc context
+                                        :command-prefix
+                                        (command-prefix namespace))
+                                 namespace)]
                       (println (str/upper-case (name (:status entry))))
                       entry))
                   selected)
@@ -242,7 +355,9 @@
                                :namespaces (count (:namespaces corpus))}
                       :runner-adaptations
                       [:omit-spec-instrumentation-reset
-                       :normalize-keyword-destructuring]
+                       :normalize-keyword-destructuring
+                       :grenadine-per-root-dependency-installation
+                       :isolated-maven-classpaths]
                       :selection (if (seq filters) (vec filters) :all)
                       :status status
                       :case-summary case-summary
@@ -393,9 +508,11 @@
 (let [[mode & args] *command-line-args*]
   (case mode
     "lib-tests"
-    (let [[source bb gobb cache result & filters] args]
-      (when-not result (fail! "lib-tests requires source bb gobb cache result"))
-      (lib-tests! {:source source :bb bb :gobb gobb :cache cache
+    (let [[source bb gobb grenadine cache result & filters] args]
+      (when-not result
+        (fail! "lib-tests requires source bb gobb grenadine cache result"))
+      (lib-tests! {:source source :bb bb :gobb gobb :grenadine grenadine
+                   :cache cache
                    :result result :filters filters}))
 
     "examples"

@@ -19,6 +19,14 @@
   (github.com:glojurelang:glojure:pkg:stdlib:clojure:core:protocols.LoadNS)
   (github.com:glojurelang:glojure:pkg:stdlib:clojure:test.LoadNS))
 
+(defmacro runtime-import [& _]
+  ;; Runtime-evaluated imports need Gobb's Java compatibility resolver rather
+  ;; than Glojure's Go-package import host form. Ignoring the declaration is
+  ;; sufficient for namespaces whose imported JVM types are compile-time-only
+  ;; or appear solely in inactive forms; referenced types remain explicit
+  ;; compatibility failures until the resolver maps them.
+  nil)
+
 (defn spit* [file content & options]
   ;; Glojure's clojure.core/spit currently targets the unimplemented
   ;; glojure.go.io/writer host form. Route it through Gobb's Java I/O
@@ -35,6 +43,10 @@
         (.Close writer)))))
 
 (defn initialize! []
+  ;; Babashka reads shared .cljc sources as both Clojure and Babashka. Keep
+  ;; Glojure's default :glj feature and opt this embedding into :clj and :bb.
+  (github.com:glojurelang:glojure:pkg:reader.EnableFeature "clj")
+  (github.com:glojurelang:glojure:pkg:reader.EnableFeature "bb")
   ;; Glojure initializes *in* and *out* at bootstrap, but its generated
   ;; clojure.core currently leaves *err* nil. Own all three roots here so the
   ;; Gobb execution host has one explicit standard-stream contract.
@@ -42,6 +54,7 @@
   (alter-var-root #'*out* (constantly os.Stdout))
   (alter-var-root #'*err* (constantly os.Stderr))
   (alter-var-root #'clojure.core/spit (constantly spit*))
+  (alter-var-root #'clojure.core/import (constantly @#'runtime-import))
   (load-clojure-test!)
   (in-ns 'user)
   (refer 'clojure.core))
