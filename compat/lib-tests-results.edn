@@ -3,13 +3,13 @@
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
  :corpus {:libraries 111, :namespaces 261},
- :summary {:test 230, :pass 759, :fail 37, :error 450},
+ :summary {:test 241, :pass 1712, :fail 42, :error 214},
  :runner-adaptations
  [:omit-spec-instrumentation-reset
   :normalize-keyword-destructuring
   :grenadine-per-root-dependency-installation
   :isolated-maven-classpaths],
- :case-summary {:total 261, :pass 12, :fail 32, :blocked 217},
+ :case-summary {:total 261, :pass 25, :fail 23, :blocked 213},
  :status :fail,
  :suite :lib-tests,
  :selection :all,
@@ -18,18 +18,16 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: bad binding form: :aero.core/incomplete?"}
   {:namespace "again.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "arrangement.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 9, :pass 100, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 9, :pass 110, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "babashka.curl-test",
    :status :pass,
@@ -58,7 +56,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: Object"}
+   :diagnostic
+   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "bond.assertions-test",
    :status :fail,
    :exit 1,
@@ -85,19 +84,19 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "camel-snake-kebab.extras-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "camel-snake-kebab.internals.string-separator-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cheshire.test.core",
    :status :blocked,
    :exit 1,
@@ -106,7 +105,7 @@
   {:namespace "clarktown.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :summary {:test 1, :pass 0, :fail 1, :error 0},
    :diagnostic nil}
   {:namespace "clarktown.parsers.bold-test",
    :status :pass,
@@ -114,9 +113,9 @@
    :summary {:test 1, :pass 3, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clarktown.parsers.code-block-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 0, :fail 0, :error 2},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 2, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clarktown.parsers.empty-block-test",
    :status :pass,
@@ -149,9 +148,9 @@
    :summary {:test 1, :pass 5, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clarktown.parsers.quote-block-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 3, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 4, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clarktown.parsers.strikethrough-test",
    :status :pass,
@@ -204,8 +203,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: Byte/TYPE"}
   {:namespace "clj-http.lite.client-test",
    :status :blocked,
    :exit 1,
@@ -232,7 +230,7 @@
   {:namespace "clj-yaml.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 26, :pass 31, :fail 10, :error 16},
+   :summary {:test 26, :pass 30, :fail 15, :error 12},
    :diagnostic nil}
   {:namespace "cljc.java-time-test",
    :status :blocked,
@@ -243,12 +241,12 @@
   {:namespace "clojure-csv.test.core",
    :status :fail,
    :exit 1,
-   :summary {:test 11, :pass 7, :fail 0, :error 54},
+   :summary {:test 11, :pass 13, :fail 0, :error 48},
    :diagnostic nil}
   {:namespace "clojure-csv.test.utils",
    :status :fail,
    :exit 1,
-   :summary {:test 5, :pass 0, :fail 0, :error 30},
+   :summary {:test 5, :pass 2, :fail 0, :error 28},
    :diagnostic nil}
   {:namespace "clojure.algo.test-monads",
    :status :blocked,
@@ -305,7 +303,7 @@
   {:namespace "clojure.math.test-combinatorics",
    :status :fail,
    :exit 1,
-   :summary {:test 18, :pass 0, :fail 0, :error 122},
+   :summary {:test 18, :pass 783, :fail 0, :error 13},
    :diagnostic nil}
   {:namespace "clojure.math.test-numeric-tower",
    :status :blocked,
@@ -331,11 +329,10 @@
    :diagnostic
    "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
   {:namespace "clojure.tools.gitlibs.test-impl",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewDelay"}
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "clojure.tools.namespace.dependency-test",
    :status :blocked,
    :exit 1,
@@ -366,11 +363,10 @@
    :summary {:test 0, :pass 0, :fail 0, :error 0},
    :diagnostic "exit 1: {:test 0, :pass 0, :fail 0, :error 0}"}
   {:namespace "clojure.tools.test-gitlibs",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewDelay"}
+   :summary {:test 4, :pass 2, :fail 0, :error 7},
+   :diagnostic nil}
   {:namespace "cloverage.args-test",
    :status :blocked,
    :exit 1,
@@ -411,8 +407,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "cognitect.test-runner.samples-test",
    :status :pass,
    :exit 0,
@@ -463,36 +458,33 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "com.rpl.specter.test-helpers",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "com.rpl.specter.zipper-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "com.stuartsierra.component-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "com.stuartsierra.dependency-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "com.wsscode.misc.coll-test",
    :status :fail,
    :exit 1,
-   :summary {:test 28, :pass 51, :fail 0, :error 15},
+   :summary {:test 28, :pass 56, :fail 0, :error 10},
    :diagnostic nil}
   {:namespace "com.wsscode.misc.macros-test",
    :status :pass,
@@ -500,20 +492,19 @@
    :summary {:test 1, :pass 2, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "com.wsscode.misc.math-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 6, :pass 8, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 6, :pass 9, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "com.wsscode.misc.refs-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 11, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "com.wsscode.misc.uuid-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 0, :fail 1, :error 0},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 1, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "comb.test.template",
    :status :fail,
@@ -530,12 +521,11 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "cprop.smoke-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 0, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "crispin.core-test",
    :status :blocked,
@@ -548,19 +538,19 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "datalog.parser.impl-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "datalog.parser.pull-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "datalog.parser.test.util",
    :status :blocked,
    :exit 1,
@@ -572,7 +562,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "docopt.core-test",
    :status :blocked,
    :exit 1,
@@ -583,8 +573,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewLazySeq"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: Character/toTitleCase"}
   {:namespace "doric.test.doctest",
    :status :blocked,
    :exit 1,
@@ -599,7 +588,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: Object"}
+   :diagnostic
+   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "environ.core-test",
    :status :blocked,
    :exit 1,
@@ -609,7 +599,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: Object"}
+   :diagnostic
+   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "exoscale.interceptor-test",
    :status :blocked,
    :exit 1,
@@ -620,13 +611,14 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: Object"}
+   :diagnostic
+   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "expectations.clojure.test-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "expound.print-length-test",
    :status :blocked,
    :exit 1,
@@ -662,7 +654,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "gaka.core-test",
    :status :fail,
    :exit 1,
@@ -672,8 +664,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: MessageDigest"}
   {:namespace "hato.client-test",
    :status :blocked,
    :exit 1,
@@ -684,19 +675,17 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: StandardCharsets/UTF_8"}
   {:namespace "hiccup.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 5, :pass 45, :fail 20, :error 1},
+   :summary {:test 5, :pass 46, :fail 20, :error 0},
    :diagnostic nil}
   {:namespace "hiccup2.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: java.net.URI"}
   {:namespace "hickory.test.convert",
    :status :blocked,
    :exit 1,
@@ -756,19 +745,19 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: NO_SOURCE_PATH: defrecord protocol implementations are not yet supported"}
   {:namespace "honeysql.format-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: NO_SOURCE_PATH: defrecord protocol implementations are not yet supported"}
   {:namespace "httpkit.client-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewDelay"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "hugsql.babashka-test",
    :status :blocked,
    :exit 1,
@@ -805,26 +794,27 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewLazySeq"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "jasentaa.collections-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 3, :pass 1, :fail 0, :error 10},
+   :status :pass,
+   :exit 0,
+   :summary {:test 3, :pass 13, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "jasentaa.parser.basic-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 4, :pass 0, :fail 0, :error 15},
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 15, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "jasentaa.parser.combinators-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.Symbol"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "jasentaa.position-test",
    :status :fail,
    :exit 1,
-   :summary {:test 5, :pass 0, :fail 0, :error 9},
+   :summary {:test 5, :pass 8, :fail 0, :error 5},
    :diagnostic nil}
   {:namespace "jasentaa.test-helpers",
    :status :blocked,
@@ -835,12 +825,14 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.Symbol"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "jasentaa.worked-example-2",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.Symbol"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "java-http-clj.smoke-test",
    :status :blocked,
    :exit 1,
@@ -928,8 +920,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "malli.destructure-test",
    :status :blocked,
    :exit 1,
@@ -976,8 +967,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "malli.plantuml-test",
    :status :blocked,
    :exit 1,
@@ -1019,7 +1009,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: NO_SOURCE_PATH: wrong number of arguments: expected 1, got 2"}
   {:namespace "me.raynes.core-test",
    :status :blocked,
    :exit 1,
@@ -1078,14 +1068,12 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "meander.substitute.epsilon-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "meander.syntax.epsilon-test",
    :status :blocked,
    :exit 1,
@@ -1095,22 +1083,22 @@
   {:namespace "medley.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 43, :pass 107, :fail 2, :error 81},
+   :summary {:test 43, :pass 140, :fail 2, :error 51},
    :diagnostic nil}
   {:namespace "meta-merge.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 2, :fail 0, :error 15},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 17, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "minimallist.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 2, :pass 317, :fail 0, :error 21},
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 338, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "minimallist.util-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 4, :pass 12, :fail 0, :error 3},
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 15, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "missing.test.assertions-test",
    :status :blocked,
@@ -1135,11 +1123,10 @@
    :summary nil,
    :diagnostic "exit 1: EvalASTMaybeHostForm: Charset/forName"}
   {:namespace "multigrep.core-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 2, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "net.cgrand.xforms-test",
    :status :blocked,
    :exit 1,
@@ -1251,8 +1238,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: Byte"}
   {:namespace "portal.runtime.fs-test",
    :status :fail,
    :exit 1,
@@ -1262,7 +1248,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.IRef"}
+   :diagnostic
+   "exit 1: unable to resolve symbol: clojure.lang.Namespace"}
   {:namespace "postmortem.core-test",
    :status :blocked,
    :exit 1,
@@ -1315,19 +1302,19 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "rewrite-clj.node.coercer-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "rewrite-clj.paredit-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "rewrite-clj.parser-test",
    :status :blocked,
    :exit 1,
@@ -1338,13 +1325,13 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "rewrite-clj.zip.subedit-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "riddley.walk-test",
    :status :blocked,
    :exit 1,
@@ -1451,22 +1438,21 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "testdoc.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 8, :pass 3, :fail 0, :error 10},
+   :summary {:test 8, :pass 17, :fail 0, :error 2},
    :diagnostic nil}
   {:namespace "testdoc.style.code-first-test",
    :status :fail,
    :exit 1,
-   :summary {:test 2, :pass 0, :fail 0, :error 2},
+   :summary {:test 2, :pass 3, :fail 0, :error 1},
    :diagnostic nil}
   {:namespace "testdoc.style.repl-test",
    :status :fail,
    :exit 1,
-   :summary {:test 2, :pass 0, :fail 0, :error 4},
+   :summary {:test 2, :pass 3, :fail 0, :error 1},
    :diagnostic nil}
   {:namespace "vault.client.http-test",
    :status :blocked,
@@ -1483,22 +1469,22 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "version-clj.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "version-clj.split-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "version-clj.via-use-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewMultiFn"}]}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}]}

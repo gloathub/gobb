@@ -27,6 +27,23 @@
   ;; compatibility failures until the resolver maps them.
   nil)
 
+(defn register-runtime-host-forms! []
+  ;; These constructors are emitted by macros in dynamically loaded library
+  ;; source. Register them explicitly because Gloat cannot discover host forms
+  ;; that appear only after runtime macro expansion.
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "github.com/glojurelang/glojure/pkg/lang.NewMultiFn"
+   github.com:glojurelang:glojure:pkg:lang.NewMultiFn)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "github.com/glojurelang/glojure/pkg/lang.NewDelay"
+   github.com:glojurelang:glojure:pkg:lang.NewDelay)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "github.com/glojurelang/glojure/pkg/lang.NewLazySeq"
+   github.com:glojurelang:glojure:pkg:lang.NewLazySeq)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "github.com/glojurelang/glojure/pkg/lang.Identical"
+   github.com:glojurelang:glojure:pkg:lang.Identical))
+
 (defn spit* [file content & options]
   ;; Glojure's clojure.core/spit currently targets the unimplemented
   ;; glojure.go.io/writer host form. Route it through Gobb's Java I/O
@@ -42,17 +59,63 @@
       (finally
         (.Close writer)))))
 
+(defn slurp* [file & options]
+  ;; The precompiled clojure.core/slurp dispatch table does not know Gobb's
+  ;; Java-compatible File wrapper. Use the same reader bridge as
+  ;; clojure.java.io and consume its Go io.Reader directly.
+  (require 'clojure.java.io)
+  (let [reader-fn (ns-resolve 'clojure.java.io 'reader)
+        reader (apply reader-fn file options)]
+    (try
+      (let [[content error] (io.ReadAll reader)]
+        (when error (throw error))
+        (go/string content))
+      (finally
+        (.Close reader)))))
+
+(defn uuid?* [value]
+  ;; java.util.UUID compatibility values are backed by gojava rather than the
+  ;; google UUID value used by Glojure's built-in random-uuid implementation.
+  (github.com:glojurelang:glojure:pkg:javacompat:uuid.IsUUID value))
+
+(defn take*
+  ;; Clojure treats positive infinity as an unbounded take. The generated
+  ;; Glojure core function narrows its numeric argument before dispatch, so
+  ;; preserve the lazy collection directly for this Babashka-supported case.
+  ([n]
+   (fn [rf]
+     (let [remaining (volatile! n)]
+       (fn
+         ([] (rf))
+         ([result] (rf result))
+         ([result input]
+          (let [n @remaining
+                next-n (vswap! remaining dec)
+                result (if (pos? n) (rf result input) result)]
+            (if (not (pos? next-n)) (ensure-reduced result) result)))))))
+  ([n collection]
+   (if (= ##Inf n)
+     collection
+     (lazy-seq
+      (when (pos? n)
+        (when-let [items (seq collection)]
+          (cons (first items) (take* (dec n) (rest items)))))))))
+
 (defn initialize! []
   ;; Babashka reads shared .cljc sources as both Clojure and Babashka. Keep
   ;; Glojure's default :glj feature and opt this embedding into :clj and :bb.
   (github.com:glojurelang:glojure:pkg:reader.EnableFeature "clj")
   (github.com:glojurelang:glojure:pkg:reader.EnableFeature "bb")
+  (register-runtime-host-forms!)
   ;; Glojure initializes *in* and *out* at bootstrap, but its generated
   ;; clojure.core currently leaves *err* nil. Own all three roots here so the
   ;; Gobb execution host has one explicit standard-stream contract.
   (alter-var-root #'*in* (constantly os.Stdin))
   (alter-var-root #'*out* (constantly os.Stdout))
   (alter-var-root #'*err* (constantly os.Stderr))
+  (alter-var-root #'clojure.core/take (constantly take*))
+  (alter-var-root #'clojure.core/uuid? (constantly uuid?*))
+  (alter-var-root #'clojure.core/slurp (constantly slurp*))
   (alter-var-root #'clojure.core/spit (constantly spit*))
   (alter-var-root #'clojure.core/import (constantly @#'runtime-import))
   (load-clojure-test!)

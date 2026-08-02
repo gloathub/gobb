@@ -49,6 +49,7 @@ with explicit compatibility states and milestone assignments.
     <ul class="task-list">
       <li class="task-done">Establish the 261-namespace baseline: 2 pass, 2 fail, and 257 blocked</li>
       <li class="task-done">First closure checkpoint: 12 pass, 32 fail, and 217 blocked</li>
+      <li class="task-done">Second closure checkpoint: 25 pass, 23 fail, and 213 blocked</li>
       <li>Resolve dependency and source-classpath blockers</li>
       <li>Provide the required Clojure spec and test.check namespaces</li>
       <li>Close Glojure host-interop and evaluator gaps exposed by runnable tests</li>
