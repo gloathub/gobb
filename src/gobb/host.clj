@@ -12,6 +12,12 @@
 (def shutdown-ran? (atom false))
 (def current-source (atom no-source-path))
 
+(def core-load (atom nil))
+(def core-destructure (atom nil))
+(def core-fn-macro (atom nil))
+(def core-remove-ns (atom nil))
+(def initialized? (atom false))
+
 (defn load-clojure-test! []
   ;; Referencing Glojure's precompiled stdlib package links its namespace
   ;; loaders into Gobb without recompiling clojure.test from source. Load the
@@ -51,7 +57,55 @@
    github.com:glojurelang:glojure:pkg:lang.NewPersistentArrayMapAsIfByAssoc)
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "strings.Builder"
-   strings.Builder))
+   strings.Builder)
+  ;; Charset values are opaque selectors to the hosted string and stream
+  ;; bridges. Register the JVM names used by portable libraries so their
+  ;; static forms resolve while those bridges continue to perform UTF-8 I/O.
+  (doseq [class-name ["Charset" "StandardCharsets"]]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     class-name "java.nio.charset")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     class-name (reflect.TypeOf "")))
+  (doseq [class-name ["Charset" "java.nio.charset.Charset"]]
+    (github.com:glojurelang:glojure:pkg:pkgmap.Set
+     (str class-name ".forName")
+     (fn [name] name)))
+  (doseq [class-name ["StandardCharsets"
+                      "java.nio.charset.StandardCharsets"]
+          [field value] [["UTF_8" "UTF-8"]
+                         ["US_ASCII" "US-ASCII"]
+                         ["ISO_8859_1" "ISO-8859-1"]]]
+    (github.com:glojurelang:glojure:pkg:pkgmap.Set
+     (str class-name "." field)
+     value))
+  ;; Aero only needs the line-numbering reader's pushback behavior on its
+  ;; successful parse path. Reuse Glojure's Java-compatible PushbackReader;
+  ;; its missing getLineNumber method is relevant only while formatting a
+  ;; malformed configuration error.
+  (let [java-name "clojure.lang.LineNumberingPushbackReader"
+        sample (github.com:glojurelang:glojure:pkg:javacompat:streams.NewPushbackReader
+                (strings.NewReader ""))
+        class (github.com:glojurelang:glojure:pkg:lang.NewClass
+               (reflect.TypeOf sample) java-name)]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     "LineNumberingPushbackReader" "clojure.lang")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     "LineNumberingPushbackReader" class)
+    (github.com:glojurelang:glojure:pkg:lang.RegisterHostConstructor
+     java-name
+     (fn [& args]
+       (apply
+        github.com:glojurelang:glojure:pkg:javacompat:streams.NewPushbackReader
+        args))))
+  (let [java-name "java.io.EOFException"
+        class (github.com:glojurelang:glojure:pkg:lang.NewClass
+               (reflect.TypeOf (errors.New "")) java-name)]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     "EOFException" "java.io")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     "EOFException" class)
+    (github.com:glojurelang:glojure:pkg:lang.RegisterHostConstructor
+     java-name (fn [message] (errors.New message)))))
 
 (defn spit* [file content & options]
   ;; Glojure's clojure.core/spit currently targets the unimplemented
@@ -168,7 +222,101 @@
     (map #(nth collection %)
          (range (dec (count collection)) -1 -1))))
 
-(defn initialize! []
+(defn satisfies?* [protocol value]
+  ;; The current Glojure core does not expose satisfies?. Cover the hosted
+  ;; IKVReduce protocol used by BB-targeted transducer libraries; Gobb's
+  ;; reduce-kv bridge above supports these same collection categories.
+  (if (identical? protocol clojure.core.protocols/IKVReduce)
+    (or (map? value) (vector? value))
+    false))
+
+(defn get-method* [multifn dispatch-value]
+  ;; Glojure exposes MultiFn's method table, while its current get-method
+  ;; wrapper targets an unexported Go method. Exact and default dispatch cover
+  ;; the public Clojure API and the clojure.test report extension contract.
+  (let [method-table (methods multifn)]
+    (or (get method-table dispatch-value)
+        (get method-table :default))))
+
+(defn load* [& paths]
+  ;; Glojure's AOT-compiled clojure.core/load currently specializes *ns* to
+  ;; clojure.core. Resolve relative resources here before delegating so a
+  ;; namespace such as clojure.pprint loads pprint/utilities from
+  ;; /clojure/pprint/utilities rather than /pprint/utilities.
+  (let [current-ns (var-get #'*ns*)
+        resource (-> (str (ns-name current-ns))
+                     (strings.ReplaceAll "-" "_")
+                     (strings.ReplaceAll "." "/"))
+        separator (strings.LastIndex resource "/")
+        root (if (neg? separator)
+               ""
+               (subs resource 0 separator))]
+    (apply @core-load
+           (map (fn [path]
+                  (if (strings.HasPrefix path "/")
+                    path
+                    (str "/" root
+                         (when (seq root) "/")
+                         path)))
+                paths))))
+
+(defn normalize-binding-form [form]
+  (cond
+    (vector? form)
+    (mapv normalize-binding-form form)
+
+    (map? form)
+    (reduce-kv
+     (fn [result key value]
+       (assoc result key
+              (if (and (= :keys key) (vector? value))
+                (mapv (fn [binding]
+                        (if (keyword? binding)
+                          (symbol (namespace binding) (name binding))
+                          binding))
+                      value)
+                (normalize-binding-form value))))
+     {}
+     form)
+
+    :else form))
+
+(defn destructure* [bindings]
+  (@core-destructure (normalize-binding-form bindings)))
+
+(defn let-macro* [_form _environment bindings & body]
+  (list* 'let* (destructure* bindings) body))
+
+(defn normalize-fn-signature [signature]
+  (if (vector? signature)
+    (normalize-binding-form signature)
+    (with-meta
+      (cons (normalize-binding-form (first signature))
+            (next signature))
+      (meta signature))))
+
+(defn fn-macro* [form environment & signatures]
+  (let [function-name (when (symbol? (first signatures))
+                        (first signatures))
+        signatures (if function-name (next signatures) signatures)
+        normalized (if (vector? (first signatures))
+                     (cons (normalize-binding-form (first signatures))
+                           (next signatures))
+                     (map normalize-fn-signature signatures))
+        normalized (if function-name
+                     (cons function-name normalized)
+                     normalized)]
+    (apply @core-fn-macro form environment normalized)))
+
+(defn remove-ns* [namespace-name]
+  ;; Babashka can require a namespace immediately after removing it. Glojure's
+  ;; loaded-lib registry otherwise suppresses that reload and leaves callers
+  ;; with no namespace to resolve.
+  (dosync
+   (commute @#'clojure.core/*loaded-libs* disj namespace-name))
+  (@core-remove-ns namespace-name))
+
+(defn initialize-runtime! []
   ;; Babashka reads shared .cljc sources as both Clojure and Babashka. Keep
   ;; Glojure's default :glj feature and opt this embedding into :clj and :bb.
   (github.com:glojurelang:glojure:pkg:reader.EnableFeature "clj")
@@ -180,6 +328,9 @@
   (when-not (ns-resolve 'clojure.core '*clojure-version*)
     (intern 'clojure.core '*clojure-version*
             {:major 1 :minor 12 :incremental 4 :qualifier nil}))
+  (when-not (ns-resolve 'clojure.core 'satisfies?)
+    (intern 'clojure.core 'satisfies? satisfies?*))
+  (alter-var-root #'clojure.core/get-method (constantly get-method*))
   ;; Glojure initializes *in* and *out* at bootstrap, but its generated
   ;; clojure.core currently leaves *err* nil. Own all three roots here so the
   ;; Gobb execution host has one explicit standard-stream contract.
@@ -190,14 +341,35 @@
   (alter-var-root #'clojure.core/read (constantly read*))
   (alter-var-root #'clojure.core/reduce-kv (constantly reduce-kv*))
   (alter-var-root #'clojure.core/rseq (constantly rseq*))
+  (reset! core-destructure @#'clojure.core/destructure)
+  (alter-var-root #'clojure.core/destructure (constantly destructure*))
+  (alter-var-root #'clojure.core/let (constantly let-macro*))
+  (reset! core-fn-macro @#'clojure.core/fn)
+  (alter-var-root #'clojure.core/fn (constantly fn-macro*))
+  (reset! core-remove-ns @#'clojure.core/remove-ns)
+  (alter-var-root #'clojure.core/remove-ns (constantly remove-ns*))
+  (reset! core-load @#'clojure.core/load)
+  (alter-var-root #'clojure.core/load (constantly load*))
   (alter-var-root #'clojure.core/take (constantly take*))
   (alter-var-root #'clojure.core/uuid? (constantly uuid?*))
   (alter-var-root #'clojure.core/slurp (constantly slurp*))
   (alter-var-root #'clojure.core/spit (constantly spit*))
   (alter-var-root #'clojure.core/import (constantly @#'runtime-import))
   (load-clojure-test!)
+  ;; Runtime codegen can classify a fully-qualified protocol Var as a late
+  ;; host form before its namespace alias table is complete.
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "clojure.core.protocols.IKVReduce"
+   (var-get (ns-resolve 'clojure.core.protocols 'IKVReduce)))
   (in-ns 'user)
   (refer 'clojure.core))
+
+(defn initialize! []
+  ;; The CLI initializes the host before dispatching, while reusable entry
+  ;; points such as the browser REPL initialize themselves. Runtime patches
+  ;; must only capture and replace core Vars once.
+  (when (compare-and-set! initialized? false true)
+    (initialize-runtime!)))
 
 (defn set-command-line-args! [args]
   (alter-var-root #'*command-line-args* (constantly (seq args))))

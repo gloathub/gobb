@@ -6,4 +6,4 @@
   (render/escape-html value))
 
 (defmacro html [& values]
-  `(hiccup.render/render-root [~@values] false))
+  `(hiccup.render/render-root [~@values] false :xhtml))

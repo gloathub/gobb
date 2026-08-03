@@ -10,7 +10,13 @@
 (defn csv-reader [input separator]
   (let [reader (encoding:csv.NewReader
                 (if (string? input)
-                  (strings.NewReader input)
+                  ;; java.io readers recognize CR, LF, and CRLF as record
+                  ;; separators. Go's encoding/csv accepts LF/CRLF, so
+                  ;; normalize lone CR without doubling CRLF records.
+                  (strings.NewReader
+                   (-> input
+                       (strings.ReplaceAll "\r\n" "\n")
+                       (strings.ReplaceAll "\r" "\n")))
                   (io/reader input)))]
     (set! (.Comma reader) (go/rune separator))
     reader))
@@ -28,7 +34,10 @@
         {:quote quote})))
     (let [[records error] (.ReadAll (csv-reader input separator))]
       (when error
-        (fail! :read error))
+        (let [message (fmt.Sprint error)]
+          (if (strings.Contains message "extraneous or missing")
+            (throw (errors.New message))
+            (fail! :read error))))
       (seq (mapv vec records)))))
 
 (defn csv-writer [output separator]

@@ -74,6 +74,7 @@
         (reverse (str/split-lines text))))
 
 (def project-fixture-names ["README.md" "DEPS_CLJ_VERSION"])
+(def project-fixture-directories ["test/resources" "resources"])
 
 (defn prepare-project-fixtures! [work roots]
   (doseq [name project-fixture-names]
@@ -87,7 +88,18 @@
                                      (str "META-INF/leiningen/**/" name))))))
                        roots)]
       (when (fs/exists? target) (fs/delete target))
-      (when source (fs/copy source target)))))
+      (when source (fs/copy source target))))
+  (doseq [name project-fixture-directories]
+    (let [target (fs/path work name)
+          source (some (fn [root]
+                         (let [candidate (fs/path root name)]
+                           (when (fs/directory? candidate) candidate)))
+                       roots)]
+      (when (and (not= name "test/resources") (fs/exists? target))
+        (fs/delete-tree target))
+      (when source
+        (fs/create-dirs (fs/parent target))
+        (fs/copy-tree source target {:replace-existing true})))))
 
 (def extra-lib-test-namespaces
   '[babashka.process-test babashka.process-exec-test])
@@ -251,22 +263,37 @@
   (let [[group artifact] (str/split (str library) #"/" 2)]
     (fs/path home ".gitlibs" "libs" group artifact revision)))
 
+(def git-source-libraries
+  '#{com.github.askonomm/clarktown
+     com.potetm/fusebox
+     org.clojars.lispyclouds/contajners
+     testdoc/testdoc})
+
+(defn submodule-revision [root url]
+  (let [directory-name (-> url
+                           (str/split #"/")
+                           last
+                           (str/replace #"\.git$" ""))
+        tree-entry (run-command ["git" "-C" (str root) "ls-tree"
+                                 "HEAD" directory-name] {})]
+    (when (zero? (:exit tree-entry))
+      (nth (str/split (str/trim (:out tree-entry)) #"\s+") 2 nil))))
+
 (defn prepare-git-classpath!
-  [{:keys [home config-value corpus grenadine cache selected-libraries]}]
+  [{:keys [root home config-value corpus grenadine cache selected-libraries]}]
   (into {}
         (keep
          (fn [[library coordinate]]
-           (when (and (contains? selected-libraries library)
-                      (or (:git/sha coordinate) (:git-sha coordinate)
-                          (:sha coordinate) (:git/tag coordinate)
-                          (:git-tag coordinate) (:tag coordinate)))
+           (when (contains? selected-libraries library)
              (when-let [url (or (:git/url coordinate) (:git-url coordinate))]
-               (let [revision (or (:git/sha coordinate)
+               (when-let [revision (or (:git/sha coordinate)
                                   (:git-sha coordinate)
                                   (:sha coordinate)
                                   (:git/tag coordinate)
                                   (:git-tag coordinate)
-                                  (:tag coordinate))
+                                  (:tag coordinate)
+                                  (submodule-revision root url))]
+                 (let [
                      directory (git-library-directory home library revision)
                      manifest-details (get (:manifest corpus) library)
                      clone-result
@@ -313,7 +340,8 @@
                                   (or declared-paths ["src"])
                                   ["src/main/clojure" "src/main/cljc"
                                    "src/test/clojure" "test"]
-                                  (:test-paths manifest-details)))
+                                  (:test-paths manifest-details)
+                                  (:test-directories manifest-details)))
                          source-paths
                          (->> relative-paths
                               (map #(fs/path directory %))
@@ -321,8 +349,16 @@
                               (map #(str (fs/absolutize %))))
                          paths (vec (distinct (concat source-paths
                                                       dependency-paths)))]
-                     [library paths]))))))
-         (merge (:manifest corpus) (:deps config-value)))))
+                     [library paths])))))))
+         (merge
+          (:manifest corpus)
+          (into {}
+                (map (fn [[library coordinate]]
+                       [library
+                        (if (contains? git-source-libraries library)
+                          (merge (get (:manifest corpus) library) coordinate)
+                          coordinate)]))
+                (:deps config-value))))))
 
 (defn lib-case-result
   [{:keys [root gobb cache work environment command-prefix log-dir
@@ -393,6 +429,14 @@
       (fail! (str "unknown library test namespaces: "
                   (str/join ", " unknown))))
     (doseq [directory [work home suite-dir log-dir]] (fs/create-dirs directory))
+    ;; Shared upstream fixtures are project-relative. Seed them once for the
+    ;; isolated run, then let per-library test/resources overlays accumulate;
+    ;; copying the complete tree for each of 261 namespaces is prohibitively
+    ;; expensive and the extra fixtures are inert.
+    (let [target (fs/path work "test-resources")
+          source (fs/path root "test-resources")]
+      (when (fs/exists? target) (fs/delete-tree target))
+      (fs/copy-tree source target {:replace-existing true}))
     (write-edn! config config-value)
     ;; Upstream tests run from a project root. Expose the effective suite
     ;; configuration there so filesystem-oriented tests see the same deps.edn
@@ -402,7 +446,8 @@
                        {:grenadine grenadine :cache cache
                         :config-value config-value})
           git-paths (prepare-git-classpath!
-                     {:home home :config-value config-value :corpus corpus
+                     {:root root :home home :config-value config-value
+                      :corpus corpus
                       :grenadine grenadine :cache cache
                       :selected-libraries selected-libraries})
           platform-paths (get maven-paths 'org.clojure/test.check [])
@@ -411,7 +456,8 @@
             (let [library (get (:namespace-libraries corpus) namespace)]
               (str/join (System/getProperty "path.separator")
                         (distinct
-                         (concat paths platform-paths
+                         (concat [(str (fs/absolutize work))]
+                                 paths platform-paths
                                  (get git-paths library [])
                                  (get maven-paths library []))))))
           prepared-runner (prepare-lib-runner! runner suite-dir)

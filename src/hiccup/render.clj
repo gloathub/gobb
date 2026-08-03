@@ -40,19 +40,22 @@
     :class (class-value value)
     (str value)))
 
-(defn render-attributes [attributes escape?]
+(defn render-attributes [attributes escape? mode]
   (apply
    str
    (keep
     (fn [[key value]]
       (cond
         (or (nil? value) (false? value)) nil
-        (true? value) (str " " (name key))
+        (true? value) (if (#{:html :sgml} mode)
+                        (str " " (name key))
+                        (str " " (name key) "=\"" (name key) "\""))
         :else
-        (let [value (attribute-value key value)
-              value (if escape? (escape-html value) value)]
+        ;; Hiccup always escapes attribute values. Its legacy
+        ;; :escape-strings? option applies only to element content.
+        (let [value (escape-html (attribute-value key value))]
           (str " " (name key) "=\"" value "\""))))
-    attributes)))
+    (sort-by (comp name key) attributes))))
 
 (def void-tags
   #{"area" "base" "br" "col" "embed" "hr" "img" "input"
@@ -60,7 +63,7 @@
 
 (declare render-value)
 
-(defn render-element [element escape?]
+(defn render-element [element escape? mode]
   (let [[tag & body] element
         {:keys [name id class]} (parse-tag tag)
         [attributes children]
@@ -76,16 +79,25 @@
                               (remove nil? [class existing]))))
           (and id (not (contains? attributes :id)))
           (assoc :id id))
-        opening (str "<" name
-                     (render-attributes attributes escape?)
-                     ">")]
-    (if (contains? void-tags name)
-      opening
-      (str opening
-           (apply str (map #(render-value % escape?) children))
+        attributes-text (render-attributes attributes escape? mode)
+        empty? (empty? children)]
+    (cond
+      (contains? void-tags name)
+      (str "<" name attributes-text
+           (if (#{:xhtml :xml} mode) " />" ">"))
+
+      (and empty? (= :xml mode))
+      (str "<" name attributes-text " />")
+
+      (and empty? (= :sgml mode))
+      (str "<" name attributes-text ">")
+
+      :else
+      (str "<" name attributes-text ">"
+           (apply str (map #(render-value % escape? mode) children))
            "</" name ">"))))
 
-(defn render-value [value escape?]
+(defn render-value [value escape? mode]
   (cond
     (nil? value) ""
     (and (map? value)
@@ -95,13 +107,27 @@
          (or (keyword? (first value))
              (symbol? (first value))
              (string? (first value))))
-    (render-element value escape?)
+    (render-element value escape? mode)
+    (vector? value)
+    (throw
+     (github.com:glojurelang:glojure:pkg:lang.NewIllegalArgumentError
+      "Hiccup element vectors require a tag name"))
     (sequential? value)
-    (apply str (map #(render-value % escape?) value))
+    (apply str (map #(render-value % escape? mode) value))
+    (keyword? value)
+    (name value)
     :else
     (if escape?
       (escape-html value)
       (str value))))
 
-(defn render-root [values escape?]
-  (apply str (map #(render-value % escape?) values)))
+(defn render-root
+  ([values escape?]
+   (render-root values escape? :html))
+  ([values escape? default-mode]
+   (let [options (when (and (map? (first values))
+                            (contains? (first values) :mode))
+                   (first values))
+         values (if options (next values) values)
+         mode (or (:mode options) default-mode)]
+     (apply str (map #(render-value % escape? mode) values)))))

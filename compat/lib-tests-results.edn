@@ -3,23 +3,23 @@
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
  :corpus {:libraries 111, :namespaces 261},
- :summary {:test 404, :pass 2610, :fail 51, :error 479},
+ :summary {:test 450, :pass 2678, :fail 26, :error 549},
  :runner-adaptations
  [:omit-spec-instrumentation-reset
   :normalize-keyword-destructuring
   :grenadine-per-root-dependency-installation
   :isolated-maven-classpaths
   :load-only-namespaces-pass],
- :case-summary {:total 261, :pass 50, :fail 23, :blocked 188},
+ :case-summary {:total 261, :pass 60, :fail 22, :blocked 179},
  :status :fail,
  :suite :lib-tests,
  :selection :all,
  :results
  [{:namespace "aero.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: bad binding form: :aero.core/incomplete?"}
+   :summary {:test 28, :pass 0, :fail 0, :error 43},
+   :diagnostic nil}
   {:namespace "again.core-test",
    :status :blocked,
    :exit 1,
@@ -104,9 +104,9 @@
    :summary nil,
    :diagnostic "exit 1: unable to resolve symbol: JsonFactory"}
   {:namespace "clarktown.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 0, :fail 1, :error 0},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 1, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clarktown.parsers.bold-test",
    :status :pass,
@@ -267,9 +267,9 @@
    :diagnostic
    "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clojure.data.csv-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 4, :pass 19, :fail 3, :error 2},
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 26, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.data.generators-test",
    :status :blocked,
@@ -280,20 +280,17 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "clojure.data.json-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "clojure.data.json-test-suite-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "clojure.data.zip-test",
    :status :blocked,
    :exit 1,
@@ -381,8 +378,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "cloverage.report.console-test",
    :status :blocked,
    :exit 1,
@@ -416,7 +412,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   "exit 1: unable to resolve symbol: ScheduledExecutorService"}
   {:namespace "com.potetm.fusebox.circuit-breaker-test",
    :status :blocked,
    :exit 1,
@@ -424,29 +420,25 @@
    :diagnostic
    "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "com.potetm.fusebox.fallback-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 5, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "com.potetm.fusebox.memoize-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "com.potetm.fusebox.registry-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 1, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "com.potetm.fusebox.retry-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :diagnostic nil}
   {:namespace "com.rpl.specter.cljs-test-helpers",
    :status :pass,
    :exit 1,
@@ -510,11 +502,10 @@
    :summary {:test 2, :pass 6, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "contajners.impl-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /contajners/impl: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 5, :pass 7, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "core-match.core-tests",
    :status :blocked,
    :exit 1,
@@ -589,9 +580,9 @@
    :diagnostic
    "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "environ.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 0, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 9, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "exoscale.coax-test",
    :status :blocked,
@@ -673,11 +664,11 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: EvalASTMaybeHostForm: StandardCharsets/UTF_8"}
+   :diagnostic "exit 1: unable to resolve symbol: DirectByteBuffer"}
   {:namespace "hiccup.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 5, :pass 46, :fail 20, :error 0},
+   :status :pass,
+   :exit 0,
+   :summary {:test 5, :pass 66, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "hiccup2.core-test",
    :status :blocked,
@@ -997,14 +988,12 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "meander.defsyntax-test.gh-145",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "meander.epsilon-test",
    :status :blocked,
    :exit 1,
@@ -1027,8 +1016,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "meander.match.ir.epsilon-test",
    :status :blocked,
    :exit 1,
@@ -1055,12 +1043,11 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "medley.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 43, :pass 169, :fail 2, :error 22},
+   :summary {:test 43, :pass 170, :fail 1, :error 22},
    :diagnostic nil}
   {:namespace "meta-merge.core-test",
    :status :pass,
@@ -1078,35 +1065,35 @@
    :summary {:test 4, :pass 15, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "missing.test.assertions-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: bad binding form: :throw?"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 1, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "missing.test.old-methods",
-   :status :blocked,
+   :status :pass,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: bad binding form: :throw?"}
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "msgpack.core-check",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: EvalASTMaybeHostForm: Charset/forName"}
+   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.BigInt"}
   {:namespace "msgpack.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: EvalASTMaybeHostForm: Charset/forName"}
+   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.BigInt"}
   {:namespace "multigrep.core-test",
    :status :pass,
    :exit 0,
    :summary {:test 2, :pass 2, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "net.cgrand.xforms-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: satisfies?"}
+   :summary {:test 7, :pass 11, :fail 0, :error 30},
+   :diagnostic nil}
   {:namespace "nextjournal.markdown-test",
    :status :blocked,
    :exit 1,
@@ -1143,7 +1130,7 @@
   {:namespace "ol.sfv.example-test",
    :status :fail,
    :exit 1,
-   :summary {:test 4, :pass 20, :fail 0, :error 6},
+   :summary {:test 4, :pass 21, :fail 0, :error 5},
    :diagnostic nil}
   {:namespace "ol.sfv.parser-test",
    :status :fail,
@@ -1159,8 +1146,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "orchestra.core-test",
    :status :blocked,
    :exit 1,
@@ -1190,8 +1176,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "portal.bench",
    :status :pass,
    :exit 1,
@@ -1206,7 +1191,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: Byte"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "portal.runtime.fs-test",
    :status :pass,
    :exit 0,
@@ -1312,32 +1298,27 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "schema.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "schema.experimental.abstract-map-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "schema.macros-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "schema.test-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load pprint/utilities: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "schema.utils-test",
    :status :blocked,
    :exit 1,
@@ -1403,9 +1384,9 @@
    :summary nil,
    :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "testdoc.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 11, :pass 35, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 11, :pass 39, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "testdoc.style.code-first-test",
    :status :pass,
