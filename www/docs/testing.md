@@ -13,7 +13,7 @@ Status: **FAIL**
 
 | Libraries | Test namespaces | Cases run | Cases passed | Cases failed | Cases blocked | Tests | Assertions passed | Failures | Errors |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 111 | 261 | 261 | 60 | 22 | 179 | 450 | 2678 | 26 | 549 |
+| 111 | 261 | 261 | 70 | 8 | 183 | 446 | 3232 | 23 | 58 |
 
 Run the complete suite with:
 
@@ -31,7 +31,7 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 
 | Namespace | Status | Tests | Assertions passed | Failures | Errors | Note |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `aero.core-test` | fail | 28 | 0 | 0 | 43 |  |
+| `aero.core-test` | pass | 28 | 58 | 0 | 0 |  |
 | `again.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `arrangement.core-test` | pass | 9 | 110 | 0 | 0 |  |
 | `babashka.curl-test` | pass | 1 | 0 | 0 | 0 |  |
@@ -43,9 +43,9 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `bond.james-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `bond.target-data` | pass | 0 | 0 | 0 | 0 |  |
 | `borkdude.deps.smoke-test` | fail | 1 | 0 | 0 | 1 |  |
-| `camel-snake-kebab.core-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `camel-snake-kebab.extras-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `camel-snake-kebab.internals.string-separator-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `camel-snake-kebab.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: reify |
+| `camel-snake-kebab.extras-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: reify |
+| `camel-snake-kebab.internals.string-separator-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: reify |
 | `cheshire.test.core` | blocked | — | — | — | — | exit 1: unable to resolve symbol: JsonFactory |
 | `clarktown.core-test` | pass | 1 | 1 | 0 | 0 |  |
 | `clarktown.parsers.bold-test` | pass | 1 | 3 | 0 | 0 |  |
@@ -70,10 +70,10 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `clj-http.lite.test-runner` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clj-stacktrace.core-test` | fail | 3 | 3 | 0 | 2 |  |
 | `clj-stacktrace.repl-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `clj-yaml.core-test` | fail | 26 | 31 | 14 | 12 |  |
+| `clj-yaml.core-test` | fail | 26 | 32 | 14 | 11 |  |
 | `cljc.java-time-test` | blocked | — | — | — | — | exit 1: failed to load /cljs/java_time/interop: not found in load path |
-| `clojure-csv.test.core` | fail | 11 | 23 | 0 | 38 |  |
-| `clojure-csv.test.utils` | fail | 5 | 2 | 0 | 28 |  |
+| `clojure-csv.test.core` | pass | 11 | 61 | 0 | 0 |  |
+| `clojure-csv.test.utils` | pass | 5 | 30 | 0 | 0 |  |
 | `clojure.algo.test-monads` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/specials |
 | `clojure.core.cache-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clojure.core.cache.wrapped-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
@@ -103,19 +103,19 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `cognitect.test-runner-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.net.URLClassLoader |
 | `cognitect.test-runner.sample-property-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `cognitect.test-runner.samples-test` | pass | 2 | 3 | 0 | 0 |  |
-| `com.potetm.fusebox.bulwark-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: ScheduledExecutorService |
+| `com.potetm.fusebox.bulwark-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `com.potetm.fusebox.circuit-breaker-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `com.potetm.fusebox.fallback-test` | pass | 1 | 5 | 0 | 0 |  |
-| `com.potetm.fusebox.memoize-test` | fail | 1 | 0 | 0 | 1 |  |
-| `com.potetm.fusebox.registry-test` | pass | 1 | 1 | 0 | 0 |  |
-| `com.potetm.fusebox.retry-test` | fail | 1 | 0 | 0 | 1 |  |
+| `com.potetm.fusebox.fallback-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.memoize-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.registry-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
+| `com.potetm.fusebox.retry-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `com.rpl.specter.cljs-test-helpers` | pass | 0 | 0 | 0 | 0 |  |
 | `com.rpl.specter.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `com.rpl.specter.test-helpers` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `com.rpl.specter.zipper-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `com.stuartsierra.component-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `com.stuartsierra.dependency-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `com.wsscode.misc.coll-test` | fail | 28 | 58 | 0 | 8 |  |
+| `com.wsscode.misc.coll-test` | pass | 28 | 71 | 0 | 0 |  |
 | `com.wsscode.misc.macros-test` | pass | 1 | 2 | 0 | 0 |  |
 | `com.wsscode.misc.math-test` | pass | 6 | 9 | 0 | 0 |  |
 | `com.wsscode.misc.refs-test` | pass | 4 | 11 | 0 | 0 |  |
@@ -158,9 +158,9 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `hickory.test.render` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
 | `hickory.test.select` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
 | `hickory.test.zip` | blocked | — | — | — | — | exit 1: unable to resolve symbol: DocumentType |
-| `honey.sql-test` | fail | 47 | 8 | 1 | 150 |  |
-| `honey.sql.helpers-test` | fail | 31 | 32 | 0 | 125 |  |
-| `honey.sql.postgres-test` | fail | 20 | 0 | 0 | 41 |  |
+| `honey.sql-test` | pass | 47 | 160 | 0 | 0 |  |
+| `honey.sql.helpers-test` | pass | 31 | 157 | 0 | 0 |  |
+| `honey.sql.postgres-test` | pass | 20 | 41 | 0 | 0 |  |
 | `honeysql.core-test` | blocked | — | — | — | — | exit 1: NO_SOURCE_PATH: defrecord protocol implementations are not yet supported |
 | `honeysql.format-test` | blocked | — | — | — | — | exit 1: NO_SOURCE_PATH: defrecord protocol implementations are not yet supported |
 | `httpkit.client-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
@@ -174,7 +174,7 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `jasentaa.collections-test` | pass | 3 | 13 | 0 | 0 |  |
 | `jasentaa.parser.basic-test` | pass | 4 | 15 | 0 | 0 |  |
 | `jasentaa.parser.combinators-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `jasentaa.position-test` | fail | 5 | 8 | 0 | 5 |  |
+| `jasentaa.position-test` | pass | 5 | 13 | 0 | 0 |  |
 | `jasentaa.test-helpers` | pass | 0 | 0 | 0 | 0 |  |
 | `jasentaa.worked-example-1` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `jasentaa.worked-example-2` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
@@ -220,7 +220,7 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `meander.strategy.epsilon-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `meander.substitute.epsilon-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `meander.syntax.epsilon-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: definterface |
-| `medley.core-test` | fail | 43 | 170 | 1 | 22 |  |
+| `medley.core-test` | pass | 43 | 196 | 0 | 0 |  |
 | `meta-merge.core-test` | pass | 1 | 17 | 0 | 0 |  |
 | `minimallist.core-test` | pass | 2 | 338 | 0 | 0 |  |
 | `minimallist.util-test` | pass | 4 | 15 | 0 | 0 |  |
@@ -233,12 +233,12 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `nextjournal.markdown-test` | blocked | — | — | — | — | exit 1: failed to load /matcher_combinators/ansi_color: not found in load path |
 | `nextjournal.markdown.multi-threading-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: proxy |
 | `odoyle.rules-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/spec/alpha: not found in load path |
-| `ol.sfv.api-test` | fail | 10 | 56 | 0 | 2 |  |
+| `ol.sfv.api-test` | pass | 10 | 64 | 0 | 0 |  |
 | `ol.sfv.conformance-test` | blocked | — | — | — | — | exit 1: failed to load /alphabase/base32: not found in load path |
-| `ol.sfv.error-test` | fail | 1 | 100 | 0 | 9 |  |
-| `ol.sfv.example-test` | fail | 4 | 21 | 0 | 5 |  |
-| `ol.sfv.parser-test` | fail | 11 | 113 | 1 | 14 |  |
-| `ol.sfv.serialization-test` | fail | 6 | 30 | 0 | 4 |  |
+| `ol.sfv.error-test` | pass | 1 | 136 | 0 | 0 |  |
+| `ol.sfv.example-test` | fail | 4 | 29 | 0 | 2 |  |
+| `ol.sfv.parser-test` | fail | 11 | 130 | 0 | 4 |  |
+| `ol.sfv.serialization-test` | pass | 6 | 34 | 0 | 0 |  |
 | `omniconf.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: definterface |
 | `orchestra.core-test` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.expound-test` | blocked | — | — | — | — | exit 1: {} |

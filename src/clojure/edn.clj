@@ -1,14 +1,15 @@
 (ns clojure.edn
-  (:refer-clojure :exclude [read read-string]))
+  (:refer-clojure :exclude [read read-string])
+  (:require [gobb.host :as host]))
 
 (defn read
   ([stream]
-   (clojure.core/read stream))
+   (host/read* stream))
   ([options stream]
-   (clojure.core/read options stream)))
+   (host/read* options stream)))
 
 (defn read-string
   ([string]
-   (clojure.core/read-string string))
+   (host/read* (StringReader. string)))
   ([options string]
-   (clojure.core/read-string options string)))
+   (host/read* options (StringReader. string))))

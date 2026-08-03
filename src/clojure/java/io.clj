@@ -83,9 +83,14 @@
 
 (defn reader
   [value & options]
-  (if (instance? Reader value)
-    value
-    (apply input-stream value options)))
+  (cond
+    (instance? Reader value) value
+    ;; java.lang.String/toCharArray is represented as a hosted sequence of
+    ;; characters. Preserve java.io's char-array reader behavior instead of
+    ;; treating those code points as a byte input stream.
+    (and (sequential? value) (every? char? value))
+    (StringReader. (apply str value))
+    :else (apply input-stream value options)))
 
 (defn writer
   [value & options]

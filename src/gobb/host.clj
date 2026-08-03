@@ -13,8 +13,10 @@
 (def current-source (atom no-source-path))
 
 (def core-load (atom nil))
+(def core-assoc (atom nil))
 (def core-destructure (atom nil))
 (def core-fn-macro (atom nil))
+(def core-name (atom nil))
 (def core-remove-ns (atom nil))
 (def initialized? (atom false))
 
@@ -28,18 +30,52 @@
   (github.com:glojurelang:glojure:pkg:stdlib:clojure:template.LoadNS)
   (github.com:glojurelang:glojure:pkg:stdlib:clojure:test.LoadNS))
 
-(defmacro runtime-import [& _]
-  ;; Runtime-evaluated imports need Gobb's Java compatibility resolver rather
-  ;; than Glojure's Go-package import host form. Ignoring the declaration is
-  ;; sufficient for namespaces whose imported JVM types are compile-time-only
-  ;; or appear solely in inactive forms; referenced types remain explicit
-  ;; compatibility failures until the resolver maps them.
-  nil)
+(defn runtime-import-one! [qualified-name]
+  (let [separator (strings.LastIndex qualified-name ".")
+        package-name (subs qualified-name 0 separator)
+        class-name (subs qualified-name (inc separator))
+        [host-value found?]
+        (github.com:glojurelang:glojure:pkg:pkgmap.Get qualified-name)
+        [host-class class-found?]
+        (github.com:glojurelang:glojure:pkg:pkgmap.HostClass class-name)
+        source-ns (when-not (or found? class-found?)
+                    (find-ns (symbol package-name)))
+        source-var (when source-ns
+                     (ns-resolve source-ns (symbol class-name)))
+        value (cond
+                found? host-value
+                class-found? host-class
+                source-var @source-var)]
+    (when value
+      (.Import *ns* qualified-name value))))
+
+(defmacro runtime-import [& import-symbols-or-lists]
+  ;; Runtime-loaded namespaces can import both registered JVM compatibility
+  ;; classes and record descriptors defined by another loaded namespace.
+  (let [qualified-names
+        (for [raw-spec import-symbols-or-lists
+              :let [spec (if (and (seq? raw-spec)
+                                  (= 'quote (first raw-spec)))
+                           (second raw-spec)
+                           raw-spec)]
+              qualified-name
+              (if (symbol? spec)
+                [(str spec)]
+                (map (fn [class-name]
+                       (str (first spec) "." class-name))
+                     (rest spec)))]
+          qualified-name)]
+    (cons 'do
+          (map (fn [qualified-name]
+                 (list 'gobb.host/runtime-import-one! qualified-name))
+               qualified-names))))
 
 (defn register-runtime-host-forms! []
   ;; These constructors are emitted by macros in dynamically loaded library
   ;; source. Register them explicitly because Gloat cannot discover host forms
   ;; that appear only after runtime macro expansion.
+  (github.com:glojurelang:glojure:pkg:javacompat:base64.Link)
+  (github.com:glojurelang:glojure:pkg:javacompat:nio.Link)
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "github.com/glojurelang/glojure/pkg/lang.NewMultiFn"
    github.com:glojurelang:glojure:pkg:lang.NewMultiFn)
@@ -55,29 +91,63 @@
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "github.com/glojurelang/glojure/pkg/lang.NewPersistentArrayMapAsIfByAssoc"
    github.com:glojurelang:glojure:pkg:lang.NewPersistentArrayMapAsIfByAssoc)
+  (github.com:glojurelang:glojure:pkg:lang.RegisterHostConstructor
+   "clojure.lang.MapEntry"
+   (fn [key value]
+     (github.com:glojurelang:glojure:pkg:lang.NewMapEntry key value)))
+  (let [java-name "clojure.lang.PersistentArrayMap"
+        class (github.com:glojurelang:glojure:pkg:lang.NewClass
+               (reflect.TypeOf {}) java-name)]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     "PersistentArrayMap" "clojure.lang")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     "PersistentArrayMap" class))
+  (let [java-name "clojure.lang.PersistentHashMap"
+        sample (into {} (map (fn [value] [value value]) (range 50)))
+        class (github.com:glojurelang:glojure:pkg:lang.NewClass
+               (reflect.TypeOf sample) java-name)]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     "PersistentHashMap" "clojure.lang")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     "PersistentHashMap" class))
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "clojure.lang.RT.chunkIteratorSeq"
+   (fn [iter] (seq iter)))
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "clojure.lang.RT.iter"
+   identity)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "clojure.lang.TransformerIterator.create"
+   (fn [xform iter]
+     (seq (transduce xform conj [] iter))))
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "strings.Builder"
    strings.Builder)
-  ;; Charset values are opaque selectors to the hosted string and stream
-  ;; bridges. Register the JVM names used by portable libraries so their
-  ;; static forms resolve while those bridges continue to perform UTF-8 I/O.
-  (doseq [class-name ["Charset" "StandardCharsets"]]
-    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
-     class-name "java.nio.charset")
-    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
-     class-name (reflect.TypeOf "")))
-  (doseq [class-name ["Charset" "java.nio.charset.Charset"]]
+  ;; Class.forName is primarily used by portable sources to identify JVM
+  ;; primitive array classes. Return the hosted Go type for byte[].
+  (doseq [class-name ["Class" "java.lang.Class"]]
     (github.com:glojurelang:glojure:pkg:pkgmap.Set
      (str class-name ".forName")
-     (fn [name] name)))
-  (doseq [class-name ["StandardCharsets"
-                      "java.nio.charset.StandardCharsets"]
-          [field value] [["UTF_8" "UTF-8"]
-                         ["US_ASCII" "US-ASCII"]
-                         ["ISO_8859_1" "ISO-8859-1"]]]
+     (fn [name]
+       (case name
+         "[B" (reflect.TypeOf (go/make (go/slice-of go/byte) 0))
+         (throw (errors.New (str "Class.forName: unsupported class " name)))))))
+  ;; Locale arguments only select Unicode case conversion behavior for the
+  ;; portable libraries Gobb currently hosts. Glojure's string bridge already
+  ;; performs that conversion and deliberately ignores extra arguments.
+  (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+   "Locale" "java.util")
+  (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+   "Locale" (reflect.TypeOf ""))
+  (doseq [class-name ["Locale" "java.util.Locale"]]
     (github.com:glojurelang:glojure:pkg:pkgmap.Set
-     (str class-name "." field)
-     value))
+     (str class-name ".US") (fn [] "en-US"))
+    (github.com:glojurelang:glojure:pkg:pkgmap.Set
+     (str class-name ".getDefault") (fn [] "en-US"))
+    (github.com:glojurelang:glojure:pkg:pkgmap.Set
+     (str class-name ".forLanguageTag") (fn [tag] tag))
+    (github.com:glojurelang:glojure:pkg:pkgmap.Set
+     (str class-name ".setDefault") (fn [_] nil)))
   ;; Aero only needs the line-numbering reader's pushback behavior on its
   ;; successful parse path. Reuse Glojure's Java-compatible PushbackReader;
   ;; its missing getLineNumber method is relevant only while formatting a
@@ -105,7 +175,37 @@
     (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
      "EOFException" class)
     (github.com:glojurelang:glojure:pkg:lang.RegisterHostConstructor
-     java-name (fn [message] (errors.New message)))))
+     java-name (fn [message] (errors.New message))))
+  (let [java-name "java.io.IOException"
+        class (github.com:glojurelang:glojure:pkg:lang.NewClass
+               (reflect.TypeOf (errors.New "")) java-name)]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     "IOException" "java.io")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     "IOException" class)
+    (github.com:glojurelang:glojure:pkg:lang.RegisterHostConstructor
+     java-name (fn [message] (errors.New message))))
+  ;; Portable retry libraries use this class in catch clauses even when no
+  ;; interruption is raised. Give the imported JVM name a distinct hosted
+  ;; error class so those clauses compile without broadening ordinary catches.
+  (let [java-name "java.lang.InterruptedException"
+        class (github.com:glojurelang:glojure:pkg:lang.NewClass
+               (reflect.TypeOf (errors.New "")) java-name)]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     "InterruptedException" "java.lang")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     "InterruptedException" class)
+    (github.com:glojurelang:glojure:pkg:lang.RegisterHostConstructor
+     java-name (fn [message] (errors.New message))))
+  (let [java-name "java.text.ParseException"
+        class (github.com:glojurelang:glojure:pkg:lang.NewClass
+               (reflect.TypeOf (errors.New "")) java-name)]
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClassPackage
+     "ParseException" "java.text")
+    (github.com:glojurelang:glojure:pkg:pkgmap.SetHostClass
+     "ParseException" class)
+    (github.com:glojurelang:glojure:pkg:lang.RegisterHostConstructor
+     java-name (fn [message & _] (errors.New message)))))
 
 (defn spit* [file content & options]
   ;; Glojure's clojure.core/spit currently targets the unimplemented
@@ -155,13 +255,17 @@
          [value error] (.ReadOne reader)]
      (cond
        (nil? error) value
-       (and (errors.Is error io.EOF) (not eof-error?)) eof-value
+       (and (or (errors.Is error io.EOF)
+                (errors.Is error github.com:glojurelang:glojure:pkg:reader.ErrEOF))
+            (not eof-error?)) eof-value
        :else (throw error))))
   ([options stream]
-   (read* stream
-          (not (contains? options :eof))
-          (:eof options)
-          false)))
+   (binding [*data-readers* (merge *data-readers* (:readers options))
+             *default-data-reader-fn* (:default options)]
+     (read* stream
+            (not (contains? options :eof))
+            (:eof options)
+            false))))
 
 (defn take*
   ;; Clojure treats positive infinity as an unbounded take. The generated
@@ -237,6 +341,33 @@
   (let [method-table (methods multifn)]
     (or (get method-table dispatch-value)
         (get method-table :default))))
+
+(defn assoc*
+  ([collection key value]
+   ;; Glojure's map node identity check currently compares function-wrapper
+   ;; structs directly when replacing a function value. Remove that entry
+   ;; first so ordinary persistent-map association remains safe.
+   (@core-assoc
+    (if (and (map? collection)
+             (contains? collection key)
+             (fn? value))
+      (dissoc collection key)
+      collection)
+    key value))
+  ([collection key value & key-values]
+   (loop [result (assoc* collection key value)
+          entries key-values]
+     (if (seq entries)
+       (recur (assoc* result (first entries) (second entries))
+              (nnext entries))
+       result))))
+
+(defn name* [value]
+  ;; The hosted keyword reader represents :/ with empty name/namespace
+  ;; components. Preserve Clojure's public name contract for this operator.
+  (if (= :/ value)
+    "/"
+    (@core-name value)))
 
 (defn load* [& paths]
   ;; Glojure's AOT-compiled clojure.core/load currently specializes *ns* to
@@ -328,6 +459,10 @@
   (when-not (ns-resolve 'clojure.core '*clojure-version*)
     (intern 'clojure.core '*clojure-version*
             {:major 1 :minor 12 :incremental 4 :qualifier nil}))
+  (when-not (ns-resolve 'clojure.core 'default-data-readers)
+    (intern 'clojure.core 'default-data-readers
+            {'inst github.com:glojurelang:glojure:pkg:javacompat:date.ParseInstantDate
+             'uuid github.com:glojurelang:glojure:pkg:javacompat:uuid.FromString}))
   (when-not (ns-resolve 'clojure.core 'satisfies?)
     (intern 'clojure.core 'satisfies? satisfies?*))
   (alter-var-root #'clojure.core/get-method (constantly get-method*))
@@ -341,11 +476,15 @@
   (alter-var-root #'clojure.core/read (constantly read*))
   (alter-var-root #'clojure.core/reduce-kv (constantly reduce-kv*))
   (alter-var-root #'clojure.core/rseq (constantly rseq*))
+  (reset! core-assoc @#'clojure.core/assoc)
+  (alter-var-root #'clojure.core/assoc (constantly assoc*))
   (reset! core-destructure @#'clojure.core/destructure)
   (alter-var-root #'clojure.core/destructure (constantly destructure*))
   (alter-var-root #'clojure.core/let (constantly let-macro*))
   (reset! core-fn-macro @#'clojure.core/fn)
   (alter-var-root #'clojure.core/fn (constantly fn-macro*))
+  (reset! core-name @#'clojure.core/name)
+  (alter-var-root #'clojure.core/name (constantly name*))
   (reset! core-remove-ns @#'clojure.core/remove-ns)
   (alter-var-root #'clojure.core/remove-ns (constantly remove-ns*))
   (reset! core-load @#'clojure.core/load)
