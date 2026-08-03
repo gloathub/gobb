@@ -15,31 +15,138 @@
 (def core-load (atom nil))
 (def core-assoc (atom nil))
 (def core-destructure (atom nil))
+(def core-extend (atom nil))
 (def core-fn-macro (atom nil))
+(def core-format (atom nil))
 (def core-name (atom nil))
 (def core-remove-ns (atom nil))
+(def core-re-find (atom nil))
 (def core-string-replace (atom nil))
+(def core-string-split (atom nil))
 (def initialized? (atom false))
 
 (defmacro gen-class* [& _]
   nil)
 
+(defn define-interface! [interface-name]
+  ;; Go cannot manufacture a reflect.Type for a new interface at runtime.
+  ;; Keep the JVM name resolvable for type hints and host-form analysis; code
+  ;; that actually implements the interface is handled by Gobb's reify/proxy
+  ;; compatibility paths.
+  (let [qualified-name (str (ns-name *ns*) "." interface-name)
+        interface-type (reflect.TypeOf (fn [] nil))]
+    (.Import *ns* qualified-name interface-type)
+    nil))
+
+(defmacro definterface* [interface-name & _signatures]
+  (define-interface! interface-name)
+  nil)
+
 (defmacro reify* [interface & methods]
-  (if (and (contains? #{'FilenameFilter 'java.io.FilenameFilter} interface)
-           (= 1 (count methods))
-           (= 'accept (first (first methods))))
+  (cond
+    (and (contains? #{'FilenameFilter 'java.io.FilenameFilter} interface)
+         (= 1 (count methods))
+         (= 'accept (first (first methods))))
     (let [[_ arguments & body] (first methods)]
       (cons 'fn (cons (vec (rest arguments)) body)))
+
+    (and (= 'StringSeparator interface)
+         (= 1 (count methods))
+         (= 'split (first (first methods))))
+    (let [[_ arguments & body] (first methods)
+          implementation (gensym "implementation")
+          instance (gensym "instance")]
+      `(let [~implementation (fn ~(vec (rest arguments)) ~@body)
+             ~instance (atom ~implementation)]
+         (extend (type ~instance)
+                 ~interface
+                 {:split (fn [this# value#]
+                           ((deref this#) value#))})
+         ~instance))
+
+    :else
     (throw
      (ex-info
       (str "Gobb does not yet support reify for " interface)
       {:gobb/reify interface}))))
 
 (defn string-replace* [s match replacement]
-  (if (github.com:glojurelang:glojure:pkg:javacompat:regex.IsPattern match)
-    (github.com:glojurelang:glojure:pkg:javacompat:regex.ReplaceAll
-     match s replacement)
-    (@core-string-replace s match replacement)))
+  (let [[_ java-pattern?]
+        (github.com:glojurelang:glojure:pkg:lang.FieldOrMethod
+         match "Matcher")]
+    (if java-pattern?
+      (.ReplaceAll (.Matcher match s) replacement)
+      (@core-string-replace s match replacement))))
+
+(defn format* [pattern & arguments]
+  ;; Clojure's Formatter accepts every value for %s and renders it through
+  ;; String.valueOf. Go's fmt reserves %s for strings, so use its generic %v
+  ;; rendering for the unadorned conversion that portable libraries use.
+  (apply fmt.Sprintf (strings.ReplaceAll pattern "%s" "%v") arguments))
+
+(defn extend* [atype & protocol-method-maps]
+  ;; Imported JVM compatibility classes are lang.Class wrappers, while
+  ;; protocol multimethods dispatch on the wrapped Go reflect.Type.
+  (let [[host-type found?]
+        (if (nil? atype)
+          [nil false]
+          (github.com:glojurelang:glojure:pkg:lang.FieldOrMethod atype "Type"))]
+    (apply @core-extend
+           (if found? host-type atype)
+           protocol-method-maps)))
+
+(defn trim-split-tail [source parts]
+  (loop [result (vec parts)]
+    (if (and (seq result)
+             (empty? (peek result))
+             (or (seq source) (< 1 (count result))))
+      (recur (pop result))
+      result)))
+
+(defn string-split*
+  ([source pattern]
+   (trim-split-tail source (.Split pattern source -1)))
+  ([source pattern limit]
+   (let [parts (.Split pattern source (if (zero? limit) -1 limit))]
+     (if (zero? limit)
+       (trim-split-tail source parts)
+       (vec parts)))))
+
+(defn re-find*
+  ([matcher]
+   (when (.Find matcher)
+     (re-groups matcher)))
+  ([pattern source]
+   (@core-re-find pattern source)))
+
+(defn rewrite-known-java-regex-source [source]
+  ;; RE2 has no zero-width lookahead. Clojure pprint uses one lookahead only
+  ;; to recognize an omitted format parameter before a comma. Consume the
+  ;; comma in the hosted regex and restore the original token/remainder and
+  ;; offset semantics in that parser's adjacent bindings.
+  (let [source (if (strings.Contains source "(defprotocol Spec")
+                 (strings.ReplaceAll
+                  source
+                  "(instance? clojure.spec.alpha.Spec x)"
+                  "(satisfies? Spec x)")
+                 source)]
+    (if (strings.Contains source "(?=,)")
+    (-> source
+        (strings.ReplaceAll "(?=,)" ",")
+        (strings.ReplaceAll
+         "token-str (first (re-groups m))"
+         (str "raw-token-str (first (re-groups m))\n"
+              "            token-str (if (= \",\" raw-token-str)"
+              " \"\" raw-token-str)"))
+        (strings.ReplaceAll
+         (str "remainder (subs s (.end m))\n"
+              "            new-offset (+ offset (.end m))")
+         (str "remaining (subs s (.end m))\n"
+              "            remainder (if (= \",\" raw-token-str)"
+              " (str \",\" remaining) remaining)\n"
+              "            new-offset (if (= \",\" raw-token-str)"
+              " offset (+ offset (.end m)))")))
+      source)))
 
 (defn load-clojure-test! []
   ;; Referencing Glojure's precompiled stdlib package links its namespace
@@ -63,10 +170,20 @@
                     (find-ns (symbol package-name)))
         source-var (when source-ns
                      (ns-resolve source-ns (symbol class-name)))
-        value (cond
-                found? host-value
-                class-found? host-class
-                source-var @source-var)]
+        raw-value (cond
+                    found? host-value
+                    class-found? host-class
+                    source-var @source-var)
+        value (if (and raw-value
+                       (contains? #{"clojure.lang.Keyword"
+                                    "clojure.lang.Symbol"
+                                    "java.util.regex.Pattern"}
+                                  qualified-name))
+                (let [[host-type type-found?]
+                      (github.com:glojurelang:glojure:pkg:lang.FieldOrMethod
+                       raw-value "Type")]
+                  (if type-found? host-type raw-value))
+                raw-value)]
     (when value
       (.Import *ns* qualified-name value))))
 
@@ -145,6 +262,34 @@
    (fn [xform iter]
      (seq (transduce xform conj [] iter))))
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "clojure.lang.TransformerIterator.createMulti"
+   (fn [xform iters]
+     (let [rf (xform (fn
+                       ([] [])
+                       ([result] result)
+                       ([result input] (conj result input))))
+           result (reduce
+                   (fn [acc inputs]
+                     (let [next (apply rf acc inputs)]
+                       (if (reduced? next)
+                         (reduced @next)
+                         next)))
+                   []
+                   (apply map vector iters))]
+       (seq (rf result)))))
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "clojure.lang.Compiler.specials"
+   (zipmap '[deftype* new quote & var set! monitor-enter recur . case*
+             clojure.core/import* reify* do fn* throw monitor-exit letfn*
+             finally let* loop* try catch if def]
+           (repeat true)))
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "java.lang.ProcessBuilder$Redirect.DISCARD"
+   :discard)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
+   "java.security.MessageDigest.getInstance"
+   github.com:glojurelang:glojure:pkg:javacompat:messagedigest.GetInstance)
+  (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "strings.Builder"
    strings.Builder)
   ;; Class.forName is primarily used by portable sources to identify JVM
@@ -154,7 +299,7 @@
      (str class-name ".forName")
      (fn [name]
        (case name
-         "[B" (reflect.TypeOf (go/make (go/slice-of go/byte) 0))
+         "[B" (reflect.TypeOf (go/make (go/slice-of go/int8) 0))
          (throw (errors.New (str "Class.forName: unsupported class " name)))))))
   ;; Locale arguments only select Unicode case conversion behavior for the
   ;; portable libraries Gobb currently hosts. Glojure's string bridge already
@@ -476,6 +621,9 @@
   ;; Glojure's default :glj feature and opt this embedding into :clj and :bb.
   (github.com:glojurelang:glojure:pkg:reader.EnableFeature "clj")
   (github.com:glojurelang:glojure:pkg:reader.EnableFeature "bb")
+  (github.com:glojurelang:glojure:pkg:runtime.SetSourceTransformer
+   (fn [_filename source]
+     (rewrite-known-java-regex-source source)))
   (register-runtime-host-forms!)
   ;; Runtime-loaded portable libraries inspect this standard Clojure var when
   ;; selecting reader and compatibility behavior. Glojure does not currently
@@ -483,6 +631,8 @@
   (when-not (ns-resolve 'clojure.core '*clojure-version*)
     (intern 'clojure.core '*clojure-version*
             {:major 1 :minor 12 :incremental 4 :qualifier nil}))
+  (when-not (ns-resolve 'clojure.core 'clojure-version)
+    (intern 'clojure.core 'clojure-version (fn [] "1.12.4")))
   (when-not (ns-resolve 'clojure.core 'default-data-readers)
     (intern 'clojure.core 'default-data-readers
             {'inst github.com:glojurelang:glojure:pkg:javacompat:date.ParseInstantDate
@@ -490,6 +640,8 @@
   (when-not (ns-resolve 'clojure.core 'satisfies?)
     (intern 'clojure.core 'satisfies? satisfies?*))
   (alter-var-root #'clojure.core/get-method (constantly get-method*))
+  (reset! core-extend @#'clojure.core/extend)
+  (alter-var-root #'clojure.core/extend (constantly extend*))
   ;; Glojure initializes *in* and *out* at bootstrap, but its generated
   ;; clojure.core currently leaves *err* nil. Own all three roots here so the
   ;; Gobb execution host has one explicit standard-stream contract.
@@ -520,12 +672,23 @@
   (alter-var-root #'clojure.core/import (constantly @#'runtime-import))
   (alter-var-root #'clojure.core/gen-class (constantly @#'gen-class*))
   (alter-meta! #'clojure.core/gen-class assoc :macro true)
+  (let [definterface-var
+        (intern 'clojure.core 'definterface @#'definterface*)]
+    (alter-meta! definterface-var assoc :macro true))
   (let [reify-var (intern 'clojure.core 'reify @#'reify*)]
     (alter-meta! reify-var assoc :macro true))
   (require 'clojure.string)
+
+  (reset! core-format @#'clojure.core/format)
+  (alter-var-root #'clojure.core/format (constantly format*))
+  (reset! core-re-find @#'clojure.core/re-find)
+  (alter-var-root #'clojure.core/re-find (constantly re-find*))
   (reset! core-string-replace (var-get (ns-resolve 'clojure.string 'replace)))
   (alter-var-root (ns-resolve 'clojure.string 'replace)
                   (constantly string-replace*))
+  (reset! core-string-split (var-get (ns-resolve 'clojure.string 'split)))
+  (alter-var-root (ns-resolve 'clojure.string 'split)
+                  (constantly string-split*))
   (load-clojure-test!)
   ;; Runtime codegen can classify a fully-qualified protocol Var as a late
   ;; host form before its namespace alias table is complete.
@@ -984,7 +1147,8 @@
   (reset! current-source file)
   (let [source (-> source
                    rewrite-reader-features
-                   rewrite-tagged-literals)
+                   rewrite-tagged-literals
+                   rewrite-known-java-regex-source)
         read-and-evaluate
         (fn []
           ;; Read all top-level forms as data, then evaluate them one at a

@@ -215,7 +215,9 @@
                              (filter (comp :mvn/version val))
                              (:deps config-value))
                        (assoc 'org.clojure/test.check
-                              {:mvn/version "1.1.1"}))]
+                              {:mvn/version "1.1.1"}
+                              'org.clojure/spec.alpha
+                              {:mvn/version "0.3.218"}))]
     (doseq [directory [config-dir log-dir]] (fs/create-dirs directory))
     (let [results
           (mapv
@@ -269,9 +271,31 @@
      com.github.askonomm/clarktown
      com.potetm/fusebox
      io.github.swirrl/dogstatsd
+     henryw374/cljc.java-time
      org.clojars.askonomm/ruuter
      org.clojars.lispyclouds/contajners
+     org.clojure/tools.namespace
      testdoc/testdoc})
+
+;; A handful of upstream namespace entries are assigned to an aggregate
+;; library whose own coordinate does not carry every source dependency used by
+;; that namespace. The artifacts are already resolved from Babashka's pinned
+;; lib-tests graph; add only the missing roots to the affected isolated cases.
+(def supplemental-maven-libraries
+  {"ol.sfv.conformance-test" ['mvxcvi/alphabase]
+   "loom.test.alg" ['org.clojure/data.priority-map]
+   "loom.test.derived" ['org.clojure/data.priority-map]
+   "loom.test.flow" ['org.clojure/data.priority-map]
+   "cloverage.args-test" ['org.clojure/tools.cli]
+   "cloverage.dependency-test" ['org.clojure/tools.namespace]
+   "cloverage.report.console-test" ['org.clojure/tools.namespace]
+   "cloverage.source-test" ['org.clojure/tools.namespace]
+   "cli-matic.core-test" ['expound/expound]
+   "cli-matic.utils-convert-config-test" ['expound/expound]
+   "cli-matic.utils-test" ['expound/expound]
+   "cli-matic.presets-test" ['henryw374/cljc.java-time]
+   "nextjournal.markdown-test" ['nubank/matcher-combinators]
+   "clojure.data.zip-test" ['org.clojure/data.xml]})
 
 (defn submodule-revision [root url]
   (let [directory-name (-> url
@@ -406,7 +430,9 @@
         corpus (lib-test-corpus root)
         selected (if (seq filters) (vec filters) (:namespaces corpus))
         selected-libraries
-        (set (keep (:namespace-libraries corpus) selected))
+        (set (concat (keep (:namespace-libraries corpus) selected)
+                     (mapcat #(get supplemental-maven-libraries % [])
+                             selected)))
         unknown (remove (set (:namespaces corpus)) selected)
         work (fs/path cache "lib_tests" "work")
         home (fs/path cache "lib_tests" "home")
@@ -454,7 +480,12 @@
                       :corpus corpus
                       :grenadine grenadine :cache cache
                       :selected-libraries selected-libraries})
-          platform-paths (get maven-paths 'org.clojure/test.check [])
+          ;; Babashka ships test.check and spec as built-ins. Make their
+          ;; extracted source roots globally available so isolated namespaces
+          ;; see the same baseline without having to declare either library.
+          platform-paths (concat
+                          (get maven-paths 'org.clojure/test.check [])
+                          (get maven-paths 'org.clojure/spec.alpha []))
           classpath-for
           (fn [namespace]
             (let [library (get (:namespace-libraries corpus) namespace)]
@@ -463,7 +494,13 @@
                          (concat [(str (fs/absolutize work))]
                                  paths platform-paths
                                  (get git-paths library [])
-                                 (get maven-paths library []))))))
+                                 (get maven-paths library [])
+                                 (mapcat #(get git-paths % [])
+                                         (get supplemental-maven-libraries
+                                              namespace []))
+                                 (mapcat #(get maven-paths % [])
+                                         (get supplemental-maven-libraries
+                                              namespace [])))))))
           prepared-runner (prepare-lib-runner! runner suite-dir)
           command-prefix
           (fn [namespace]
@@ -475,7 +512,13 @@
           (fn [namespace]
             (let [library (get (:namespace-libraries corpus) namespace)]
               (concat (get git-paths library [])
-                      (get maven-paths library []))))
+                      (get maven-paths library [])
+                      (mapcat #(get git-paths % [])
+                              (get supplemental-maven-libraries
+                                   namespace []))
+                      (mapcat #(get maven-paths % [])
+                              (get supplemental-maven-libraries
+                                   namespace [])))))
           environment {"HOME" (str home)
                        "GOBB_CACHE" (str (fs/path cache "gobb-cache"))
                        "BABASHKA_TEST_ENV" "native"

@@ -3,14 +3,14 @@
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
  :corpus {:libraries 111, :namespaces 261},
- :summary {:test 488, :pass 3316, :fail 31, :error 18},
+ :summary {:test 3600, :pass 6669, :fail 152, :error 297},
  :runner-adaptations
  [:omit-spec-instrumentation-reset
   :normalize-keyword-destructuring
   :grenadine-per-root-dependency-installation
   :isolated-maven-classpaths
   :load-only-namespaces-pass],
- :case-summary {:total 261, :pass 80, :fail 5, :blocked 176},
+ :case-summary {:total 261, :pass 91, :fail 13, :blocked 157},
  :status :fail,
  :suite :lib-tests,
  :selection :all,
@@ -42,9 +42,10 @@
    :diagnostic nil}
   {:namespace "babashka.process-test",
    :status :blocked,
-   :exit 1,
+   :exit 2,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 2: actual: \"unable to resolve symbol: github.com:glojurelang:glojure:pkg:lang.NewIllegalArgumentError/n/nGLJ Stack:/n%!s(<nil>):%!d(<nil>):%!d(<nil>):/tgithub.com:glojurelang:glojure:pkg:lang.NewIllegalArgumentError/n\""}
   {:namespace "babashka.statecharts-test",
    :status :blocked,
    :exit 1,
@@ -56,7 +57,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "bond.assertions-test",
    :status :pass,
    :exit 0,
@@ -79,23 +80,20 @@
    :summary {:test 1, :pass 0, :fail 0, :error 1},
    :diagnostic nil}
   {:namespace "camel-snake-kebab.core-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 130, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "camel-snake-kebab.extras-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 6, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "camel-snake-kebab.internals.string-separator-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 22, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "cheshire.test.core",
    :status :blocked,
    :exit 1,
@@ -161,7 +159,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /expound/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cli-matic.help-gen-test",
    :status :blocked,
    :exit 1,
@@ -173,7 +171,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /cljc/java_time/zone_id: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cli-matic.utils-candidates-test",
    :status :pass,
    :exit 0,
@@ -184,13 +182,13 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /expound/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cli-matic.utils-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /expound/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cli-matic.utils-v2-test",
    :status :blocked,
    :exit 1,
@@ -198,11 +196,10 @@
    :diagnostic
    "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clj-commons.digest-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 9, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clj-http.lite.client-test",
    :status :blocked,
    :exit 1,
@@ -236,7 +233,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /cljs/java_time/interop: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clojure-csv.test.core",
    :status :pass,
    :exit 0,
@@ -248,11 +245,10 @@
    :summary {:test 5, :pass 30, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.algo.test-monads",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/specials"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 11, :pass 28, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clojure.core.cache-test",
    :status :blocked,
    :exit 1,
@@ -271,42 +267,40 @@
    :summary {:test 4, :pass 26, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.data.generators-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: java.util.Random"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 3, :pass 100, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clojure.data.json-compat-0-1-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :summary {:test 39, :pass 32, :fail 0, :error 24},
+   :diagnostic nil}
   {:namespace "clojure.data.json-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :summary {:test 66, :pass 51, :fail 0, :error 49},
+   :diagnostic nil}
   {:namespace "clojure.data.json-test-suite-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 128, :pass 128, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "clojure.data.zip-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/data/xml: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: QName"}
   {:namespace "clojure.math.test-combinatorics",
    :status :pass,
    :exit 0,
    :summary {:test 18, :pass 999, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.math.test-numeric-tower",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: java.math.BigInteger"}
+   :summary {:test 9, :pass 82, :fail 0, :error 12},
+   :diagnostic nil}
   {:namespace "clojure.term.colors-test",
    :status :pass,
    :exit 0,
@@ -317,13 +311,13 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clojure.test-clojure.spec",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clojure.tools.gitlibs.test-impl",
    :status :pass,
    :exit 0,
@@ -366,30 +360,29 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/tools/cli: not found in load path"}
+   "exit 1: failed to load /clojure/java/classpath: not found in load path"}
   {:namespace "cloverage.dependency-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/tools/namespace/dependency: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cloverage.instrument-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/namespace/file: not found in load path"}
   {:namespace "cloverage.report.console-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/tools/namespace/file: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "cloverage.source-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /clojure/tools/namespace/file: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "cognitect.test-runner-test",
    :status :blocked,
    :exit 1,
@@ -513,7 +506,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cprop.smoke-test",
    :status :pass,
    :exit 0,
@@ -581,7 +575,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "environ.core-test",
    :status :pass,
    :exit 0,
@@ -592,7 +586,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "exoscale.interceptor-test",
    :status :blocked,
    :exit 1,
@@ -604,7 +598,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "expectations.clojure.test-test",
    :status :blocked,
    :exit 1,
@@ -616,31 +610,31 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "expound.problems-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "expound.spec-gen",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "expound.specs-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "expound.test-utils",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "failjure.test-core",
    :status :blocked,
    :exit 1,
@@ -653,16 +647,16 @@
    :summary {:test 7, :pass 39, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "hasch.test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: MessageDigest"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 7, :pass 26, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "hato.client-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "helins.binf.test",
    :status :blocked,
    :exit 1,
@@ -773,9 +767,9 @@
    :summary {:test 0, :pass 0, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "io.aviso.binary-test",
-   :status :pass,
-   :exit 0,
-   :summary {:test 4, :pass 9, :fail 0, :error 0},
+   :status :fail,
+   :exit 1,
+   :summary {:test 4, :pass 7, :fail 0, :error 2},
    :diagnostic nil}
   {:namespace "jasentaa.collections-test",
    :status :pass,
@@ -840,54 +834,50 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/data/priority_map: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "loom.test.alg-generic",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "loom.test.attr",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 11, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "loom.test.compliance-tester",
-   :status :blocked,
+   :status :pass,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "loom.test.derived",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/data/priority_map: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "loom.test.flow",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/data/priority_map: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "loom.test.graph",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "loom.test.label",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 8, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "loom.test.network-simplex",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
+   :summary {:test 10, :pass 15, :fail 5, :error 0},
+   :diagnostic nil}
   {:namespace "malli.clj-kondo-test",
    :status :blocked,
    :exit 1,
@@ -985,47 +975,49 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "meander.defsyntax-test.gh-145",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "meander.epsilon-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "meander.interpreter.epsilon-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: ClassNotFoundException"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "meander.match.check.epsilon-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "meander.match.epsilon-test",
-   :status :blocked,
+   :status :pass,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :summary {:test 0, :pass 0, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "meander.match.ir.epsilon-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "meander.matrix.epsilon-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "meander.strategy.epsilon-test",
    :status :blocked,
    :exit 1,
@@ -1040,7 +1032,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "medley.core-test",
    :status :pass,
    :exit 0,
@@ -1075,12 +1068,12 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.BigInt"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "msgpack.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: clojure.lang.BigInt"}
+   :summary {:test 10, :pass 2, :fail 0, :error 188},
+   :diagnostic nil}
   {:namespace "multigrep.core-test",
    :status :pass,
    :exit 0,
@@ -1097,7 +1090,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /matcher_combinators/ansi_color: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "nextjournal.markdown.multi-threading-test",
    :status :blocked,
    :exit 1,
@@ -1108,18 +1101,17 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "ol.sfv.api-test",
    :status :pass,
    :exit 0,
    :summary {:test 10, :pass 64, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "ol.sfv.conformance-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /alphabase/base32: not found in load path"}
+   :summary {:test 2821, :pass 2700, :fail 119, :error 2},
+   :diagnostic nil}
   {:namespace "ol.sfv.error-test",
    :status :pass,
    :exit 0,
@@ -1131,9 +1123,9 @@
    :summary {:test 4, :pass 31, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "ol.sfv.parser-test",
-   :status :pass,
-   :exit 0,
-   :summary {:test 11, :pass 134, :fail 0, :error 0},
+   :status :fail,
+   :exit 1,
+   :summary {:test 11, :pass 133, :fail 0, :error 1},
    :diagnostic nil}
   {:namespace "ol.sfv.serialization-test",
    :status :pass,
@@ -1141,10 +1133,10 @@
    :summary {:test 6, :pass 34, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "omniconf.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :summary {:test 1, :pass 2, :fail 1, :error 1},
+   :diagnostic nil}
   {:namespace "orchestra.core-test",
    :status :blocked,
    :exit 1,
@@ -1174,7 +1166,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
   {:namespace "portal.bench",
    :status :pass,
    :exit 1,
@@ -1201,7 +1194,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.lang.Namespace"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "postmortem.core-test",
    :status :blocked,
    :exit 1,
@@ -1234,19 +1227,19 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "reifyhealth.specmonstah.spec-gen-test",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "reifyhealth.specmonstah.test-data",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /clojure/spec/alpha: not found in load path"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "rewrite-clj.node-test",
    :status :blocked,
    :exit 1,
@@ -1297,27 +1290,32 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
   {:namespace "schema.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
   {:namespace "schema.experimental.abstract-map-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
   {:namespace "schema.macros-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
   {:namespace "schema.test-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: definterface"}
+   :diagnostic
+   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
   {:namespace "schema.utils-test",
    :status :blocked,
    :exit 1,
@@ -1364,11 +1362,11 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "table.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 26, :pass 22, :fail 4, :error 0},
+   :status :pass,
+   :exit 0,
+   :summary {:test 26, :pass 26, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "table.width-test",
    :status :pass,
