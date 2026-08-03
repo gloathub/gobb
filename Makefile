@@ -12,6 +12,11 @@ BABASHKA-VERSION ?= 1.12.218
 
 GLOAT-DIR ?= $(or $(GLOAT_DIR),$(LOCAL-CACHE)/gloat-$(GLOAT-VERSION))
 
+# Prefer an adjacent Glojure checkout during compatibility development. Gloat
+# falls back to its pinned release when Gobb is cloned without that sibling.
+GLOJURE_DIR ?= $(if $(wildcard $(TOP)/../glojure/go.mod),$(abspath $(TOP)/../glojure))
+export GLOJURE_DIR
+
 include $M/babashka.mk
 include $M/gloat.mk
 include $M/gh.mk
