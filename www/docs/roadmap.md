@@ -16,7 +16,7 @@ description: Current Gobb implementation progress and upcoming milestones
   </div>
   <div>
     <p class="summary-label">Last updated</p>
-    <p class="summary-value">August 1, 2026</p>
+    <p class="summary-value">August 3, 2026</p>
   </div>
 </div>
 
@@ -52,9 +52,19 @@ with explicit compatibility states and milestone assignments.
       <li class="task-done">Second closure checkpoint: 25 pass, 23 fail, and 213 blocked</li>
       <li class="task-done">Third closure checkpoint: 35 pass, 18 fail, and 208 blocked</li>
       <li class="task-done">Fourth closure checkpoint: 50 pass, 23 fail, and 188 blocked</li>
-      <li>Resolve dependency and source-classpath blockers</li>
-      <li>Provide the required Clojure spec and test.check namespaces</li>
-      <li>Close Glojure host-interop and evaluator gaps exposed by runnable tests</li>
+      <li class="task-done">Fifth closure checkpoint: 60 passing namespaces</li>
+      <li class="task-done">Sixth closure checkpoint: 70 passing namespaces</li>
+      <li class="task-done">Seventh closure checkpoint: 80 passing namespaces</li>
+      <li class="task-done">Eighth closure checkpoint: 91 pass, 13 fail, and 157 blocked</li>
+      <li class="task-done">Current verified result: 94 pass, 10 fail, and 157 blocked</li>
+      <li class="task-done">Install 96 of 104 Maven dependency roots independently with Grenadine</li>
+      <li class="task-done">Add signed-byte arrays, numeric-tower rounding, and multi-type JVM marker compatibility</li>
+      <li class="task-done">Load Clojure pprint through hosted Writer proxies and eliminate its runtime errors</li>
+      <li>Finish the two JSON suites, currently at 99/100 and 55/56 assertions</li>
+      <li>Finish Omniconf, currently at 3/4 assertions</li>
+      <li>Implement <code>deftype</code> support for the seven-namespace Schema cluster and other portable libraries</li>
+      <li>Resolve the eight remaining dependency roots, including <code>core.async</code> and <code>core.rrb-vector</code></li>
+      <li>Continue closing Glojure host-interop and evaluator gaps exposed by runnable tests</li>
       <li>Turn runnable failures into passing differential results</li>
       <li>Document waivers only for genuinely non-portable behavior</li>
       <li>Pass every applicable library-test namespace</li>
