@@ -13,7 +13,7 @@ Status: **FAIL**
 
 | Libraries | Test namespaces | Cases run | Cases passed | Cases failed | Cases blocked | Tests | Assertions passed | Failures | Errors |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 111 | 261 | 261 | 91 | 13 | 157 | 3600 | 6669 | 152 | 297 |
+| 111 | 261 | 261 | 94 | 10 | 157 | 3601 | 6752 | 153 | 214 |
 
 Run the complete suite with:
 
@@ -65,7 +65,7 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `cli-matic.utils-convert-config-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `cli-matic.utils-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `cli-matic.utils-v2-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `clj-commons.digest-test` | pass | 1 | 9 | 0 | 0 |  |
+| `clj-commons.digest-test` | fail | 1 | 3 | 0 | 6 |  |
 | `clj-http.lite.client-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clj-http.lite.test-runner` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clj-stacktrace.core-test` | pass | 3 | 19 | 0 | 0 |  |
@@ -79,18 +79,18 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `clojure.core.cache.wrapped-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clojure.data.csv-test` | pass | 4 | 26 | 0 | 0 |  |
 | `clojure.data.generators-test` | pass | 3 | 100 | 0 | 0 |  |
-| `clojure.data.json-compat-0-1-test` | fail | 39 | 32 | 0 | 24 |  |
-| `clojure.data.json-test` | fail | 66 | 51 | 0 | 49 |  |
+| `clojure.data.json-compat-0-1-test` | fail | 39 | 55 | 1 | 0 |  |
+| `clojure.data.json-test` | fail | 66 | 99 | 1 | 0 |  |
 | `clojure.data.json-test-suite-test` | pass | 128 | 128 | 0 | 0 |  |
 | `clojure.data.zip-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: QName |
 | `clojure.math.test-combinatorics` | pass | 18 | 999 | 0 | 0 |  |
-| `clojure.math.test-numeric-tower` | fail | 9 | 82 | 0 | 12 |  |
+| `clojure.math.test-numeric-tower` | pass | 10 | 95 | 0 | 0 |  |
 | `clojure.term.colors-test` | pass | 1 | 0 | 0 | 0 |  |
 | `clojure.test-clojure.instr` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clojure.test-clojure.spec` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `clojure.tools.gitlibs.test-impl` | pass | 1 | 16 | 0 | 0 |  |
 | `clojure.tools.namespace.dependency-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `clojure.tools.namespace.find-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.net.URLClassLoader |
+| `clojure.tools.namespace.find-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `clojure.tools.namespace.move-test` | pass | 1 | 6 | 0 | 0 |  |
 | `clojure.tools.namespace.parse-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `clojure.tools.namespace.test-helpers` | pass | 0 | 0 | 0 | 0 |  |
@@ -100,7 +100,7 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `cloverage.instrument-test` | blocked | — | — | — | — | exit 1: failed to load /clojure/tools/namespace/file: not found in load path |
 | `cloverage.report.console-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `cloverage.source-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
-| `cognitect.test-runner-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: java.net.URLClassLoader |
+| `cognitect.test-runner-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `cognitect.test-runner.sample-property-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `cognitect.test-runner.samples-test` | pass | 2 | 3 | 0 | 0 |  |
 | `com.potetm.fusebox.bulwark-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
@@ -170,7 +170,7 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `integrant.test.baz` | pass | 0 | 0 | 0 | 0 |  |
 | `integrant.test.foo` | pass | 0 | 0 | 0 | 0 |  |
 | `integrant.test.quz` | pass | 0 | 0 | 0 | 0 |  |
-| `io.aviso.binary-test` | fail | 4 | 7 | 0 | 2 |  |
+| `io.aviso.binary-test` | pass | 4 | 9 | 0 | 0 |  |
 | `jasentaa.collections-test` | pass | 3 | 13 | 0 | 0 |  |
 | `jasentaa.parser.basic-test` | pass | 4 | 15 | 0 | 0 |  |
 | `jasentaa.parser.combinators-test` | pass | 3 | 11 | 0 | 0 |  |
@@ -231,21 +231,21 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `multigrep.core-test` | pass | 2 | 2 | 0 | 0 |  |
 | `net.cgrand.xforms-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `nextjournal.markdown-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
-| `nextjournal.markdown.multi-threading-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: proxy |
+| `nextjournal.markdown.multi-threading-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `odoyle.rules-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `ol.sfv.api-test` | pass | 10 | 64 | 0 | 0 |  |
 | `ol.sfv.conformance-test` | fail | 2821 | 2700 | 119 | 2 |  |
 | `ol.sfv.error-test` | pass | 1 | 136 | 0 | 0 |  |
 | `ol.sfv.example-test` | pass | 4 | 31 | 0 | 0 |  |
-| `ol.sfv.parser-test` | fail | 11 | 133 | 0 | 1 |  |
+| `ol.sfv.parser-test` | pass | 11 | 134 | 0 | 0 |  |
 | `ol.sfv.serialization-test` | pass | 6 | 34 | 0 | 0 |  |
-| `omniconf.core-test` | fail | 1 | 2 | 1 | 1 |  |
+| `omniconf.core-test` | pass | 1 | 4 | 0 | 0 |  |
 | `orchestra.core-test` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.expound-test` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.make-fns` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.many-fns` | blocked | — | — | — | — | exit 1: {} |
 | `orchestra.reload-test` | blocked | — | — | — | — | exit 1: {} |
-| `plumbing.core-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
+| `plumbing.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `portal.bench` | pass | 0 | 0 | 0 | 0 |  |
 | `portal.e2e` | pass | 0 | 0 | 0 | 0 |  |
 | `portal.runtime.cson-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
@@ -267,12 +267,12 @@ make test-lib_tests LIB_TESTS='namespace.one namespace.two'
 | `rewrite-clj.zip.subedit-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `riddley.walk-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: clojure.lang.Compiler |
 | `ruuter.core-test` | pass | 3 | 7 | 0 | 0 |  |
-| `schema.coerce-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
-| `schema.core-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
-| `schema.experimental.abstract-map-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
-| `schema.macros-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
-| `schema.test-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
-| `schema.utils-test` | blocked | — | — | — | — | exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP |
+| `schema.coerce-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `schema.core-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `schema.experimental.abstract-map-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `schema.macros-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `schema.test-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
+| `schema.utils-test` | blocked | — | — | — | — | exit 1: unable to resolve symbol: deftype |
 | `selmer.core-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `selmer.our-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
 | `slingshot.slingshot-test` | blocked | — | — | — | — | exit 1: <unknown-file>:2:1:	(load-file "<CACHE>/lib_tests/run_all_libtests.clj") |
@@ -319,13 +319,13 @@ make test-examples EXAMPLES='which.clj xml-example.clj'
 
 | Example | Scenario | Compile | Result | Note |
 | --- | --- | --- | --- | --- |
-| `cprop.clj` | waived | fail | fail | exit 1: failed to load /babashka/classpath: not found in load path |
-| `db_who.clj` | waived | fail | fail | exit 1: failed to load /clojure/java/shell: not found in load path |
-| `digitalocean-ping.clj` | waived | fail | fail | exit 1: failed to load /clojure/java/shell: not found in load path |
+| `cprop.clj` | waived | fail | fail | exit 1: failed to load /clojure/pprint: not found in load path |
+| `db_who.clj` | waived | fail | fail | exit 1: failed to load /clojure/pprint: not found in load path |
+| `digitalocean-ping.clj` | waived | fail | fail | exit 1: unable to resolve symbol: runtime.GOOS |
 | `download-aliases.clj` | waived | fail | fail | exit 1: <unknown-file>:1:1:	(compile (quote main.core)) |
 | `fzf.clj` | waived | fail | fail | exit 1: unable to resolve symbol: runtime.GOOS |
 | `hsqldb_unused_vars.clj` | waived | fail | fail | exit 1: failed to load /clojure/pprint: not found in load path |
-| `htmx_todoapp.clj` | waived | fail | fail | exit 1: <preloads>: String index out of range |
+| `htmx_todoapp.clj` | waived | fail | fail | exit 1: failed to load /clojure/java/browse: not found in load path |
 | `http-server.clj` | waived | fail | fail | exit 1: failed to load /clojure/java/browse: not found in load path |
 | `http_server_from_scratch.clj` | waived | fail | fail | exit 1: <unknown-file>:1:1:	(compile (quote main.core)) |
 | `httpkit_server.clj` | waived | fail | fail | exit 1: failed to load /clojure/pprint: not found in load path |
@@ -337,7 +337,7 @@ make test-examples EXAMPLES='which.clj xml-example.clj'
 | `mysql_cmdline.clj` | waived | fail | fail | exit 1: EvalASTMaybeHostForm: shell/sh |
 | `normalize-keywords.clj` | waived | fail | fail | exit 1: failed to load /rewrite_clj/node: not found in load path |
 | `notes.clj` | waived | fail | fail | exit 1: failed to load /clojure/pprint: not found in load path |
-| `outdated.clj` | waived | fail | fail | exit 1: failed to load /clojure/java/shell: not found in load path |
+| `outdated.clj` | waived | fail | fail | exit 1: <unknown-file>:1:1:	(compile (quote main.core)) |
 | `pom_version_get.clj` | run | fail | fail | exit 1: failed to load /clojure/data/xml: not found in load path |
 | `pom_version_get_xml_zip.clj` | waived | fail | fail | exit 1: failed to load /babashka/deps: not found in load path |
 | `pom_version_set.clj` | waived | fail | fail | exit 1: failed to load /clojure/data/xml: not found in load path |
@@ -347,7 +347,7 @@ make test-examples EXAMPLES='which.clj xml-example.clj'
 | `random_doc.clj` | waived | fail | fail | exit 1: cannot compile /clojure/repl: filesystem is not writable |
 | `sqlite.clj` | waived | fail | fail | exit 1: bad binding form: :ns |
 | `torrent-viewer.clj` | waived | fail | fail | exit 1: failed to load /bencode/core: not found in load path |
-| `tree.clj` | run | fail | fail | exit 1: <preloads>: String index out of range |
+| `tree.clj` | run | fail | fail | exit 1: failed to load /clojure/tools/cli: not found in load path |
 | `vim.clj` | waived | fail | fail | exit 1: unable to resolve symbol: ProcessBuilder |
 | `whatsapp_frequencies.clj` | waived | fail | fail | exit 1: failed to load /clojure/pprint: not found in load path |
 | `which.clj` | run | fail | fail | exit 1: unsupported value type lang.ArityFn: {<nil> [<ADDR> <ADDR> <ADDR> <nil> <nil> <nil>] map[] 2 {<nil> 2 <ADDR>} 2} |

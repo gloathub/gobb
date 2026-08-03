@@ -3,14 +3,14 @@
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
  :corpus {:libraries 111, :namespaces 261},
- :summary {:test 3600, :pass 6669, :fail 152, :error 297},
+ :summary {:test 3601, :pass 6752, :fail 153, :error 214},
  :runner-adaptations
  [:omit-spec-instrumentation-reset
   :normalize-keyword-destructuring
   :grenadine-per-root-dependency-installation
   :isolated-maven-classpaths
   :load-only-namespaces-pass],
- :case-summary {:total 261, :pass 91, :fail 13, :blocked 157},
+ :case-summary {:total 261, :pass 94, :fail 10, :blocked 157},
  :status :fail,
  :suite :lib-tests,
  :selection :all,
@@ -196,9 +196,9 @@
    :diagnostic
    "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clj-commons.digest-test",
-   :status :pass,
-   :exit 0,
-   :summary {:test 1, :pass 9, :fail 0, :error 0},
+   :status :fail,
+   :exit 1,
+   :summary {:test 1, :pass 3, :fail 0, :error 6},
    :diagnostic nil}
   {:namespace "clj-http.lite.client-test",
    :status :blocked,
@@ -274,12 +274,12 @@
   {:namespace "clojure.data.json-compat-0-1-test",
    :status :fail,
    :exit 1,
-   :summary {:test 39, :pass 32, :fail 0, :error 24},
+   :summary {:test 39, :pass 55, :fail 1, :error 0},
    :diagnostic nil}
   {:namespace "clojure.data.json-test",
    :status :fail,
    :exit 1,
-   :summary {:test 66, :pass 51, :fail 0, :error 49},
+   :summary {:test 66, :pass 99, :fail 1, :error 0},
    :diagnostic nil}
   {:namespace "clojure.data.json-test-suite-test",
    :status :pass,
@@ -297,9 +297,9 @@
    :summary {:test 18, :pass 999, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.math.test-numeric-tower",
-   :status :fail,
-   :exit 1,
-   :summary {:test 9, :pass 82, :fail 0, :error 12},
+   :status :pass,
+   :exit 0,
+   :summary {:test 10, :pass 95, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.term.colors-test",
    :status :pass,
@@ -333,8 +333,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: java.net.URLClassLoader"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "clojure.tools.namespace.move-test",
    :status :pass,
    :exit 0,
@@ -387,8 +386,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: unable to resolve symbol: java.net.URLClassLoader"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "cognitect.test-runner.sample-property-test",
    :status :blocked,
    :exit 1,
@@ -767,9 +765,9 @@
    :summary {:test 0, :pass 0, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "io.aviso.binary-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 4, :pass 7, :fail 0, :error 2},
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 9, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "jasentaa.collections-test",
    :status :pass,
@@ -1095,7 +1093,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: proxy"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "odoyle.rules-test",
    :status :blocked,
    :exit 1,
@@ -1123,9 +1122,9 @@
    :summary {:test 4, :pass 31, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "ol.sfv.parser-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 11, :pass 133, :fail 0, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 11, :pass 134, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "ol.sfv.serialization-test",
    :status :pass,
@@ -1133,9 +1132,9 @@
    :summary {:test 6, :pass 34, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "omniconf.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 1, :pass 2, :fail 1, :error 1},
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 4, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "orchestra.core-test",
    :status :blocked,
@@ -1166,8 +1165,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "portal.bench",
    :status :pass,
    :exit 1,
@@ -1290,38 +1288,32 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "schema.core-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "schema.experimental.abstract-map-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "schema.macros-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "schema.test-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "schema.utils-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: EvalASTMaybeHostForm: clojure.lang.Compiler/CHAR_MAP"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "selmer.core-test",
    :status :blocked,
    :exit 1,

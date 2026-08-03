@@ -70,6 +70,60 @@
       (str "Gobb does not yet support reify for " interface)
       {:gobb/reify interface}))))
 
+(defn proxy-signature-fn [instance-symbol signature]
+  (let [[arguments & body] signature]
+    (list 'fn arguments
+          (list* 'let ['this (list 'deref instance-symbol)] body))))
+
+(defn proxy-method-entry [instance-symbol method]
+  (let [method-name (first method)
+        raw-signatures (rest method)
+        signatures (if (vector? (first raw-signatures))
+                     [(cons (first raw-signatures) (rest raw-signatures))]
+                     raw-signatures)
+        implementation
+        (if (= 1 (count signatures))
+          (proxy-signature-fn instance-symbol (first signatures))
+          (let [arguments (gensym "arguments")
+                cases
+                (mapcat
+                 (fn [signature]
+                   [(count (first signature))
+                    (list 'apply
+                          (proxy-signature-fn instance-symbol signature)
+                          arguments)])
+                 signatures)]
+            (list 'fn ['& arguments]
+                  (list* 'case (list 'count arguments)
+                         (concat
+                          cases
+                          [(list 'throw
+                                 (list 'ex-info
+                                       (str method-name ": unsupported arity")
+                                       {:gobb/proxy-method method-name}))])))))]
+    [(keyword method-name) implementation]))
+
+(defmacro proxy* [classes _constructor-arguments & methods]
+  ;; Hosted Writer proxies cover Clojure pprint's column, pretty, and case
+  ;; conversion writers. Method bodies remain ordinary Clojure closures while
+  ;; a Go value supplies Writer/IDeref host interfaces.
+  (if (some #(strings.HasSuffix (str %) "Writer") classes)
+    (let [instance (gensym "instance")
+          result (gensym "result")
+          method-map (into {} (map (partial proxy-method-entry instance) methods))]
+      (list 'let
+            [instance (list 'atom nil)
+             result
+             (list
+              'github.com:glojurelang:glojure:pkg:javacompat:streams.NewDynamicWriterProxy
+              method-map)]
+            (list 'reset! instance result)
+            result))
+    (throw
+     (ex-info
+      (str "Gobb does not yet support proxy for " classes)
+      {:gobb/proxy classes}))))
+
 (defn string-replace* [s match replacement]
   (let [[_ java-pattern?]
         (github.com:glojurelang:glojure:pkg:lang.FieldOrMethod
@@ -87,13 +141,20 @@
 (defn extend* [atype & protocol-method-maps]
   ;; Imported JVM compatibility classes are lang.Class wrappers, while
   ;; protocol multimethods dispatch on the wrapped Go reflect.Type.
-  (let [[host-type found?]
+  (let [[host-types types-found?]
+        (if (nil? atype)
+          [nil false]
+          (github.com:glojurelang:glojure:pkg:lang.FieldOrMethod atype "Types"))
+        [host-type found?]
         (if (nil? atype)
           [nil false]
           (github.com:glojurelang:glojure:pkg:lang.FieldOrMethod atype "Type"))]
-    (apply @core-extend
-           (if found? host-type atype)
-           protocol-method-maps)))
+    (if types-found?
+      (doseq [dispatch-type (host-types)]
+        (apply @core-extend dispatch-type protocol-method-maps))
+      (apply @core-extend
+             (if found? host-type atype)
+             protocol-method-maps))))
 
 (defn trim-split-tail [source parts]
   (loop [result (vec parts)]
@@ -124,7 +185,18 @@
   ;; to recognize an omitted format parameter before a comma. Consume the
   ;; comma in the hosted regex and restore the original token/remainder and
   ;; offset semantics in that parser's adjacent bindings.
-  (let [source (if (strings.Contains source "(defprotocol Spec")
+  (let [source (strings.ReplaceAll
+                source
+                "[^/]+(?:$|(?=/+$))"
+                "[^/]+/*$")
+        source (-> source
+                   (strings.ReplaceAll
+                    "(. clojure.lang.Var (pushThreadBindings "
+                    "(do (github.com:glojurelang:glojure:pkg:lang.PushThreadBindings ")
+                   (strings.ReplaceAll
+                    "(. clojure.lang.Var (popThreadBindings))"
+                    "(github.com:glojurelang:glojure:pkg:lang.PopThreadBindings)"))
+        source (if (strings.Contains source "(defprotocol Spec")
                  (strings.ReplaceAll
                   source
                   "(instance? clojure.spec.alpha.Spec x)"
@@ -283,6 +355,34 @@
              clojure.core/import* reify* do fn* throw monitor-exit letfn*
              finally let* loop* try catch if def]
            (repeat true)))
+  (let [char-map
+        {\- "_"
+         \: "_COLON_"
+         \+ "_PLUS_"
+         \> "_GT_"
+         \< "_LT_"
+         \= "_EQ_"
+         \~ "_TILDE_"
+         \! "_BANG_"
+         \@ "_CIRCA_"
+         \# "_SHARP_"
+         \' "_SINGLEQUOTE_"
+         \" "_DOUBLEQUOTE_"
+         \% "_PERCENT_"
+         \^ "_CARET_"
+         \& "_AMPERSAND_"
+         \* "_STAR_"
+         \| "_BAR_"
+         \{ "_LBRACE_"
+         \} "_RBRACE_"
+         \[ "_LBRACK_"
+         \] "_RBRACK_"
+         \/ "_SLASH_"
+         \\ "_BSLASH_"
+         \? "_QMARK_"}]
+    (doseq [name ["clojure.lang.Compiler.CHAR_MAP"
+                  "clojure.lang.Compiler/CHAR_MAP"]]
+      (github.com:glojurelang:glojure:pkg:pkgmap.Set name char-map)))
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "java.lang.ProcessBuilder$Redirect.DISCARD"
    :discard)
@@ -298,9 +398,15 @@
     (github.com:glojurelang:glojure:pkg:pkgmap.Set
      (str class-name ".forName")
      (fn [name]
-       (case name
-         "[B" (reflect.TypeOf (go/make (go/slice-of go/int8) 0))
-         (throw (errors.New (str "Class.forName: unsupported class " name)))))))
+       (if (= "[B" name)
+         (reflect.TypeOf (go/make (go/slice-of go/int8) 0))
+         (let [separator (strings.LastIndex name ".")
+               simple-name (if (neg? separator) name (subs name (inc separator)))
+               [class found?]
+               (github.com:glojurelang:glojure:pkg:pkgmap.HostClass simple-name)]
+           (if found?
+             class
+             (throw (errors.New (str "Class.forName: unsupported class " name)))))))))
   ;; Locale arguments only select Unicode case conversion behavior for the
   ;; portable libraries Gobb currently hosts. Glojure's string bridge already
   ;; performs that conversion and deliberately ignores extra arguments.
@@ -677,6 +783,8 @@
     (alter-meta! definterface-var assoc :macro true))
   (let [reify-var (intern 'clojure.core 'reify @#'reify*)]
     (alter-meta! reify-var assoc :macro true))
+  (let [proxy-var (intern 'clojure.core 'proxy @#'proxy*)]
+    (alter-meta! proxy-var assoc :macro true))
   (require 'clojure.string)
 
   (reset! core-format @#'clojure.core/format)

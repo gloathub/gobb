@@ -19,19 +19,18 @@
    :compile :fail,
    :status :fail,
    :diagnostic
-   "exit 1: failed to load /babashka/classpath: not found in load path"}
+   "exit 1: failed to load /clojure/pprint: not found in load path"}
   {:name "db_who.clj",
    :scenario :waived,
    :compile :fail,
    :status :fail,
    :diagnostic
-   "exit 1: failed to load /clojure/java/shell: not found in load path"}
+   "exit 1: failed to load /clojure/pprint: not found in load path"}
   {:name "digitalocean-ping.clj",
    :scenario :waived,
    :compile :fail,
    :status :fail,
-   :diagnostic
-   "exit 1: failed to load /clojure/java/shell: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: runtime.GOOS"}
   {:name "download-aliases.clj",
    :scenario :waived,
    :compile :fail,
@@ -53,7 +52,8 @@
    :scenario :waived,
    :compile :fail,
    :status :fail,
-   :diagnostic "exit 1: <preloads>: String index out of range"}
+   :diagnostic
+   "exit 1: failed to load /clojure/java/browse: not found in load path"}
   {:name "http-server.clj",
    :scenario :waived,
    :compile :fail,
@@ -114,7 +114,7 @@
    :compile :fail,
    :status :fail,
    :diagnostic
-   "exit 1: failed to load /clojure/java/shell: not found in load path"}
+   "exit 1: <unknown-file>:1:1:\t(compile (quote main.core))"}
   {:name "pom_version_get.clj",
    :scenario :run,
    :compile :fail,
@@ -171,7 +171,8 @@
    :scenario :run,
    :compile :fail,
    :status :fail,
-   :diagnostic "exit 1: <preloads>: String index out of range"}
+   :diagnostic
+   "exit 1: failed to load /clojure/tools/cli: not found in load path"}
   {:name "vim.clj",
    :scenario :waived,
    :compile :fail,

@@ -60,8 +60,9 @@ with explicit compatibility states and milestone assignments.
       <li class="task-done">Install 96 of 104 Maven dependency roots independently with Grenadine</li>
       <li class="task-done">Add signed-byte arrays, numeric-tower rounding, and multi-type JVM marker compatibility</li>
       <li class="task-done">Load Clojure pprint through hosted Writer proxies and eliminate its runtime errors</li>
+      <li class="task-done">Pass Numeric Tower, Aviso Binary, SFV Parser, and Omniconf in the full 261-namespace run</li>
       <li>Finish the two JSON suites, currently at 99/100 and 55/56 assertions</li>
-      <li>Finish Omniconf, currently at 3/4 assertions</li>
+      <li>Restore <code>clj-commons.digest-test</code>, which regressed from 9/9 to 3/9 passing assertions</li>
       <li>Implement <code>deftype</code> support for the seven-namespace Schema cluster and other portable libraries</li>
       <li>Resolve the eight remaining dependency roots, including <code>core.async</code> and <code>core.rrb-vector</code></li>
       <li>Continue closing Glojure host-interop and evaluator gaps exposed by runnable tests</li>
