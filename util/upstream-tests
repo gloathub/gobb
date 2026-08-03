@@ -264,8 +264,12 @@
     (fs/path home ".gitlibs" "libs" group artifact revision)))
 
 (def git-source-libraries
-  '#{com.github.askonomm/clarktown
+  '#{aysylu/loom
+     clj-commons/fs
+     com.github.askonomm/clarktown
      com.potetm/fusebox
+     io.github.swirrl/dogstatsd
+     org.clojars.askonomm/ruuter
      org.clojars.lispyclouds/contajners
      testdoc/testdoc})
 

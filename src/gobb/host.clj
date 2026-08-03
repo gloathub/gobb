@@ -18,7 +18,28 @@
 (def core-fn-macro (atom nil))
 (def core-name (atom nil))
 (def core-remove-ns (atom nil))
+(def core-string-replace (atom nil))
 (def initialized? (atom false))
+
+(defmacro gen-class* [& _]
+  nil)
+
+(defmacro reify* [interface & methods]
+  (if (and (contains? #{'FilenameFilter 'java.io.FilenameFilter} interface)
+           (= 1 (count methods))
+           (= 'accept (first (first methods))))
+    (let [[_ arguments & body] (first methods)]
+      (cons 'fn (cons (vec (rest arguments)) body)))
+    (throw
+     (ex-info
+      (str "Gobb does not yet support reify for " interface)
+      {:gobb/reify interface}))))
+
+(defn string-replace* [s match replacement]
+  (if (github.com:glojurelang:glojure:pkg:javacompat:regex.IsPattern match)
+    (github.com:glojurelang:glojure:pkg:javacompat:regex.ReplaceAll
+     match s replacement)
+    (@core-string-replace s match replacement)))
 
 (defn load-clojure-test! []
   ;; Referencing Glojure's precompiled stdlib package links its namespace
@@ -74,8 +95,11 @@
   ;; These constructors are emitted by macros in dynamically loaded library
   ;; source. Register them explicitly because Gloat cannot discover host forms
   ;; that appear only after runtime macro expansion.
+  (github.com:glojurelang:glojure:pkg:javacompat:arrays.Link)
   (github.com:glojurelang:glojure:pkg:javacompat:base64.Link)
   (github.com:glojurelang:glojure:pkg:javacompat:nio.Link)
+  (github.com:glojurelang:glojure:pkg:javacompat:processbuilder.Link)
+  (github.com:glojurelang:glojure:pkg:javacompat:stacktrace.Link)
   (github.com:glojurelang:glojure:pkg:pkgmap.Set
    "github.com/glojurelang/glojure/pkg/lang.NewMultiFn"
    github.com:glojurelang:glojure:pkg:lang.NewMultiFn)
@@ -494,6 +518,14 @@
   (alter-var-root #'clojure.core/slurp (constantly slurp*))
   (alter-var-root #'clojure.core/spit (constantly spit*))
   (alter-var-root #'clojure.core/import (constantly @#'runtime-import))
+  (alter-var-root #'clojure.core/gen-class (constantly @#'gen-class*))
+  (alter-meta! #'clojure.core/gen-class assoc :macro true)
+  (let [reify-var (intern 'clojure.core 'reify @#'reify*)]
+    (alter-meta! reify-var assoc :macro true))
+  (require 'clojure.string)
+  (reset! core-string-replace (var-get (ns-resolve 'clojure.string 'replace)))
+  (alter-var-root (ns-resolve 'clojure.string 'replace)
+                  (constantly string-replace*))
   (load-clojure-test!)
   ;; Runtime codegen can classify a fully-qualified protocol Var as a late
   ;; host form before its namespace alias table is complete.

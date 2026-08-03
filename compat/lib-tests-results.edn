@@ -3,14 +3,14 @@
  {:version "1.12.218",
   :revision "0fb349c414e717800be775ba9cb77c95a9eb700d"},
  :corpus {:libraries 111, :namespaces 261},
- :summary {:test 446, :pass 3232, :fail 23, :error 58},
+ :summary {:test 488, :pass 3316, :fail 31, :error 18},
  :runner-adaptations
  [:omit-spec-instrumentation-reset
   :normalize-keyword-destructuring
   :grenadine-per-root-dependency-installation
   :isolated-maven-classpaths
   :load-only-namespaces-pass],
- :case-summary {:total 261, :pass 70, :fail 8, :blocked 183},
+ :case-summary {:total 261, :pass 80, :fail 5, :blocked 176},
  :status :fail,
  :suite :lib-tests,
  :selection :all,
@@ -36,17 +36,15 @@
    :summary {:test 1, :pass 0, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "babashka.process-exec-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :summary {:test 6, :pass 0, :fail 3, :error 5},
+   :diagnostic nil}
   {:namespace "babashka.process-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :diagnostic "exit 1: unable to resolve symbol: definterface"}
   {:namespace "babashka.statecharts-test",
    :status :blocked,
    :exit 1,
@@ -84,17 +82,20 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: reify"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "camel-snake-kebab.extras-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: reify"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "camel-snake-kebab.internals.string-separator-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: reify"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "cheshire.test.core",
    :status :blocked,
    :exit 1,
@@ -200,7 +201,8 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: EvalASTMaybeHostForm: Byte/TYPE"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clj-http.lite.client-test",
    :status :blocked,
    :exit 1,
@@ -214,9 +216,9 @@
    :diagnostic
    "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "clj-stacktrace.core-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 3, :pass 3, :fail 0, :error 2},
+   :status :pass,
+   :exit 0,
+   :summary {:test 3, :pass 19, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clj-stacktrace.repl-test",
    :status :blocked,
@@ -227,7 +229,7 @@
   {:namespace "clj-yaml.core-test",
    :status :fail,
    :exit 1,
-   :summary {:test 26, :pass 32, :fail 14, :error 11},
+   :summary {:test 26, :pass 31, :fail 15, :error 11},
    :diagnostic nil}
   {:namespace "cljc.java-time-test",
    :status :blocked,
@@ -355,9 +357,9 @@
    :summary {:test 0, :pass 0, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "clojure.tools.test-gitlibs",
-   :status :fail,
-   :exit 1,
-   :summary {:test 4, :pass 2, :fail 0, :error 7},
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 14, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "cloverage.args-test",
    :status :blocked,
@@ -381,7 +383,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: unable to resolve symbol: cloverage.report.console"}
+   "exit 1: failed to load /clojure/tools/namespace/file: not found in load path"}
   {:namespace "cloverage.source-test",
    :status :blocked,
    :exit 1,
@@ -522,7 +524,7 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: NO_SOURCE_PATH: error reading crispin/core.cljc: crispin/core.cljc:35:26: invalid regex: error parsing regexp: invalid character class range: `/p{XDigit}`"}
+   "exit 1: NO_SOURCE_PATH: defrecord protocol implementations are not yet supported"}
   {:namespace "datalog.parser-test",
    :status :blocked,
    :exit 1,
@@ -771,11 +773,10 @@
    :summary {:test 0, :pass 0, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "io.aviso.binary-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 9, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "jasentaa.collections-test",
    :status :pass,
    :exit 0,
@@ -787,11 +788,10 @@
    :summary {:test 4, :pass 15, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "jasentaa.parser.combinators-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 3, :pass 11, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "jasentaa.position-test",
    :status :pass,
    :exit 0,
@@ -803,17 +803,15 @@
    :summary {:test 0, :pass 0, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "jasentaa.worked-example-1",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 1, :pass 7, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "jasentaa.worked-example-2",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 2, :pass 2, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "java-http-clj.smoke-test",
    :status :blocked,
    :exit 1,
@@ -842,55 +840,54 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/graph: not found in load path"}
+   "exit 1: failed to load /clojure/data/priority_map: not found in load path"}
   {:namespace "loom.test.alg-generic",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /loom/alg_generic: not found in load path"}
+   :diagnostic "exit 1: unable to resolve symbol: deftype"}
   {:namespace "loom.test.attr",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/graph: not found in load path"}
+   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
   {:namespace "loom.test.compliance-tester",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/graph: not found in load path"}
+   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
   {:namespace "loom.test.derived",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/derived: not found in load path"}
+   "exit 1: failed to load /clojure/data/priority_map: not found in load path"}
   {:namespace "loom.test.flow",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/graph: not found in load path"}
+   "exit 1: failed to load /clojure/data/priority_map: not found in load path"}
   {:namespace "loom.test.graph",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/graph: not found in load path"}
+   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
   {:namespace "loom.test.label",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/graph: not found in load path"}
+   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
   {:namespace "loom.test.network-simplex",
    :status :blocked,
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /loom/network_simplex: not found in load path"}
+   "exit 1: unable to resolve symbol: loom.graph.BasicEditableGraph"}
   {:namespace "malli.clj-kondo-test",
    :status :blocked,
    :exit 1,
@@ -983,8 +980,7 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic
-   "exit 1: failed to load /me/raynes/fs: not found in load path"}
+   :diagnostic "exit 1: EvalASTMaybeHostForm: io/Coercions"}
   {:namespace "meander.defsyntax-test",
    :status :blocked,
    :exit 1,
@@ -1091,10 +1087,11 @@
    :summary {:test 2, :pass 2, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "net.cgrand.xforms-test",
-   :status :fail,
+   :status :blocked,
    :exit 1,
-   :summary {:test 7, :pass 11, :fail 0, :error 30},
-   :diagnostic nil}
+   :summary nil,
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "nextjournal.markdown-test",
    :status :blocked,
    :exit 1,
@@ -1129,14 +1126,14 @@
    :summary {:test 1, :pass 136, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "ol.sfv.example-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 4, :pass 29, :fail 0, :error 2},
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 31, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "ol.sfv.parser-test",
-   :status :fail,
-   :exit 1,
-   :summary {:test 11, :pass 130, :fail 0, :error 4},
+   :status :pass,
+   :exit 0,
+   :summary {:test 11, :pass 134, :fail 0, :error 0},
    :diagnostic nil}
   {:namespace "ol.sfv.serialization-test",
    :status :pass,
@@ -1224,12 +1221,14 @@
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: reify"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "qbits.auspex-test",
    :status :blocked,
    :exit 1,
    :summary nil,
-   :diagnostic "exit 1: unable to resolve symbol: CompletableFuture"}
+   :diagnostic
+   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
   {:namespace "reifyhealth.specmonstah.core-test",
    :status :blocked,
    :exit 1,
@@ -1290,11 +1289,10 @@
    :diagnostic
    "exit 1: unable to resolve symbol: clojure.lang.Compiler"}
   {:namespace "ruuter.core-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: failed to load /ruuter/core: not found in load path"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 3, :pass 7, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "schema.coerce-test",
    :status :blocked,
    :exit 1,
@@ -1366,19 +1364,17 @@
    :exit 1,
    :summary nil,
    :diagnostic
-   "exit 1: failed to load /swirrl/dogstatsd: not found in load path"}
+   "exit 1: unable to resolve symbol: clojure.spec.alpha.Spec"}
   {:namespace "table.core-test",
-   :status :blocked,
+   :status :fail,
    :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :summary {:test 26, :pass 22, :fail 4, :error 0},
+   :diagnostic nil}
   {:namespace "table.width-test",
-   :status :blocked,
-   :exit 1,
-   :summary nil,
-   :diagnostic
-   "exit 1: <unknown-file>:2:1:\t(load-file \"<CACHE>/lib_tests/run_all_libtests.clj\")"}
+   :status :pass,
+   :exit 0,
+   :summary {:test 4, :pass 4, :fail 0, :error 0},
+   :diagnostic nil}
   {:namespace "test-check.smoke-test",
    :status :blocked,
    :exit 1,
