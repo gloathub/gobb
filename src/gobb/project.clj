@@ -505,7 +505,15 @@
          (keep #(pom-dependency % properties managed))
          (remove #(contains? inherited-exclusions (first %))))))
 
-(defn resolve-maven! [paths seen config library coordinate]
+(defn maven-repository-root [config root]
+  (if-let [repository (:mvn/local-repo config)]
+    (absolute
+     (if (path:filepath.IsAbs repository)
+       repository
+       (path:filepath.Join root repository)))
+    (path:filepath.Join (cache-root) "m2")))
+
+(defn resolve-maven! [paths seen config root library coordinate]
   (ensure-native-resolution! :maven-dependencies)
   (let [version (:mvn/version coordinate)]
     (when-not version
@@ -517,7 +525,7 @@
     (let [{:keys [relative]} (maven-parts library version)
           repositories (repository-urls config coordinate)
           artifact-root (path:filepath.Join
-                         (cache-root) "m2"
+                         (maven-repository-root config root)
                          (path:filepath.FromSlash relative))
           jar (str artifact-root ".jar")
           pom (str artifact-root ".pom")
@@ -536,7 +544,7 @@
           (doseq [dependency
                   (pom-dependencies (slurp pom)
                                     inherited-exclusions)]
-            (resolve-dependency! paths seen config "."
+            (resolve-dependency! paths seen config root
                                  dependency)))))))
 
 (defn resolve-dependency! [paths seen config root [library coordinate]]
@@ -555,7 +563,7 @@
         (resolve-git! paths seen root library coordinate)
 
         (:mvn/version coordinate)
-        (resolve-maven! paths seen config library coordinate)
+        (resolve-maven! paths seen config root library coordinate)
 
         :else
         (throw
@@ -628,6 +636,25 @@
               classpath
               (strings.Join @paths
                             (go/string os.PathListSeparator))))
+    @paths))
+
+(defn add-deps!
+  "Resolve a deps.edn map and append its paths to the running load path."
+  [deps-map]
+  (let [root (absolute ".")
+        paths (atom [])
+        seen (atom #{})]
+    (resolve-config! paths seen
+                     (path:filepath.Join root "deps.edn")
+                     deps-map root)
+    (doseq [path @paths]
+      (host/add-load-path! path))
+    (swap! resolved-classpath
+           (fn [current]
+             (vec (distinct (concat current @paths)))))
+    (reset! configured-classpath
+            (strings.Join @resolved-classpath
+                          (go/string os.PathListSeparator)))
     @paths))
 
 (defn classpath-string []

@@ -210,7 +210,8 @@ cat > "$transitive_root/transitive-1.0.0.pom" <<'EOF'
 </project>
 EOF
 cat > "$tmp/maven-project.edn" <<EOF
-{:mvn/repos {"central" {:url "file://$tmp/maven-repository"}}
+{:mvn/local-repo "./m2"
+ :mvn/repos {"central" {:url "file://$tmp/maven-repository"}}
  :deps {fixture/maven {:mvn/version "1.0.0"}}}
 EOF
 
@@ -219,8 +220,25 @@ check "Maven dependency and resource without a JVM" \
   env GOBB_CACHE="$tmp/cache" \
   "$GOBB" --config "$tmp/maven-project.edn" \
   -e "(require '[fixture.maven :as fixture]) (prn (fixture/value))"
+[[ -f "$tmp/m2/fixture/maven/1.0.0/maven-1.0.0.jar" ]] ||
+  fail ":mvn/local-repo did not receive the Maven artifact"
+[[ -f "$tmp/m2/fixture/transitive/1.0.0/transitive-1.0.0.jar" ]] ||
+  fail ":mvn/local-repo did not receive the transitive Maven artifact"
 env GOBB_CACHE="$tmp/cache" \
   "$GOBB" --config "$tmp/maven-project.edn" prepare
+
+check "clojurestar.deps runtime dependency" \
+  '[:maven-dependency :transitive-dependency "maven resource\n"]' \
+  bash -c \
+  'cd "$1" && "$2" -e "$3"' \
+  _ "$tmp" "$GOBB" \
+  "(require '[clojurestar.deps :as deps])
+   (deps/add-deps
+    '{:mvn/local-repo \"./runtime-m2\"
+      :mvn/repos {\"central\" {:url \"file://$tmp/maven-repository\"}}
+      :deps {fixture/maven {:mvn/version \"1.0.0\"}}})
+   (require '[fixture.maven :as fixture])
+   (prn (fixture/value))"
 
 compiled="$tmp/project-program"
 GOBB_GLOAT="$GOBB_GLOAT" \
