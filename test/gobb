@@ -73,6 +73,13 @@ check "top-level macros affect following forms" "42" \
      `(let [~binding ~value] ~@body))
    (with-value [answer 42] answer)'
 
+check "time macro uses the hosted system clock" "[42 true]" \
+  "$GOBB" -e \
+  "(require '[clojure.string :as string])
+   (let [result (atom nil)
+         output (with-out-str (reset! result (time 42)))]
+     [@result (string/includes? output \"Elapsed time: \")])"
+
 require_expression="(require '[gobb.fixture.math-ops :as math]) (math/answer 40)"
 check "explicit classpath require" "42" \
   "$GOBB" --classpath test/fixtures/classpath -e "$require_expression"

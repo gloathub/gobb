@@ -28,6 +28,14 @@
 (defmacro gen-class* [& _]
   nil)
 
+(defmacro time* [expression]
+  `(let [start# (System/nanoTime)
+         result# ~expression]
+     (prn (str "Elapsed time: "
+               (/ (double (- (System/nanoTime) start#)) 1000000.0)
+               " msecs"))
+     result#))
+
 (defn define-interface! [interface-name]
   ;; Go cannot manufacture a reflect.Type for a new interface at runtime.
   ;; Keep the JVM name resolvable for type hints and host-form analysis; code
@@ -778,6 +786,10 @@
   (alter-var-root #'clojure.core/import (constantly @#'runtime-import))
   (alter-var-root #'clojure.core/gen-class (constantly @#'gen-class*))
   (alter-meta! #'clojure.core/gen-class assoc :macro true)
+  ;; Glojure's precompiled `time` macro expands to raw Go `time.Now`, which
+  ;; is not linked into an AOT runtime. Restore the original Clojure contract
+  ;; through the hosted java.lang.System clock supplied by gojava.
+  (alter-var-root #'clojure.core/time (constantly @#'time*))
   (let [definterface-var
         (intern 'clojure.core 'definterface @#'definterface*)]
     (alter-meta! definterface-var assoc :macro true))

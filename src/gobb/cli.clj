@@ -416,10 +416,14 @@
             (path:filepath.Join home ".gobb_history")))
         history-option
         (github.com:glojurelang:glojure:pkg:repl.WithHistoryFile
-         history-file "jline")]
+         history-file "jline")
+        environment-option
+        (github.com:glojurelang:glojure:pkg:repl.WithEnvironment
+         github.com:glojurelang:glojure:pkg:lang.GlobalEnv)]
     (os.Setenv "GLJ_REPL_NO_BANNER" "all")
     (try
-      (github.com:glojurelang:glojure:pkg:repl.Start history-option)
+      (github.com:glojurelang:glojure:pkg:repl.Start
+       history-option environment-option)
       (finally
         (if (empty? previous)
           (os.Unsetenv "GLJ_REPL_NO_BANNER")
