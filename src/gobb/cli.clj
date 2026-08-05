@@ -419,11 +419,14 @@
          history-file "jline")
         environment-option
         (github.com:glojurelang:glojure:pkg:repl.WithEnvironment
-         github.com:glojurelang:glojure:pkg:lang.GlobalEnv)]
+         github.com:glojurelang:glojure:pkg:lang.GlobalEnv)
+        share-option
+        (github.com:glojurelang:glojure:pkg:repl.WithShareBaseURL
+         "https://gobb.site/repl/")]
     (os.Setenv "GLJ_REPL_NO_BANNER" "all")
     (try
       (github.com:glojurelang:glojure:pkg:repl.Start
-       history-option environment-option)
+       history-option environment-option share-option)
       (finally
         (if (empty? previous)
           (os.Unsetenv "GLJ_REPL_NO_BANNER")
