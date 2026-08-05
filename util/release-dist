@@ -76,7 +76,7 @@ build_platform() {
       --force \
       --quiet \
       --ext=goimports \
-      --module=github.com/clojurestar/gobb
+      --module=github.com/gloathub/gobb
   else
     "$gloat" "$source_stage" \
       --out="$output" \
@@ -84,7 +84,7 @@ build_platform() {
       --force \
       --quiet \
       --ext=goimports \
-      --module=github.com/clojurestar/gobb
+      --module=github.com/gloathub/gobb
   fi
 }
 

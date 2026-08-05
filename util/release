@@ -87,7 +87,7 @@ release_notes() {
     grep -v "^v$version\$" |
     head -1)
   if [[ -n $previous_tag ]]; then
-    printf '\n**Full changelog**: https://github.com/clojurestar/gobb/compare/%s...v%s\n' \
+    printf '\n**Full changelog**: https://github.com/gloathub/gobb/compare/%s...v%s\n' \
       "$previous_tag" "$version"
   fi
 }
@@ -162,14 +162,14 @@ publish() {
   release_notes > "$notes_file"
   gh=${GH:-gh}
 
-  if "$gh" release view "$tag" --repo clojurestar/gobb >/dev/null 2>&1; then
+  if "$gh" release view "$tag" --repo gloathub/gobb >/dev/null 2>&1; then
     "$gh" release upload "$tag" \
-      --repo clojurestar/gobb \
+      --repo gloathub/gobb \
       --clobber \
       "$top"/dist/gobb-"$version"-*
   else
     "$gh" release create "$tag" \
-      --repo clojurestar/gobb \
+      --repo gloathub/gobb \
       --title "Gobb $tag" \
       --notes-file "$notes_file" \
       "$top"/dist/gobb-"$version"-*

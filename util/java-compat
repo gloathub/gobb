@@ -153,7 +153,7 @@
                     " | " (evidence-text item) " |\n"))
              top))
      "\nThe complete 583-class ledger is tracked in "
-     "[`compat/java-classes.edn`](https://github.com/clojurestar/gobb/blob/main/compat/java-classes.edn).\n\n"
+     "[`compat/java-classes.edn`](https://github.com/gloathub/gobb/blob/main/compat/java-classes.edn).\n\n"
      "Regenerate it with:\n\n```sh\nmake java-compat\n```\n")))
 
 (let [[spec-path inventory-path source ledger-path report-path]

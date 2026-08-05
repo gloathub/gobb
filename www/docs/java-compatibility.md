@@ -223,7 +223,7 @@ The first wave covers `java.lang`, `java.io`, and `java.nio.file`. Supported ent
 | 49 | `java.util.List` | `go-adapter` | planned | 18 | `src/babashka/impl/classes.clj` (9)<br>`src/babashka/impl/clojure/data.clj` (2)<br>`test/babashka/interop_test.clj` (2)<br>`test/babashka/jline_test.clj` (2)<br>`test/babashka/scripts/kill_child_processes.bb` (2) |
 | 50 | `java.time.Instant` | `gojava` | supported | 18 | `test/babashka/interop_test.clj` (9)<br>`test/babashka/cheshire_test.clj` (5)<br>`test/babashka/reify_test.clj` (2)<br>`examples/pst.clj` (1)<br>`src/babashka/impl/classes.clj` (1) |
 
-The complete 583-class ledger is tracked in [`compat/java-classes.edn`](https://github.com/clojurestar/gobb/blob/main/compat/java-classes.edn).
+The complete 583-class ledger is tracked in [`compat/java-classes.edn`](https://github.com/gloathub/gobb/blob/main/compat/java-classes.edn).
 
 Regenerate it with:
 

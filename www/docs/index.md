@@ -47,7 +47,7 @@ hide:
 Clone Gobb and install it:
 
 ```bash
-git clone https://github.com/clojurestar/gobb
+git clone https://github.com/gloathub/gobb
 make -C gobb install
 ```
 

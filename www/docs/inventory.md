@@ -226,7 +226,7 @@ Discovery does not imply support. Gobb marks an item supported or partial only w
 - `compat/capabilities.edn` for native, WASI, and browser dispositions
 - `compat/inventory.edn` for Gobb states, milestones, rationales, and evidence
 
-The full ledger is tracked as [`compat/ledger.edn`](https://github.com/clojurestar/gobb/blob/main/compat/ledger.edn).
+The full ledger is tracked as [`compat/ledger.edn`](https://github.com/gloathub/gobb/blob/main/compat/ledger.edn).
 
 Regenerate and validate both files with:
 

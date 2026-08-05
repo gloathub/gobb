@@ -367,7 +367,7 @@
      "- `compat/capabilities.edn` for native, WASI, and browser dispositions\n"
      "- `compat/inventory.edn` for Gobb states, milestones, rationales, and evidence\n\n"
      "The full ledger is tracked as "
-     "[`compat/ledger.edn`](https://github.com/clojurestar/gobb/blob/main/compat/ledger.edn).\n\n"
+     "[`compat/ledger.edn`](https://github.com/gloathub/gobb/blob/main/compat/ledger.edn).\n\n"
      "Regenerate and validate both files with:\n\n"
      "```sh\n"
      "make inventory\n"
