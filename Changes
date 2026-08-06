@@ -1,3 +1,9 @@
+- version: 0.1.5
+  date:    Thu Aug  6 01:23:30 PM EDT 2026
+  changes:
+  - Run complete release workflow
+  - Split source and binary release workflows
+
 - version: 0.1.4
   date:    Wed Aug  5 2026
   changes:
