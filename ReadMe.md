@@ -315,8 +315,8 @@ WASI, and browser-Wasm executables.
 | `source-ledger` | Print the generated Babashka namespace compatibility ledger. |
 | `release-prep VERSION=X.Y.Z` | Update `VERSION` and prepend generated release notes to `Changes`. |
 | `release-dist VERSION=X.Y.Z` | Build the cross-platform release archives and checksums. |
-| `release VERSION=X.Y.Z` | Update versions, commit, tag, and atomically push `main` and the tag. |
-| `publish-release VERSION=X.Y.Z` | Test, package, and publish the tagged binary GitHub release. |
+| `release VERSION=X.Y.Z` | Version, commit, tag, push, publish binaries, and publish the website. |
+| `publish-release VERSION=X.Y.Z` | Retry the tagged binary GitHub release stage. |
 | `site` | Build the MkDocs website in strict mode. |
 | `serve` | Serve the website locally with live reload. |
 | `publish` | Build and publish the website to the `gh-pages` branch. |
@@ -357,10 +357,11 @@ make release VERSION=0.1.5
 ```
 
 `make release` updates `VERSION` and `Changes`, commits the version, creates an
-annotated tag, and atomically pushes `main` and the tag. It does not build or
-publish binary artifacts.
+annotated tag, and atomically pushes `main` and the tag. It then tests and
+publishes the binary archives before publishing the website.
 
-After the source release is pushed, publish its binaries and website explicitly:
+If a later stage fails after the source release is pushed, retry that stage
+directly without creating another version or tag:
 
 ```bash
 make publish-release VERSION=0.1.5

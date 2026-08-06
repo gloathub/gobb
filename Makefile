@@ -892,10 +892,13 @@ release-dist: $(SOURCE-STAGE-STAMP) $(GLOAT)
 	  '$(DIST)' \
 	  '$(RELEASE-BUILD)'
 
-release:
+release: $(GH) $(WASMTIME)
 	@$(if $(filter command line,$(origin VERSION)),,\
 	  $(error VERSION is required on the command line))
 	$Q '$(RELEASE)' release '$(VERSION)'
+	$Q GH='$(GH)' WASMTIME='$(WASMTIME)' \
+	  '$(RELEASE)' publish '$(VERSION)'
+	$Q $(MAKE) publish-www
 
 publish-release: $(GH) $(WASMTIME)
 	@$(if $(filter command line,$(origin VERSION)),,\
