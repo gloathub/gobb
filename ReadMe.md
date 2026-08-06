@@ -315,7 +315,8 @@ WASI, and browser-Wasm executables.
 | `source-ledger` | Print the generated Babashka namespace compatibility ledger. |
 | `release-prep VERSION=X.Y.Z` | Update `VERSION` and prepend generated release notes to `Changes`. |
 | `release-dist VERSION=X.Y.Z` | Build the cross-platform release archives and checksums. |
-| `release VERSION=X.Y.Z` | Test, package, tag, push, and create the GitHub release. |
+| `release VERSION=X.Y.Z` | Update versions, commit, tag, and atomically push `main` and the tag. |
+| `publish-release VERSION=X.Y.Z` | Test, package, and publish the tagged binary GitHub release. |
 | `site` | Build the MkDocs website in strict mode. |
 | `serve` | Serve the website locally with live reload. |
 | `publish` | Build and publish the website to the `gh-pages` branch. |
@@ -349,18 +350,22 @@ Gobb builds release binaries for:
 | WASI | `wasm` | `wasip1_wasm` |
 | Browser WebAssembly | `wasm` | `js_wasm` |
 
-Prepare and review a release, then publish it:
+Create and push the source release:
 
 ```bash
-make release-prep VERSION=0.1.0
-git add VERSION Changes
-git commit -m 'Version 0.1.0'
-make release VERSION=0.1.0
+make release VERSION=0.1.5
 ```
 
-`make release` can perform the preparation and version commit itself when
-starting from a clean checkout. After publishing the GitHub release and its
-assets, it publishes the website as the final step.
+`make release` updates `VERSION` and `Changes`, commits the version, creates an
+annotated tag, and atomically pushes `main` and the tag. It does not build or
+publish binary artifacts.
+
+After the source release is pushed, publish its binaries and website explicitly:
+
+```bash
+make publish-release VERSION=0.1.5
+make publish-www
+```
 
 ## Website
 

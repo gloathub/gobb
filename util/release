@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-command=${1:?usage: release prepare|publish VERSION}
-version=${2:?usage: release prepare|publish VERSION}
+command=${1:?usage: release prepare|release|publish VERSION}
+version=${2:?usage: release prepare|release|publish VERSION}
 version=${version#v}
 
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
@@ -92,13 +92,35 @@ release_notes() {
   fi
 }
 
-publish() {
-  local branch tag tag_commit notes_file gh
+check_branch() {
+  local branch
   branch=$(git branch --show-current)
   [[ $branch == main ]] || {
     echo "release: releases must be made from main, not $branch" >&2
     exit 1
   }
+}
+
+check_remote() {
+  if [[ ${RELEASE_SKIP_REMOTE_CHECK:-0} == 0 ]]; then
+    git fetch origin main
+    [[ $(git rev-list --count HEAD..origin/main) == 0 ]] || {
+      echo "release: origin/main contains commits not in this checkout" >&2
+      exit 1
+    }
+  fi
+}
+
+check_version() {
+  if [[ $(< "$version_file") != "$version" ]] || ! has_changes_entry; then
+    echo "release: v$version is not represented by VERSION and Changes" >&2
+    exit 1
+  fi
+}
+
+release() {
+  local tag tag_commit
+  check_branch
 
   tag="v$version"
   if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
@@ -107,18 +129,18 @@ publish() {
       echo "release: $tag already points to another commit" >&2
       exit 1
     }
-  else
-    [[ -z $(git status --short) ]] || {
-      echo "release: publish requires a clean worktree" >&2
-      exit 1
-    }
-    prepare
   fi
 
-  if [[ $(< "$version_file") != "$version" ]] || ! has_changes_entry; then
-    echo "release: v$version is not represented by VERSION and Changes" >&2
+  [[ -z $(git status --short) ]] || {
+    echo "release: release requires a clean worktree" >&2
     exit 1
+  }
+  check_remote
+
+  if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+    prepare
   fi
+  check_version
 
   if ! git diff --quiet -- "$version_file" "$changes_file"; then
     git add "$version_file" "$changes_file"
@@ -130,13 +152,33 @@ publish() {
     exit 1
   }
 
-  if [[ ${RELEASE_SKIP_REMOTE_CHECK:-0} == 0 ]]; then
-    git fetch origin main
-    [[ $(git rev-list --count HEAD..origin/main) == 0 ]] || {
-      echo "release: origin/main contains commits not in this checkout" >&2
-      exit 1
-    }
+  if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+    git tag -a "$tag" -m "Release $tag"
   fi
+
+  git push --atomic origin HEAD:main "$tag"
+  echo "Release $tag committed, tagged, and pushed"
+}
+
+publish() {
+  local tag tag_commit notes_file gh
+  check_branch
+
+  tag="v$version"
+  git rev-parse -q --verify "refs/tags/$tag" >/dev/null || {
+    echo "release: $tag does not exist; run make release VERSION=$version first" >&2
+    exit 1
+  }
+  tag_commit=$(git rev-list -n1 "$tag")
+  [[ $tag_commit == "$(git rev-parse HEAD)" ]] || {
+    echo "release: $tag does not point to HEAD" >&2
+    exit 1
+  }
+  check_version
+  [[ -z $(git status --short) ]] || {
+    echo "release: publish requires a clean worktree" >&2
+    exit 1
+  }
 
   make test
   make release-dist VERSION="$version"
@@ -150,13 +192,6 @@ publish() {
       --version |
       grep -qx "gobb v$version"
   fi
-
-  if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
-    git tag -a "$tag" -m "Release $tag"
-  fi
-
-  git push origin HEAD:main
-  git push origin "$tag"
 
   notes_file="$top/.cache/release-notes-$version.md"
   release_notes > "$notes_file"
@@ -175,13 +210,12 @@ publish() {
       "$top"/dist/gobb-"$version"-*
   fi
 
-  make publish-www
-
-  echo "Release $tag complete"
+  echo "Published binary release $tag"
 }
 
 case $command in
   prepare) prepare ;;
+  release) release ;;
   publish) publish ;;
   *)
     echo "release: unknown command '$command'" >&2
