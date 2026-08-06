@@ -11,6 +11,7 @@ dist_dir=${6:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP
 build_dir=${7:?usage: release-dist VERSION GLOAT SOURCE-STAGE BABASHKA-SOURCE TOP DIST BUILD}
 
 version=${version#v}
+resume=${RESUME:-0}
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
   echo "release-dist: VERSION must have the form X.Y.Z" >&2
   exit 1
@@ -21,6 +22,10 @@ version=${version#v}
 }
 [[ $dist_dir == "$top/dist" && $build_dir == "$top/.cache/release" ]] || {
   echo "release-dist: refusing unexpected output directories" >&2
+  exit 1
+}
+[[ $resume == 0 || $resume == 1 ]] || {
+  echo "release-dist: RESUME must be 0 or 1" >&2
   exit 1
 }
 
@@ -42,7 +47,11 @@ platforms=(
   js_wasm
 )
 
-rm -rf "$dist_dir" "$build_dir"
+if [[ $resume == 1 ]]; then
+  rm -rf "$dist_dir" "$build_dir/packages" "$build_dir/licenses"
+else
+  rm -rf "$dist_dir" "$build_dir"
+fi
 mkdir -p "$dist_dir" "$build_dir/bin" "$build_dir/packages"
 
 build_platform() {
@@ -67,6 +76,10 @@ build_platform() {
 
   output="$build_dir/bin/$platform/$name"
   mkdir -p "${output%/*}"
+  if [[ $resume == 1 && -s $output ]]; then
+    echo "* Reusing $platform"
+    return
+  fi
   echo "* Building $platform"
 
   if [[ $platform == linux_armv6 ]]; then
@@ -107,10 +120,15 @@ cp "$babashka_source/LICENSE" "$license_base/Babashka-EPL-1.0.txt"
 cp "$gloat_dir/License" "$license_base/Gloat-MIT.txt"
 cp "$go_root/LICENSE" "$license_base/Go-BSD-3-Clause.txt"
 
-glojure_license=$(
-  find "$gloat_dir/.cache/local/cache" \
-    -path '*/glojure-*/LICENSE.md' -print -quit
-)
+glojure_license=
+if [[ -n ${GLOJURE_DIR:-} && -f $GLOJURE_DIR/LICENSE.md ]]; then
+  glojure_license=$GLOJURE_DIR/LICENSE.md
+else
+  glojure_license=$(
+    find "$gloat_dir/.cache/local/cache" \
+      -path '*/glojure-*/LICENSE.md' -print -quit
+  )
+fi
 [[ -n $glojure_license ]] || {
   echo "release-dist: cannot locate the Glojure license" >&2
   exit 1

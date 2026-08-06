@@ -161,27 +161,47 @@ release() {
 }
 
 publish() {
-  local tag tag_commit notes_file gh
+  local tag tag_commit notes_file gh resume unexpected
   check_branch
 
+  resume=${RESUME:-0}
+  [[ $resume == 0 || $resume == 1 ]] || {
+    echo "release: RESUME must be 0 or 1" >&2
+    exit 1
+  }
   tag="v$version"
   git rev-parse -q --verify "refs/tags/$tag" >/dev/null || {
     echo "release: $tag does not exist; run make release VERSION=$version first" >&2
     exit 1
   }
   tag_commit=$(git rev-list -n1 "$tag")
-  [[ $tag_commit == "$(git rev-parse HEAD)" ]] || {
-    echo "release: $tag does not point to HEAD" >&2
-    exit 1
-  }
+  if [[ $tag_commit != "$(git rev-parse HEAD)" ]]; then
+    [[ $resume == 1 ]] || {
+      echo "release: $tag does not point to HEAD" >&2
+      exit 1
+    }
+    unexpected=$(
+      git diff --name-only "$tag"..HEAD |
+        grep -Ev '^util/(release|release-dist)$' || true
+    )
+    [[ -z $unexpected ]] || {
+      echo "release: refusing resume after non-release changes:" >&2
+      printf '%s\n' "$unexpected" >&2
+      exit 1
+    }
+  fi
   check_version
   [[ -z $(git status --short) ]] || {
     echo "release: publish requires a clean worktree" >&2
     exit 1
   }
 
-  make test
-  make release-dist VERSION="$version"
+  if [[ $resume == 1 ]]; then
+    echo "* Resuming binary publication from existing build outputs"
+  else
+    make test
+  fi
+  make release-dist VERSION="$version" RESUME="$resume"
   if [[ -n ${WASMTIME:-} ]]; then
     "$WASMTIME" run \
       --dir=/ \
