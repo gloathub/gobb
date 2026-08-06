@@ -119,16 +119,32 @@ check_version() {
 }
 
 release() {
-  local tag tag_commit
+  local tag tag_commit resume unexpected
   check_branch
 
+  resume=${RESUME:-0}
+  [[ $resume == 0 || $resume == 1 ]] || {
+    echo "release: RESUME must be 0 or 1" >&2
+    exit 1
+  }
   tag="v$version"
   if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
     tag_commit=$(git rev-list -n1 "$tag")
-    [[ $tag_commit == "$(git rev-parse HEAD)" ]] || {
-      echo "release: $tag already points to another commit" >&2
-      exit 1
-    }
+    if [[ $tag_commit != "$(git rev-parse HEAD)" ]]; then
+      [[ $resume == 1 ]] || {
+        echo "release: $tag already points to another commit" >&2
+        exit 1
+      }
+      unexpected=$(
+        git diff --name-only "$tag"..HEAD |
+          grep -Ev '^util/(release|release-dist)$' || true
+      )
+      [[ -z $unexpected ]] || {
+        echo "release: refusing resume after non-release changes:" >&2
+        printf '%s\n' "$unexpected" >&2
+        exit 1
+      }
+    fi
   fi
 
   [[ -z $(git status --short) ]] || {
